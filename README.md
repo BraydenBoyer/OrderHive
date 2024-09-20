@@ -1,4 +1,4 @@
-# Hi Prof. Martin, welcome to our app.
+# Hi Prof. Martin, welcome to our app..
 
 # Welcome to your Expo app 👋
 
