@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/OrderHive.iml" filepath="$PROJECT_DIR$/.idea/OrderHive.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/OrderHiveProject.iml" filepath="$PROJECT_DIR$/.idea/OrderHiveProject.iml" />
     </modules>
   </component>
 </project>
