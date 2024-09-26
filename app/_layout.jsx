@@ -1,13 +1,13 @@
 import * as React from 'react';
 import 'react-native-reanimated';
-import {NavigationContainer} from "@react-navigation/native";
-import AppNavigator from "../app/_appNavigator";
+import BottomNavigator from "../components/navigation/bottomNavigation.jsx";
 import {PaperProvider, useTheme} from "react-native-paper";
-import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
+import {SafeAreaView} from "react-native-safe-area-context";
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import {useEffect, useState} from "react";
 import {pageStyle} from "../styles/page.jsx";
+import {NavigationContainer} from "@react-navigation/native";
 
 
 SplashScreen.preventAutoHideAsync()
@@ -47,10 +47,10 @@ export default function App() {
 
 
 	return (
-		<PaperProvider theme={theme} settings={{rippleEffectEnabled: true}}>
-			<NavigationContainer independent={true} >
+		<PaperProvider settings={{rippleEffectEnabled: true}}>
+			<NavigationContainer independent={true} theme={theme} >
 				<SafeAreaView style={pageStyle.base}>
-					<AppNavigator />
+					<BottomNavigator />
 				</SafeAreaView>
 			</NavigationContainer>
 		</PaperProvider>

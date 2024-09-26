@@ -31,7 +31,7 @@ const HomeScreen = ({navigation}) => {
 
 			<View style={homeStyle.sideBarContainer}>
 				<Button title={"Screen Switch"}
-				        onPress={() => navigation.navigate("DetailsScreen", {name: "Brayden", age: 12})}
+				        onPress={() => navigation.navigate("DetailScreen", {name: "Brayden", age: 12})}
 				/>
 			</View>
 

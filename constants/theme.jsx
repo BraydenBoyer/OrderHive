@@ -1,47 +1,71 @@
 
 export const colors = {
-	primary: "#1E3614",
-	onPrimary: "#CAE7BE",
-	primaryContainer: "#90A87F",
-	onPrimaryContainer: "#CAE7BE",
-	secondary: "#141E36",
-	onSecondary: "#BECAE7",
-	secondaryContainer: "#627FC5",
-	onSecondaryContainer: "#D3DBEF",
-	tertiary: "#36141E",
-	onTertiary: "#E7BECA",
-	tertiaryContainer: "#FF0000",
-	onTertiaryContainer: "#FF0000",
-	error: "rgb(186, 26, 26)",
-	onError: "rgb(255, 255, 255)",
-	errorContainer: "rgb(255, 218, 214)",
-	onErrorContainer: "rgb(65, 0, 2)",
-	background: "#A8D794",
-	onBackground: "#F2F9EF",
-	surface: "rgb(255, 251, 255)",
-	onSurface: "rgb(28, 28, 23)",
-	surfaceVariant: "rgb(229, 227, 209)",
-	onSurfaceVariant: "rgb(72, 71, 59)",
-	outline: "rgb(121, 120, 105)",
-	outlineVariant: "rgb(201, 199, 182)",
-	shadow: "rgb(0, 0, 0)",
-	scrim: "rgb(0, 0, 0)",
-	inverseSurface: "rgb(49, 49, 43)",
-	inverseOnSurface: "rgb(244, 240, 232)",
-	inversePrimary: "rgb(200, 206, 68)",
+	// Primary color scheme
+	primary: "#1976d2", // Main color for primary actions, buttons, and highlights
+	onPrimary: "#ffffff", // Text color on primary backgrounds for contrast
+	primaryContainer: "#bbdefb", // Background color for containers that hold primary content
+	onPrimaryContainer: "#0d47a1", // Text color on primary containers for visibility
+
+	// Secondary color scheme
+	secondary: "#dc004e", // Main color for secondary actions and elements
+	onSecondary: "#ffffff", // Text color on secondary backgrounds for contrast
+	secondaryContainer: "#f8bbd0", // Background color for containers that hold secondary content
+	onSecondaryContainer: "#880e4f", // Text color on secondary containers for visibility
+
+	// Tertiary color scheme
+	tertiary: "#ff9800", // Color for tertiary actions or accents
+	onTertiary: "#ffffff", // Text color on tertiary backgrounds for contrast
+	tertiaryContainer: "#ffe0b2", // Background color for containers that hold tertiary content
+	onTertiaryContainer: "#e65100", // Text color on tertiary containers for visibility
+
+	// Error color scheme
+	error: "#f44336", // Main color for error messages and indicators
+	onError: "#ffffff", // Text color on error backgrounds for contrast
+	errorContainer: "#ffcccc", // Background color for error containers or alerts
+	onErrorContainer: "#b71c1c", // Text color on error containers for visibility
+
+	// Background and surface colors
+	background: "#f5f5f5", // Default background color for application screens
+	onBackground: "#212121", // Text color for content on the default background
+	surface: "#ffffff", // Background color for cards, dialogs, and sheets
+	onSurface: "#212121", // Text color for content on surfaces
+	surfaceVariant: "#e0e0e0", // Background color for variant surfaces like cards with different styles
+	onSurfaceVariant: "#424242", // Text color on variant surfaces for visibility
+
+	// Outline colors
+	outline: "#bdbdbd", // Outline color for borders, dividers, and text inputs
+	outlineVariant: "#e0e0e0", // Outline color for secondary elements or inactive states
+
+	// Shadow and scrim
+	shadow: "rgba(0, 0, 0, 0.2)", // Shadow color for elevation effects on surfaces
+	scrim: "rgba(0, 0, 0, 0.5)", // Overlay color for modal backdrops and dialogs
+
+	// Inverse colors
+	inverseSurface: "#424242", // Background color for dark mode surfaces
+	inverseOnSurface: "#f5f5f5", // Text color for content on dark mode surfaces
+	inversePrimary: "#90caf9", // Color for primary actions in dark mode
+
+	// Elevation levels
 	elevation: {
-		level0: "transparent",
-		level1: "rgb(247, 243, 242)",
-		level2: "rgb(242, 239, 235)",
-		level3: "rgb(237, 234, 227)",
-		level4: "rgb(236, 233, 224)",
-		level5: "rgb(233, 230, 219)"
+		level0: "transparent", // No elevation effect
+		level1: "rgba(0, 0, 0, 0.05)", // Subtle elevation effect for low-level elements
+		level2: "rgba(0, 0, 0, 0.1)", // Moderate elevation effect for medium-level elements
+		level3: "rgba(0, 0, 0, 0.15)", // Stronger elevation effect for higher-level elements
+		level4: "rgba(0, 0, 0, 0.2)", // Deeper elevation effect for prominent elements
+		level5: "rgba(0, 0, 0, 0.25)"  // Maximum elevation effect for floating elements
 	},
-	surfaceDisabled: "rgba(28, 28, 23, 0.12)",
-	onSurfaceDisabled: "rgba(28, 28, 23, 0.38)",
-	backdrop: "rgba(49, 49, 37, 0.4)",
-	rippleColor: '#E5F2F0',
-}
+	surfaceDisabled: "rgba(0, 0, 0, 0.12)", // Color for disabled surfaces to indicate inactivity
+	onSurfaceDisabled: "rgba(0, 0, 0, 0.38)", // Text color for disabled content for visibility
+	backdrop: "rgba(0, 0, 0, 0.5)", // Overlay color for backdrop effects in modals and dialogs
+	rippleColor: "#e0e0e0", // Color for ripple effects on button presses
+
+	// Useful colors
+	red: '#FF003B',
+	green: '#29D667',
+	blue: "#6631CE",
+
+};
+
 
 export const settings = {
 	standardRadius: 15,
@@ -115,49 +139,3 @@ export const theme = {
 
 	}
 }
-
-
-
-
-/*
-	primary: "#1E3614",
-	onPrimary: "#CAE7BE",
-	primaryContainer: "rgb(229, 234, 93)",
-	onPrimaryContainer: "rgb(28, 29, 0)",
-	secondary: "#141E36",
-	onSecondary: "#BECAE7",
-	secondaryContainer: "rgb(188, 233, 255)",
-	onSecondaryContainer: "rgb(0, 31, 42)",
-	tertiary: "#36141E",
-	onTertiary: "#E7BECA",
-	tertiaryContainer: "rgb(157, 248, 152)",
-	onTertiaryContainer: "rgb(0, 34, 4)",
-	error: "rgb(186, 26, 26)",
-	onError: "rgb(255, 255, 255)",
-	errorContainer: "rgb(255, 218, 214)",
-	onErrorContainer: "rgb(65, 0, 2)",
-	background: "#A8D794",
-	onBackground: "#F2F9EF",
-	surface: "rgb(255, 251, 255)",
-	onSurface: "rgb(28, 28, 23)",
-	surfaceVariant: "rgb(229, 227, 209)",
-	onSurfaceVariant: "rgb(72, 71, 59)",
-	outline: "rgb(121, 120, 105)",
-	outlineVariant: "rgb(201, 199, 182)",
-	shadow: "rgb(0, 0, 0)",
-	scrim: "rgb(0, 0, 0)",
-	inverseSurface: "rgb(49, 49, 43)",
-	inverseOnSurface: "rgb(244, 240, 232)",
-	inversePrimary: "rgb(200, 206, 68)",
-	elevation: {
-		level0: "transparent",
-		level1: "rgb(247, 243, 242)",
-		level2: "rgb(242, 239, 235)",
-		level3: "rgb(237, 234, 227)",
-		level4: "rgb(236, 233, 224)",
-		level5: "rgb(233, 230, 219)"
-	},
-	surfaceDisabled: "rgba(28, 28, 23, 0.12)",
-	onSurfaceDisabled: "rgba(28, 28, 23, 0.38)",
-	backdrop: "rgba(49, 49, 37, 0.4)"
- */
