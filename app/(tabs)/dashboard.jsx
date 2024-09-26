@@ -1,14 +1,12 @@
 import {React} from "react";
 import {Text, View} from "react-native";
 
-const DashScreen = () => {
+export default function DashScreen() {
 
 	return (
-		<View>
-			<Text>hi</Text>
+		<View style={{height: 200, width: 200, backgroundColor: '#999999'}}>
+			<Text>hiBIGRIUgiruebgerbg</Text>
 		</View>
 	)
 }
 
-
-export default DashScreen

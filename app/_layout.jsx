@@ -28,8 +28,10 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <TabNavigation/>
-    </ThemeProvider>
+      <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
+	      <Stack>
+		      <Stack.Screen name={'(tabs)'} options={{headerShown: false}}/>
+	      </Stack>
+      </ThemeProvider>
   );
 }
