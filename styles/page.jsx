@@ -1,5 +1,5 @@
 import {Button, StyleSheet} from 'react-native'
-import {colors, settings, theme} from "@/constants/theme";
+import {colors, settings} from "../constants/theme.jsx";
 
 export const pageStyle = StyleSheet.create({
 

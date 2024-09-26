@@ -2,16 +2,14 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './(tabs)/homeScreen';
 import DetailsScreen from './(tabs)/detailsScreen';
-import {RootStackParamList} from "@/constants/types";
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import {colors, theme} from "@/constants/theme";
+import {colors} from "../constants/theme.jsx";
 
-const Stack = createNativeStackNavigator<RootStackParamList>()
+const Stack = createNativeStackNavigator()
 
 
 export default function AppNavigator() {
 
-	const screenOptions: NativeStackNavigationOptions = {
+	const screenOptions = {
 		headerShown: false,
 		animation: 'fade',
 		statusBarColor: colors.background,
