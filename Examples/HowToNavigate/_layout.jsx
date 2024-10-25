@@ -1,17 +1,10 @@
 import { Tabs } from 'expo-router';
 
 export default function AppLayout() {
-
-	let screenOptions = {
-
-		header: ''
-	}
-
 	return (
-		<Tabs screenOptions={{}}>
+		<Tabs>
 			<Tabs.Screen name="index" options={{ title: 'Home' }} />
 			<Tabs.Screen name="inventory" options={{ title: 'Inventory' }} />
 		</Tabs>
 	);
 }
-
