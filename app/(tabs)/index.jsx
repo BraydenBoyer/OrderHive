@@ -7,7 +7,7 @@ import {BackDrop} from "../../components/Backdrop.jsx";
 export default function DashboardPage(){
 	return(
 
-		<BackDrop style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+		<BackDrop style={{alignItems: 'center', justifyContent: 'center'}}>
 			<Text>This is the dashboard!!!!!</Text>
 		</BackDrop>
 	)
