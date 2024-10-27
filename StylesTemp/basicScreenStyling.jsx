@@ -24,9 +24,10 @@ export const basicTabOptions = {
 
 export const basicBackdropStyle = {
 
-	paddingVertical: 10,
-	paddingHorizontal: 10,
+	paddingVertical: 0,
+	paddingHorizontal: 0,
 	backgroundColor: lightTheme.colors.surface,
 	flex: 1,
+	flexGrow: 1
 }
 
