@@ -52,7 +52,7 @@ export default function AppLayout() {
 				/>
 
 				<Tabs.Screen name={'(TestingSpace)/index'} options={{href: null}} />
-				<Tabs.Screen name={'menuTab'} options={{href: null}} />
+				<Tabs.Screen name={'menuTab'} options={{href: "menuTab"}} />
 
 			</Tabs>
 		</PaperProvider>

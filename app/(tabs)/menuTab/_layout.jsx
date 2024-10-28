@@ -9,6 +9,8 @@ export default function StackLayout() {
 
 		<Stack screenOptions={basicScreenOption} >
 			<Stack.Screen name={'index'} />
+			<Stack.Screen name={'userDetails'} />
 		</Stack>
+
 	)
 }
