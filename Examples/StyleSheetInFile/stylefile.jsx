@@ -2,7 +2,7 @@ import {Tabs} from "expo-router";
 import {Text, StyleSheet} from "react-native";
 import {Button, useTheme} from "react-native-paper";
 import {router} from 'expo-router'
-import {BackDrop} from "../../../components/Backdrop.jsx";
+import {BackDrop} from "../../components/Backdrop.jsx";
 
 
 export default function InventoryPage(){
