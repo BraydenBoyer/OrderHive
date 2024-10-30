@@ -1,5 +1,5 @@
 import {FAB, Portal} from 'react-native-paper'
-import {} from 'react-native'
+import * as React from 'react';
 
 
 
