@@ -14,7 +14,6 @@ export const BackDrop = ({ children, style }) => {
 				<View style={[{padding: 10, flex: 1 }, style]}>
 					{children}
 				</View>
-				<MyFAB/>
 			</ScrollView>
 		</SafeAreaView>
 	);
