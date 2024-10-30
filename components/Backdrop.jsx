@@ -17,3 +17,4 @@ export const BackDrop = ({ children, style }) => {
 		</SafeAreaView>
 	);
 };
+

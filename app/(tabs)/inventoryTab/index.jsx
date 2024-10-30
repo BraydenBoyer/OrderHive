@@ -16,3 +16,4 @@ export default function InventoryPage(){
         </BackDrop>
     )
 }
+
