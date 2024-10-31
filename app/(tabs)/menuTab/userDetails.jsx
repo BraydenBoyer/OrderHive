@@ -8,7 +8,7 @@ export default function MenuPage() {
     return (
 
         <BackDrop style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text>This is the stack page. Purely for testing navigation.</Text>
+            <Text>This is the User Details page. Purely for testing navigation.</Text>
             <Button title={'Menu'} onPress={() => router.navigate('(tabs)/menuTab')}/>
             <Link href={'menuTab/index'}/>
         </BackDrop>
