@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "185090084201",
+    "project_id": "orderhive-e4d46",
+    "storage_bucket": "orderhive-e4d46.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185090084201:android:89dd7591855a4be0cbc1f8",
+        "android_client_info": {
+          "package_name": "OrderHive.Android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaZX_e2-Ti5ks_rw-J2DYEr_KZpUsMXX0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

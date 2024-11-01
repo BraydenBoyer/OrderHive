@@ -13,7 +13,8 @@ export const basicTabOptions = {
 	headerShown: false,
 	navigationBarHidden: false,
 	navigationBarColor: lightTheme.colors.surfaceVariant,
-	tabBarActiveTintColor: 'red',
+	tabBarActiveTintColor: lightTheme.colors.primary,
+	tabBarInactiveTintColor: lightTheme.colors.inverseSurface,
 	tabBarStyle: {
 		backgroundColor: lightTheme.colors.surfaceVariant,
 		paddingBottom: 10,

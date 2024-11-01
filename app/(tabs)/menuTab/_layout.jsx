@@ -1,5 +1,5 @@
 import {Stack} from "expo-router";
-import {basicScreenOption} from "../../../StylesTemp/basicScreenStyling.jsx";
+import {basicScreenOption} from "../../styles/basicScreenStyling.jsx";
 
 
 export default function StackLayout() {

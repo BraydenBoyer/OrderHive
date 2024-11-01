@@ -53,7 +53,7 @@ export default function Pickup() {
           </Card>
         )}
       />
-      <ActionButton />
+
     </View>
   );
 }

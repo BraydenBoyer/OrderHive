@@ -1,6 +1,6 @@
 // tabs/dashboardTab/_layout.jsx
 import { Stack } from 'expo-router';
-import { basicScreenOption } from '../../../StylesTemp/basicScreenStyling';
+import { basicScreenOption } from '../../styles/basicScreenStyling';
 
 export default function StackLayout() {
   return (

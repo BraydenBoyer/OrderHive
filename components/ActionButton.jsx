@@ -9,7 +9,11 @@ const ActionButton = () => {
   const openForm = () => setVisible(true);
   const closeForm = () => setVisible(false);
 
+  // TEMP CHANGE TO FIX BUG
+  return null
+
   return (
+
     <Portal>
       {/* Floating Button */}
       <TouchableOpacity style={styles.fab} onPress={openForm}>
@@ -59,6 +63,8 @@ const ActionButton = () => {
         </View>
       </Modal>
     </Portal>
+
+
   );
 };
 

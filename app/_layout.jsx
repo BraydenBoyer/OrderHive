@@ -1,9 +1,9 @@
 import {Stack, Tabs} from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
-import {basicScreenOption} from "../StylesTemp/basicScreenStyling.jsx";
-import {lightTheme} from "../StylesTemp/themes/lightTheme.jsx";
+import {basicScreenOption} from "./styles/basicScreenStyling.jsx";
+import {lightTheme} from "./styles/themes/lightTheme.jsx";
 
-export default function AppLayout() {
+export default function RootLayout() {
 	return (
 		<PaperProvider theme={lightTheme}>
 			<Stack screenOptions={basicScreenOption}>

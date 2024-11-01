@@ -1,13 +1,50 @@
-import {FAB, Portal} from 'react-native-paper'
-import * as React from 'react';
+import {FAB, Portal, useTheme} from 'react-native-paper'
+import {useEffect, useState} from 'react';
+import {StyleSheet} from "react-native";
+import {lightTheme} from "../app/styles/themes/lightTheme.jsx";
 
 
 
-export const MyFAB = () => {
+/*
+	This component is the Floating Action Button. It lets you add additional actions to the screen.
+	As of now, you cannot add custom actions. However, you can add the component to your screen.
 
-	const [state, setState] = React.useState({ open: false });
+	@author Miles Hoffman
+ */
+export const MyFAB = ({actions, icon, visible}) => {
+
+	const [state, setState] = useState({ open: false });
 	const onStateChange = ({ open }) => setState({ open });
 	const { open } = state;
+
+
+	// ########################################### Testing Purposes
+
+
+	const exampleActions = [
+		{
+			icon: 'plus',
+			label: 'Plus Sign',
+			onPress: () => { return console.log('Clicked FAB plus')},
+			size: 'large'
+		},
+		{
+			icon: 'cloud',
+			label: '',
+			onPress: () => { return console.log('Clicked FAB cloud')},
+			size: 'large'
+		},
+		{
+			icon: 'menu',
+			label: 'menu sign',
+			onPress: () => { return console.log('Clicked FAB Menu')},
+			size: 'large'
+		},
+	]
+
+	const exampleIcon = 'cloud'
+
+	// #############################################
 
 
 	return(
@@ -15,36 +52,16 @@ export const MyFAB = () => {
 
 			<FAB.Group
 				open={open}
-				visible
-				icon={open ? 'calendar-today' : 'plus'}
-				actions={[
-					{
-						icon: 'plus',
-						onPress: () => console.log('Pressed add') },
-					{
-						icon: 'star',
-						label: 'Star',
-						onPress: () => console.log('Pressed star'),
-					},
-					{
-						icon: 'email',
-						label: 'Email',
-						onPress: () => console.log('Pressed email'),
-					},
-					{
-						icon: 'bell',
-						label: 'Remind',
-						onPress: () => console.log('Pressed notifications'),
-					},
-				]}
+				visible={visible}
+				icon={open ? exampleIcon : 'plus'}
+				actions={exampleActions}
 				onStateChange={onStateChange}
-				onPress={() => {
-					if (open) {
-						// do something if the speed dial is open
-					}
-				}}
+
+				style={{marginBottom: 60,}}
+				fabStyle={{}}
 			/>
 
 		</Portal>
 	)
 }
+
