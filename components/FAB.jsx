@@ -6,45 +6,52 @@ import {lightTheme} from "../app/styles/themes/lightTheme.jsx";
 
 
 /*
-	This component is the Floating Action Button. It lets you add additional actions to the screen.
-	As of now, you cannot add custom actions. However, you can add the component to your screen.
+	The MyFAB component is the Floating Action Button. It lets you add additional actions to the screen.
+
+	Props:
+
+	* actions (Required): Defines the possible actions after opening the fab.
+	* icon (Optional): An array of two strings that define the open/close icon of the fab.
+	* visibility (Required): A boolean to determine visibility.
+
+	Requirements - You MUST:
+
+	* Define the action and visibility prop for the FAB. (See example below for action)
+	* SET THE PROPS with the useContext!!!
+
+	You must NOT:
+
+	* Create your own FAB component. This causes performance issues and overlay bugs. Unless you can fix it.
 
 	@author Miles Hoffman
  */
-export const MyFAB = ({actions, icon, visible}) => {
+
+const exampleActions = [
+	{
+		icon: 'plus',
+		label: 'Plus Sign',
+		onPress: () => { return console.log('Clicked FAB plus')},
+		size: 'large'
+	},
+	{
+		icon: 'cloud',
+		label: '',
+		onPress: () => { return console.log('Clicked FAB cloud')},
+		size: 'large'
+	},
+	{
+		icon: 'menu',
+		label: 'menu sign',
+		onPress: () => { return console.log('Clicked FAB Menu')},
+		size: 'large'
+	},
+]
+
+export const MyFAB = ({actions, icon = ['plus', 'close'], visible}) => {
 
 	const [state, setState] = useState({ open: false });
 	const onStateChange = ({ open }) => setState({ open });
 	const { open } = state;
-
-
-	// ########################################### Testing Purposes
-
-
-	const exampleActions = [
-		{
-			icon: 'plus',
-			label: 'Plus Sign',
-			onPress: () => { return console.log('Clicked FAB plus')},
-			size: 'large'
-		},
-		{
-			icon: 'cloud',
-			label: '',
-			onPress: () => { return console.log('Clicked FAB cloud')},
-			size: 'large'
-		},
-		{
-			icon: 'menu',
-			label: 'menu sign',
-			onPress: () => { return console.log('Clicked FAB Menu')},
-			size: 'large'
-		},
-	]
-
-	const exampleIcon = 'cloud'
-
-	// #############################################
 
 
 	return(
@@ -53,8 +60,8 @@ export const MyFAB = ({actions, icon, visible}) => {
 			<FAB.Group
 				open={open}
 				visible={visible}
-				icon={open ? exampleIcon : 'plus'}
-				actions={exampleActions}
+				icon={open ? icon[1] : icon[0]}
+				actions={actions ? actions : exampleActions}
 				onStateChange={onStateChange}
 
 				style={{marginBottom: 60,}}

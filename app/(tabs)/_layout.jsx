@@ -9,14 +9,16 @@ import {MyFAB} from "../../components/FAB.jsx";
 
 export const AppContext = createContext({});
 
-export default function AppLayout() {
+export default function TabLayout() {
 
 	const [fabVisibility, setFabVisible] = useState(false)
+	const [icon, setIcon] = useState(['plus', 'close'])
+	const [actions, setActions] = useState(undefined)
 
 
 	return (
 		<PaperProvider theme={lightTheme}>
-			<AppContext.Provider value={{setFabVisible}}>
+			<AppContext.Provider value={{setFabVisible, setIcon, setActions}}>
 				<Tabs
 					screenOptions={basicTabOptions}
 				>
@@ -66,7 +68,7 @@ export default function AppLayout() {
 
 				</Tabs>
 
-				<MyFAB visible={fabVisibility} />
+				<MyFAB actions={actions} icon={icon} visible={fabVisibility} />
 			</AppContext.Provider>
 		</PaperProvider>
 	);
