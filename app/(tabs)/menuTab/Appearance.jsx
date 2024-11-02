@@ -3,35 +3,23 @@ import {Button, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {router} from 'expo-router'
 import {BackDrop} from "../../../components/Backdrop.jsx";
 import React,{useState} from "react";
-import {TextInput} from "react-native-paper";
+import {Switch } from "react-native-paper";
 
 
 export default function MenuPage() {
-    const [textUN, setTextUN] = React.useState("");
-    const [textPass, setTextPass] = React.useState("");
-    const [textEm, setTextEm] = React.useState("");
-    const [textPM, setTextPM] = React.useState("");
 
-    const [isEditableUN, setIsEditableUN] = useState(false);
-    const [isEditablePass, setIsEditablePass] = useState(false);
-    const [isEditableEm, setIsEditableEm] = useState(false);
-    const [isEditablePN, setIsEditablePN] = useState(false);
+        const [isDarkSwitchOn, setIsDarkSwitchOn] = useState(false);
+        const [isLightSwitchOn, setIsLightSwitchOn] = useState(true);
 
-    const handleEditToggleUn = () => {
-        setIsEditableUN(!isEditableUN);
-    };
+        const toggleDarkSwitch = () => {
+            setIsDarkSwitchOn(true);
+            setIsLightSwitchOn(false);
+        };
 
-    const handleEditTogglePass = () => {
-        setIsEditablePass(!isEditablePass);
-    };
-
-    const handleEditToggleEm = () => {
-        setIsEditableEm(!isEditableEm);
-    };
-
-    const handleEditTogglePn = () => {
-        setIsEditablePN(!isEditablePN);
-    };
+        const toggleLightSwitch = () => {
+            setIsLightSwitchOn(true);
+            setIsDarkSwitchOn(false);
+        };
     return (
         <BackDrop>
             <View>
@@ -40,14 +28,14 @@ export default function MenuPage() {
             <View style={styles.container}>
                 <View style={styles.container}>
 
-                    <View style={[styles.backgroundContainer,
-                        {borderBottomLeftRadius: 0,borderBottomRightRadius: 0,borderBottomWidth:.5,borderBottomColor:'white'}]}>
-                        <Text style={styles.text}>Dark Mode</Text>
-
+                    <View style={styles.backgroundContainerTop}>
+                        <Text style={[styles.text,{marginRight:180}]}>Dark Mode</Text>
+                        <Switch value={isDarkSwitchOn} onValueChange={toggleDarkSwitch} />
                     </View>
 
-                    <View style={[styles.backgroundContainer,{borderTopLeftRadius: 0,borderTopRightRadius: 0}]}>
-                        <Text style={styles.text}>Light Mode</Text>
+                    <View style={styles.backgroundContainerBottom}>
+                        <Text style={[styles.text,{marginRight:180}]}>Light Mode</Text>
+                        <Switch value={isLightSwitchOn} onValueChange={toggleLightSwitch} />
 
                     </View>
                 </View>
@@ -55,14 +43,13 @@ export default function MenuPage() {
 
                 <View style={[styles.container,{paddingVertical:20}]}>
 
-                    <View style={[styles.backgroundContainer,
-                        {borderBottomLeftRadius: 0,borderBottomRightRadius: 0,borderBottomWidth:.5,borderBottomColor:'white'}]}>
+                    <View style={styles.backgroundContainerTop}>
                         <Text style={styles.text}>Primary Color</Text>
 
 
                     </View>
 
-                    <View style={[styles.backgroundContainer,{borderTopLeftRadius: 0,borderTopRightRadius: 0}]}>
+                    <View style={styles.backgroundContainerBottom}>
                         <Text style={styles.text}>Secondary Color</Text>
 
                     </View>
@@ -99,42 +86,39 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
 
-    backgroundContainer: {
-        flexDirection: 'column',
+    backgroundContainerTop: {
+        flexDirection: 'row',
         backgroundColor: '#353562',
         padding: 10,
         borderRadius: 10,
         marginRight: 10,
-        height: 100, // Set desired container height
-        width:388,
-        alignItems:"left",
-        justifyContent:"center"
-
-
-    },
-    inputContainer: {
-        flexDirection: 'row',
-
-        height: 100, // Set desired container height
+        height: 100,
         width:388,
         alignItems:"center",
-        paddingTop: 10,
-        paddingBottom: 40,
+        justifyContent:"left",
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        borderBottomWidth:.5,
+        borderBottomColor:'white',
+        paddingHorizontal:30
 
     },
-    textInput: {
-        maxWidth:'85%',
-        height: 10,
-        flex: 1, // Take up available space
 
-        paddingHorizontal: 50,
-        paddingRight: 20,
-    },
-
-    button: {
-        alignItems:'center',
-        justifyContent:'center',
+    backgroundContainerBottom: {
+        flexDirection: 'row',
+        backgroundColor: '#353562',
+        padding: 10,
+        borderRadius: 10,
+        marginRight: 10,
         height: 100,
-        width: '100%',
-    }
+        width:388,
+        alignItems:"center",
+        justifyContent:"left",
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0
+
+
+    },
+
+
 });
