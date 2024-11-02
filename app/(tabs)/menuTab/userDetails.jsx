@@ -107,7 +107,13 @@ export default function MenuPage() {
 
 
 
+                <View style={[styles.backgroundContainer,{marginVertical: 20,alignItems: "center",justifyContent:"center",paddingHorizontal:10}]}>
+                    <TouchableOpacity style={styles.button} onPress={handleEditToggleEm}>
+                        <Text style={styles.text}>Enable 2-Step Verification</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
+
 
         </BackDrop>
     )
@@ -146,6 +152,7 @@ const styles = StyleSheet.create({
         width:388,
         alignItems:"left",
 
+
     },
     inputContainer: {
         flexDirection: 'row',
@@ -163,8 +170,13 @@ const styles = StyleSheet.create({
         flex: 1, // Take up available space
 
         paddingHorizontal: 50,
-        paddingRight: 20
-
-
+        paddingRight: 20,
     },
+
+    button: {
+        alignItems:'center',
+        justifyContent:'center',
+        height: 100,
+        width: '100%',
+    }
 });
