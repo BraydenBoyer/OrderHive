@@ -13,10 +13,11 @@ export default function CollaboratorPage() {
 	useFocusEffect(
 		useCallback(() => {
 			// If you want to do something when screen is focused
-			setFabVisible(true)
+			setFabVisible(false)
 
 			return () => {
 				// If you want to do something when screen is unfocused
+
 			}
 		}, [])
 	)

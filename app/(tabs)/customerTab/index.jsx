@@ -16,6 +16,7 @@ export default function CustomerPage() {
 
 			return () => {
 				// If you want to do something when screen is unfocused
+
 			}
 		}, [])
 	)
@@ -29,3 +30,6 @@ export default function CustomerPage() {
 		</BackDrop>
 	)
 }
+
+
+

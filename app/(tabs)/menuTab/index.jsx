@@ -1,10 +1,27 @@
 import {BackDrop} from "../../../components/Backdrop.jsx";
 import {Text, View, StyleSheet, TouchableOpacity} from "react-native";
 import {Button} from "react-native-paper";
-import {router} from "expo-router";
-import React from "react";
+import {router, useFocusEffect} from "expo-router";
+import React, {useCallback, useContext} from "react";
+import {AppContext} from "../_layout.jsx";
 
 export default function MenuPage() {
+
+	const {setFabVisible} = useContext(AppContext)
+
+	useFocusEffect(
+		useCallback(() => {
+			// If you want to do something when screen is focused
+			setFabVisible(true)
+
+			return () => {
+				// If you want to do something when screen is unfocused
+
+			}
+		}, [])
+	)
+
+
 
 	return (
 

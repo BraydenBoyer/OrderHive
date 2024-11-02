@@ -4,6 +4,8 @@ import { PaperProvider, useTheme, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { basicBackdropStyle } from '../app/styles/basicScreenStyling.jsx';
 import {MyFAB} from "./FAB.jsx";
+import {BackHeader} from "./BackHeader.jsx";
+import {MainHeader} from "./MainHeader.jsx";
 
 
 /*
@@ -17,11 +19,17 @@ import {MyFAB} from "./FAB.jsx";
 
 	@author Miles Hoffman
  */
-export const BackDrop = ({ children, style }) => {
+export const BackDrop = ({ children, style, mainHeader = true, title = 'App.OrderHive' }) => {
 	const colors = useTheme().colors;
+
 
 	return (
 		<SafeAreaView style={[basicBackdropStyle]} >
+			{mainHeader ?
+				<MainHeader title={title}/>
+				:
+				<BackHeader title={title}/>
+			}
 			<ScrollView style={{width: '100%'}} contentContainerStyle={{flexGrow: 1}} showsVerticalScrollIndicator={false} horizontal={false}>
 				<View style={[{padding: 10, flex: 1 }, style]}>
 
