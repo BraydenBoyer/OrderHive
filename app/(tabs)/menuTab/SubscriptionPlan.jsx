@@ -56,15 +56,16 @@ export default function MenuPage() {
 
                         />
 
-                        <TouchableRipple onPress={handleEditTogglePn} style={styles.button}>
+
 
                             <IconButton
                                 icon="credit-card-edit"
                                 iconColor={MD3Colors.error50}
                                 size={20}
                                 onPress={() => console.log('Pressed')}
+                                containerStyle={{ backgroundColor: '#e0e0e0', borderRadius: 10 }}
+                                onPress={handleEditTogglePn}
                             />
-                        </TouchableRipple>
 
                     </View>
                 </View>
