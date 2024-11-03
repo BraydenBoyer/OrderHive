@@ -1,6 +1,21 @@
 import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, FAB, Checkbox, Card, IconButton, useTheme, Menu, Divider, Title, Paragraph, Portal, Dialog } from "react-native-paper";
+import {
+  Text,
+  Button,
+  FAB,
+  Checkbox,
+  Card,
+  IconButton,
+  useTheme,
+  Menu,
+  Divider,
+  Title,
+  Paragraph,
+  Portal,
+  Dialog,
+  Icon
+} from "react-native-paper";
 import { router } from 'expo-router';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import { MyFAB } from "../../../components/overlays/FAB.jsx";
@@ -69,8 +84,8 @@ export default function CustomerPage() {
           placeholder="Hinted search text"
           mode="outlined"
           style={styles.searchInput}
-          right={<TextInput.Icon icon="magnify" />}
         />
+        <Icon size={30} source={'magnify'} />
       </View>
 
 

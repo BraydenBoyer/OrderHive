@@ -1,13 +1,24 @@
-import {Button, Surface, Text, TextInput, TouchableRipple, useTheme} from "react-native-paper";
-import {StyleSheet} from "react-native";
+import {Button, Icon, Surface, Text, TextInput, TouchableRipple, useTheme} from "react-native-paper";
+import {StyleSheet, View} from "react-native";
 import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
 import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 
 
-export const MyButton = ({elevation, style = {height: 50, width: 50}, title = 'Button', onClick, variant = 'bodyMedium'}) => {
+export const MyButton = ({
+	elevation,
+	style = {height: 50, width: 50},
+	title = 'Button',
+	onClick,
+	variant = 'bodyMedium',
+	iconLeft,
+	iconRight,
+}) => {
 
 	const styles = inputStyles()
 	const colors = useTheme().colors
+	const fonts = useTheme().fonts
+
+	const iconSize = fonts[variant].fontSize * 1.5
 
 	return(
 
@@ -23,12 +34,15 @@ export const MyButton = ({elevation, style = {height: 50, width: 50}, title = 'B
 				borderless={true}
 				rippleColor={colors.backdrop}
 			>
-				<Text
-					style={{ flex: 0, margin: 'auto' }}
-					variant={variant}
-				>
-					{title}
-				</Text>
+				<View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+
+					<Icon size={iconSize} source={iconLeft} />
+					<Text variant={variant} style={{marginHorizontal: iconSize*.5}} >
+						{title}
+					</Text>
+					<Icon size={iconSize} source={iconRight} />
+
+				</View>
 			</TouchableRipple>
 		</Surface>
 
