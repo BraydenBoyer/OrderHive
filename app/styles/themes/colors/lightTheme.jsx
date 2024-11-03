@@ -1,6 +1,6 @@
 const colors = {
 
-	primary: '#007FFF', // Main color for interactive elements and branding.
+	primary: '#00C2FF', // Main color for interactive elements and branding.
 	onPrimary: '#FFFFFF', // Color for text and icons displayed on top of the primary color.
 	primaryContainer: '#D0EFFF', // Background color for elements containing primary color elements.
 	onPrimaryContainer: '#00215A', // Color for text and icons on top of primaryContainer.

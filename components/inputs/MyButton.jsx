@@ -1,22 +1,37 @@
-import {Button, Text, TextInput, TouchableRipple, useTheme} from "react-native-paper";
+import {Button, Surface, Text, TextInput, TouchableRipple, useTheme} from "react-native-paper";
 import {StyleSheet} from "react-native";
 import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
 import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 
 
-export const MyButton = ({style = {height: 50, width: 50}, title = 'Button', onClick}) => {
+export const MyButton = ({elevation, style = {height: 50, width: 50}, title = 'Button', onClick, variant = 'bodyMedium'}) => {
 
 	const styles = inputStyles()
+	const colors = useTheme().colors
 
 	return(
 
-		<TouchableRipple
-			onPress={onClick}
-			style={[style]}
-			theme={lightTheme}
+		<Surface
+			style={style}
+			elevation={elevation}
+			mode={'elevated'}
 		>
-			<Text>{title}</Text>
-		</TouchableRipple>
+			<TouchableRipple
+				onPress={onClick}
+				style={[style]}
+				underlayColor={'red'}
+				borderless={true}
+				rippleColor={colors.backdrop}
+			>
+				<Text
+					style={{ flex: 0, margin: 'auto' }}
+					variant={variant}
+				>
+					{title}
+				</Text>
+			</TouchableRipple>
+		</Surface>
+
 	)
 }
 

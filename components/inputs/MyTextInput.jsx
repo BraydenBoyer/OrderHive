@@ -6,13 +6,17 @@ import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
 export const MyTextInput = ({placeholder}) => {
 
 	const styles = textInputStyles()
+	const colors = useTheme().colors
 
 	return(
 
 		<TextInput
 			placeholder={placeholder}
-			mode={'flat'} style={styles.box}
+			mode={'flat'}
+			style={styles.box}
 			underlineColor={'transparent'}
+			activeUnderlineColor={'transparent'}
+			cursorColor={colors.onPrimaryContainer}
 		/>
 	)
 }

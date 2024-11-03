@@ -1,15 +1,18 @@
-import {View} from "react-native";
+import {StyleSheet, View} from "react-native";
 import {BackDrop} from "../components/Backdrop.jsx";
 import {Header} from "../components/BackHeader.jsx";
 import {Redirect, router} from "expo-router";
-import {Button, Text, TextInput} from "react-native-paper";
+import {Button, Text, TextInput, useTheme} from "react-native-paper";
 import {MyTextInput} from "../components/inputs/MyTextInput.jsx";
 import {MyButton} from "../components/inputs/MyButton.jsx";
+import {roundness} from "./styles/themes/roundness/roundness.jsx";
 
 
 export default function LoginPage() {
 
+	const colors = useTheme().colors
 
+	const styles = fileStyles()
 
 	return(
 
@@ -33,7 +36,12 @@ export default function LoginPage() {
 			}}>
 				<MyTextInput placeholder={'User Name'} />
 				<MyTextInput placeholder={'Password'} />
-
+				<MyButton
+					title={'Login'}
+					style={styles.button}
+					onClick={() => console.log('hi')}
+					variant={'bodyLarge'}
+				/>
 			</View>
 
 
@@ -43,4 +51,19 @@ export default function LoginPage() {
 		</BackDrop>
 
 	)
+}
+
+
+
+const fileStyles = () => {
+
+	const colors = useTheme().colors
+
+	return StyleSheet.create({
+		button: {
+			height: 50,
+			backgroundColor: colors.primary,
+			borderRadius: roundness.largeRadius,
+		}
+	})
 }
