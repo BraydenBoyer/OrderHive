@@ -5,26 +5,6 @@ import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 
 
 
-/*
-	The MyFAB component is the Floating Action Button. It lets you add additional actions to the screen.
-
-	Props:
-
-	* actions (Required): Defines the possible actions after opening the fab.
-	* icon (Optional): An array of two strings that define the open/close icon of the fab.
-	* visibility (Required): A boolean to determine visibility.
-
-	Requirements - You MUST:
-
-	* Define the action and visibility prop for the FAB. (See example below for action)
-	* SET THE PROPS with the useContext!!!
-
-	You must NOT:
-
-	* Create your own FAB component. This causes performance issues and overlay bugs. Unless you can fix it.
-
-	@author Miles Hoffman
- */
 
 const exampleActions = [
 	{
@@ -50,6 +30,31 @@ const exampleActions = [
 	},
 ]
 
+/*
+	The MyFAB component is the Floating Action Button. It lets you add additional actions to the screen.
+
+	Props:
+
+	- Actions (Required, JSON):
+		Defines the possible actions after opening the fab. See above for an example.
+
+	- icon (string array):
+		An array of two strings that define the open/close icon of the fab.
+
+	- visibility (Required, boolean):
+		A boolean to determine visibility.
+
+	Requirements - You MUST:
+
+	- Define the action and visibility prop for the FAB. (See example below for action)
+	- SET THE PROPS with the useContext!!!
+
+	You must NOT:
+
+	- Create your own FAB component. This causes performance issues and overlay bugs. Unless you can fix it.
+
+	@author Miles Hoffman
+ */
 export const MyFAB = ({actions, icon = ['plus', 'close'], visible}) => {
 
 	const [state, setState] = useState({ open: false });

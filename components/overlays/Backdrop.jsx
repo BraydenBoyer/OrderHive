@@ -14,10 +14,20 @@ import {MainHeader} from "./MainHeader.jsx";
 
 	props:
 
-	- children: the screen's HTML is held here. It should not be set.
-	- style: stylizes the view if needed. Functions the same as other style props. Optional.
-	- title (required): The title name
-	- mainHeader(required): boolean for sub page or main page.
+	- children:
+	   The screen's HTML is held here. It should not be set.
+
+	- style:
+		Stylizes the view if needed. Functions the same as other style props. Optional.
+
+	- title (required, string):
+		The title name
+
+	- mainHeader (required, boolean):
+		Boolean for sub page or main page.
+
+	- Header (boolean):
+		True if you want a header. False if not.
 
 	@author Miles Hoffman
  */
