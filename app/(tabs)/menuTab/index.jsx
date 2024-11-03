@@ -4,6 +4,7 @@ import {Button} from "react-native-paper";
 import {router, useFocusEffect} from "expo-router";
 import React, {useCallback, useContext} from "react";
 import {AppContext} from "../_layout.jsx";
+import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 
 export default function MenuPage() {
 
@@ -33,7 +34,7 @@ export default function MenuPage() {
 			<View style={{alignItems: "center",flexDirection: 'column', justifyContent: 'center',flex: 1}}>
 				<View style={{alignContent: 'center',paddingTop: 5}}>
 
-					<Button onPress={ () => router.navigate('menuTab/userDetails')} style={{backgroundColor:'#353562',paddingHorizontal: 15, borderRadius: 8,
+					<Button onPress={ () => router.navigate('menuTab/userDetails')} style={{backgroundColor: lightTheme.colors.primaryContainer,paddingHorizontal: 15, borderRadius: 8,
 						opacity: 1,height: 75,width: 375,borderBottomLeftRadius: 0,borderBottomRightRadius: 0,borderBottomWidth:.5,borderBottomColor:'white',paddingVertical:20,}}>
 						<Text style={styles.text}>User Details</Text>
 					</Button>
@@ -41,7 +42,7 @@ export default function MenuPage() {
 
 
 
-					<Button onPress={ () => router.navigate('menuTab/CompanyDetails')}style={{backgroundColor:'#353562',paddingHorizontal: 15, borderRadius: 8,
+					<Button onPress={ () => router.navigate('menuTab/CompanyDetails')}style={{backgroundColor:lightTheme.colors.primaryContainer,paddingHorizontal: 15, borderRadius: 8,
 						opacity: 1,height: 75,width: 375,borderTopLeftRadius: 0,borderTopRightRadius: 0,paddingVertical:20,marginBottom:20}}>
 						<Text style={styles.text}>Company Details</Text>
 					</Button>
@@ -74,10 +75,9 @@ const styles = StyleSheet.create({
 
 	text: {
 		fontSize: 16,
-		lineHeight: 21,
 		fontWeight: 'bold',
 		letterSpacing: 0.25,
-		color: 'white',
+		color: lightTheme.colors.black
 	},
 	title: {
 		fontSize: 45,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 		paddingHorizontal: 15,
 		paddingVertical: 20,
-		backgroundColor: '#353562',
+		backgroundColor:  lightTheme.colors.primaryContainer,
 		borderRadius: 8,
 		alignItems: 'center',
 		opacity: 1,
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 		paddingHorizontal: 15,
 		paddingVertical: 20,
-		backgroundColor: '#353562',
+		backgroundColor:  lightTheme.colors.primaryContainer,
 		borderRadius: 8,
 		alignItems: 'center',
 		opacity: 1,

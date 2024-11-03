@@ -3,7 +3,8 @@ import {Button, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {router} from 'expo-router'
 import {BackDrop} from "../../../components/Backdrop.jsx";
 import React,{useState} from "react";
-import {TextInput} from "react-native-paper";
+import {TextInput, useTheme} from "react-native-paper";
+import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 
 
 export default function MenuPage() {
@@ -11,6 +12,7 @@ export default function MenuPage() {
     const [textAdd, setTextAdd] = React.useState("");
     const [textEm, setTextEm] = React.useState("");
     const [textPM, setTextPM] = React.useState("");
+
 
     const [isEditableON, setIsEditableON] = useState(false);
     const [isEditableAdd, setIsEditableAdd] = useState(false);
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: 'white',
+        color: lightTheme.colors.black,
     },
     title: {
         fontSize: 45,
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
 
     backgroundContainer: {
         flexDirection: 'column',
-        backgroundColor: '#353562',
+        backgroundColor: lightTheme.colors.primaryContainer,
         padding: 10,
         borderRadius: 10,
         marginRight: 10,

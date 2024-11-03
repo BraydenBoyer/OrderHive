@@ -3,6 +3,7 @@ import { BackDrop } from "../../../components/Backdrop.jsx";
 import React, { useState } from "react";
 import { Switch } from "react-native-paper";
 import ColorPicker from 'react-native-wheel-color-picker';
+import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 
 export default function MenuPage() {
     const [isDarkSwitchOn, setIsDarkSwitchOn] = useState(false);
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: 'white',
+        color:lightTheme.colors.black,
     },
     title: {
         fontSize: 45,
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     },
     backgroundContainerTop: {
         flexDirection: 'row',
-        backgroundColor: '#353562',
+        backgroundColor: lightTheme.colors.primaryContainer,
         padding: 10,
         borderRadius: 10,
         marginRight: 10,
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     },
     backgroundContainerBottom: {
         flexDirection: 'row',
-        backgroundColor: '#353562',
+        backgroundColor: lightTheme.colors.primaryContainer,
         padding: 10,
         borderRadius: 10,
         marginRight: 10,
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     selectButtonText: {
-        color: 'white',
+        color: lightTheme.colors.black,
         fontWeight: 'bold',
         fontSize: 16,
     },
