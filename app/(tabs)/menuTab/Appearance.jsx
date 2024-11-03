@@ -6,6 +6,7 @@ import ColorPicker from 'react-native-wheel-color-picker';
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 
 export default function MenuPage() {
+
     const [isDarkSwitchOn, setIsDarkSwitchOn] = useState(false);
     const [isLightSwitchOn, setIsLightSwitchOn] = useState(true);
     const [primaryColor, setPrimaryColor] = useState('#FFFFFF'); // Default color for primary button

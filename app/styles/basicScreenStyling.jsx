@@ -3,7 +3,7 @@ import {lightTheme} from "./themes/colors/lightTheme.jsx";
 
 export const basicScreenOption = {
 	headerShown: false,
-	navigationBarHidden: true,
+	navigationBarHidden: false,
 	navigationBarColor: lightTheme.colors.primaryContainer,
 	statusBarColor: lightTheme.colors.primaryContainer,
 	statusBarStyle: 'dark',

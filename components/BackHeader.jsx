@@ -1,8 +1,14 @@
 import {Appbar} from "react-native-paper";
 import {Link, router} from "expo-router";
+import SideBar from "./SideBar.jsx";
+import * as React from "react";
+import {lightTheme} from "../app/styles/themes/colors/lightTheme.jsx";
 
 
 export const BackHeader = ({title = 'App.OrderHive'}) => {
+
+
+	const colors = lightTheme.colors
 
 	const handleSettingsPress = () => {
 
@@ -18,10 +24,11 @@ export const BackHeader = ({title = 'App.OrderHive'}) => {
 
 
 	return(
-		<Appbar.Header>
+
+		<Appbar.Header style={{backgroundColor: colors.primaryContainer}} elevated={true}>
 			<Appbar.BackAction onPress={goBack} />
-			<Appbar.Content title={title}  />
-			<Appbar.Action icon={'cog'} onPress={handleSettingsPress} />
+			<Appbar.Content color={colors.onPrimaryContainer} title={title} />
+			<Appbar.Action color={colors.onPrimaryContainer} icon={'cog'} onPress={handleSettingsPress} />
 		</Appbar.Header>
 	)
 }

@@ -21,13 +21,13 @@ import {MainHeader} from "./MainHeader.jsx";
 
 	@author Miles Hoffman
  */
-export const BackDrop = ({ children, style, mainHeader = true, title = 'App.OrderHive' }) => {
+export const BackDrop = ({ children, style, mainHeader = true, title = 'App.OrderHive', header = true }) => {
 	const colors = useTheme().colors;
 
 
 	return (
 		<SafeAreaView style={[basicBackdropStyle]} >
-			{mainHeader ?
+			{ !header ? <></> : mainHeader ?
 				<MainHeader title={title}/>
 				:
 				<BackHeader title={title}/>
