@@ -134,6 +134,8 @@ export default function CustomerPage() {
         </Dialog>
       </Portal>
 
+      {
+        true ? <></> :
 
       <Portal>
         <FAB.Group
@@ -147,6 +149,7 @@ export default function CustomerPage() {
           style={styles.fabGroup}
         />
       </Portal>
+      }
     </BackDrop>
   );
 }
