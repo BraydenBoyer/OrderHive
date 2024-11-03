@@ -13,7 +13,7 @@ export default function SideBar({ open, setOpen }) {
 		<Portal>
 			{open && ( // Conditionally render the overlay and sidebar
 				<View>
-					<TouchableOpacity style={styles.overlay} onPress={() => setOpen(false)} />
+					<TouchableOpacity style={styles.overlay} onPress={() => setOpen(false)} activeOpacity={.5} />
 					<View style={styles.sidebar}>
 						<Surface mode={"elevated"} style={[styles.sidebarSurface, {backgroundColor: colors.secondaryContainer} ]} >
 

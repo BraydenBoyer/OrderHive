@@ -1,4 +1,4 @@
-import {BackDrop} from "../../../components/Backdrop.jsx";
+import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
 import {Text, View, StyleSheet, TouchableOpacity} from "react-native";
 import {Button} from "react-native-paper";
 import {router, useFocusEffect} from "expo-router";

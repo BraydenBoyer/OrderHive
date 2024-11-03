@@ -3,7 +3,7 @@ import {Appbar, useTheme} from 'react-native-paper';
 import {router} from "expo-router";
 import {useState} from "react";
 import SideBar from "./SideBar.jsx";
-import {lightTheme} from "../app/styles/themes/colors/lightTheme.jsx";
+import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 
 export const MainHeader = ({children,  title = 'App.OrderHive' }) => {
 
@@ -11,8 +11,11 @@ export const MainHeader = ({children,  title = 'App.OrderHive' }) => {
 	const colors = useTheme().colors
 
 	const handleSettingsPress = () => {
-
 		router.replace('/menuTab')
+	}
+
+	const handleLoginPress = () => {
+		router.replace('/')	// Navigate to the login screen
 	}
 
 	return (
@@ -20,6 +23,7 @@ export const MainHeader = ({children,  title = 'App.OrderHive' }) => {
 			<Appbar.Header style={{backgroundColor: colors.primaryContainer}} elevated={true}>
 				<Appbar.Action icon={'menu'} color={colors.onPrimaryContainer}  onPress={() => setOpen(!open)} />
 				<Appbar.Content color={colors.onPrimaryContainer} title={title} />
+				<Appbar.Action color={colors.onPrimaryContainer} icon={'login'} onPress={handleLoginPress} />
 				<Appbar.Action color={colors.onPrimaryContainer} icon={'cog'} onPress={handleSettingsPress} />
 
 				<SideBar open={open} setOpen={setOpen} />

@@ -1,5 +1,5 @@
 import { Button, StyleSheet, Text, SafeAreaView, View, TouchableOpacity, Modal } from "react-native";
-import { BackDrop } from "../../../components/Backdrop.jsx";
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import React, { useState } from "react";
 import { Switch } from "react-native-paper";
 import ColorPicker from 'react-native-wheel-color-picker';

@@ -4,7 +4,7 @@ import { lightTheme } from '../styles/themes/colors/lightTheme.jsx';
 import TabBarIcon from '../../components/TabBarIcon.jsx';
 import {basicTabOptions} from "../styles/basicScreenStyling.jsx";
 import {createContext, useContext, useState} from "react";
-import {MyFAB} from "../../components/FAB.jsx";
+import {MyFAB} from "../../components/overlays/FAB.jsx";
 
 
 export const AppContext = createContext({});

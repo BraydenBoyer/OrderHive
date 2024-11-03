@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
 import { PaperProvider, useTheme, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { basicBackdropStyle } from '../app/styles/basicScreenStyling.jsx';
+import { basicBackdropStyle } from '../../app/styles/basicScreenStyling.jsx';
 import {MyFAB} from "./FAB.jsx";
 import {BackHeader} from "./BackHeader.jsx";
 import {MainHeader} from "./MainHeader.jsx";

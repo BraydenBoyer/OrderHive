@@ -3,7 +3,7 @@ import {StyleSheet} from "react-native";
 import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
 
 
-export const MyTextInput = ({placeholder}) => {
+export const MyTextInput = ({placeholder, value, onChangeText}) => {
 
 	const styles = textInputStyles()
 	const colors = useTheme().colors
@@ -17,6 +17,9 @@ export const MyTextInput = ({placeholder}) => {
 			underlineColor={'transparent'}
 			activeUnderlineColor={'transparent'}
 			cursorColor={colors.onPrimaryContainer}
+			textColor={colors.onPrimaryContainer}
+			value={value}
+			onChangeText={onChangeText}
 		/>
 	)
 }
@@ -24,14 +27,16 @@ export const MyTextInput = ({placeholder}) => {
 
 const textInputStyles = () => {
 
-	const theme = useTheme()
+	const colors = useTheme().colors
+
 
 	return StyleSheet.create({
 
 		box: {
 			borderRadius: roundness.mediumRadius,
 			borderTopLeftRadius: roundness.mediumRadius,
-			borderTopRightRadius: roundness.mediumRadius
+			borderTopRightRadius: roundness.mediumRadius,
+			backgroundColor: colors.primaryContainer
 		}
 	})
 }

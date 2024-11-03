@@ -1,7 +1,7 @@
 import {FAB, Portal, useTheme} from 'react-native-paper'
 import {useEffect, useState} from 'react';
 import {StyleSheet} from "react-native";
-import {lightTheme} from "../app/styles/themes/colors/lightTheme.jsx";
+import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 
 
 

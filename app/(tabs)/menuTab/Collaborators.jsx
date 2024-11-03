@@ -1,6 +1,6 @@
 
 import {Button, StyleSheet, Text, View} from "react-native";
-import {BackDrop} from "../../../components/Backdrop.jsx";
+import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
 import React,{} from "react";
 import {DataTable} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";

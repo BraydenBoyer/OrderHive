@@ -2,8 +2,8 @@ import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
 import { Text, Button, FAB, Checkbox, Card, IconButton, useTheme, Menu, Divider } from "react-native-paper";
 import { router } from 'expo-router';
-import { BackDrop } from "../../../components/Backdrop.jsx";
-import { MyFAB } from "../../../components/FAB.jsx";
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
+import { MyFAB } from "../../../components/overlays/FAB.jsx";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../_layout.jsx";
 

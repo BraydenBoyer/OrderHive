@@ -1,7 +1,7 @@
 import {Link, Tabs} from "expo-router";
 import {Button, StyleSheet, Text, TouchableOpacity, View,Image} from "react-native";
 import {router} from 'expo-router'
-import {BackDrop} from "../../../components/Backdrop.jsx";
+import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
 import React,{useState} from "react";
 import {TextInput, TouchableRipple, useTheme,IconButton, MD3Colors} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";

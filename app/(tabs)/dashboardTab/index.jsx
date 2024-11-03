@@ -1,7 +1,7 @@
 // tabs/dashboardTab/index.jsx
 import React, {useCallback, useContext} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { BackDrop } from "../../../components/Backdrop.jsx";
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import WidgetButton from '../../../components/WidgetButton';
 import ActionButton from '../../../components/ActionButton';
 import SettingsButton from '../../../components/SettingsButton';
