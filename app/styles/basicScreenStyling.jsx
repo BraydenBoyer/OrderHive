@@ -1,25 +1,38 @@
-import {lightTheme} from "./themes/lightTheme.jsx";
+import {lightTheme} from "./themes/colors/lightTheme.jsx";
 
 
 export const basicScreenOption = {
 	headerShown: false,
-	navigationBarHidden: false,
-	navigationBarColor: lightTheme.colors.surfaceVariant,
-	statusBarColor: lightTheme.colors.surfaceVariant,
+	navigationBarHidden: true,
+	navigationBarColor: lightTheme.colors.primaryContainer,
+	statusBarColor: lightTheme.colors.primaryContainer,
 	statusBarStyle: 'dark',
 }
 
 export const basicTabOptions = {
 	headerShown: false,
-	navigationBarHidden: false,
-	navigationBarColor: lightTheme.colors.surfaceVariant,
 	tabBarActiveTintColor: lightTheme.colors.primary,
-	tabBarInactiveTintColor: lightTheme.colors.inverseSurface,
+	tabBarInactiveTintColor: lightTheme.colors.onPrimaryContainer,
 	tabBarStyle: {
-		backgroundColor: lightTheme.colors.surfaceVariant,
+		backgroundColor: lightTheme.colors.primaryContainer,
+		height: 80,
+	},
+
+	tabBarItemStyle: {
+		backgroundColor: lightTheme.colors.primaryContainer,
 		paddingBottom: 10,
-		paddingTop: 10,
-		height: 60
+		paddingTop: 5,
+	},
+
+	tabBarIconStyle: {
+		margin: 0,
+		padding: 0
+	},
+
+	tabBarLabelStyle: {
+		fontWeight: 'bold',
+		fontSize: 12,
+		marginBottom: 10
 	}
 }
 

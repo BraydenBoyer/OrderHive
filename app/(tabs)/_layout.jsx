@@ -1,6 +1,6 @@
 import {Tabs, useLocalSearchParams} from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
-import { lightTheme } from '../styles/themes/lightTheme.jsx';
+import { lightTheme } from '../styles/themes/colors/lightTheme.jsx';
 import TabBarIcon from '../../components/TabBarIcon.jsx';
 import {basicTabOptions} from "../styles/basicScreenStyling.jsx";
 import {createContext, useContext, useState} from "react";
@@ -63,8 +63,7 @@ export default function TabLayout() {
 						}}
 					/>
 
-					<Tabs.Screen name={'(TestingSpace)/index'} options={{href: null}} />
-					<Tabs.Screen name={'menuTab'} options={{href: "menuTab"}} />
+					<Tabs.Screen name={'menuTab'} options={{href: null}} />
 
 				</Tabs>
 

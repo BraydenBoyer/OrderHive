@@ -1,7 +1,7 @@
 import {FAB, Portal, useTheme} from 'react-native-paper'
 import {useEffect, useState} from 'react';
 import {StyleSheet} from "react-native";
-import {lightTheme} from "../app/styles/themes/lightTheme.jsx";
+import {lightTheme} from "../app/styles/themes/colors/lightTheme.jsx";
 
 
 
@@ -31,13 +31,16 @@ const exampleActions = [
 		icon: 'plus',
 		label: 'Plus Sign',
 		onPress: () => { return console.log('Clicked FAB plus')},
-		size: 'large'
+		size: 'large',
+		color: lightTheme.colors.secondary,
+		style: {backgroundColor: lightTheme.colors.secondaryContainer}
 	},
 	{
 		icon: 'cloud',
 		label: '',
 		onPress: () => { return console.log('Clicked FAB cloud')},
-		size: 'large'
+		size: 'large',
+
 	},
 	{
 		icon: 'menu',
@@ -54,6 +57,8 @@ export const MyFAB = ({actions, icon = ['plus', 'close'], visible}) => {
 	const { open } = state;
 
 
+
+
 	return(
 		<Portal>
 
@@ -61,14 +66,19 @@ export const MyFAB = ({actions, icon = ['plus', 'close'], visible}) => {
 				open={open}
 				visible={visible}
 				icon={open ? icon[1] : icon[0]}
-				actions={actions ? actions : exampleActions}
+				actions={actions !== undefined ? actions : exampleActions}
 				onStateChange={onStateChange}
 
-				style={{marginBottom: 60,}}
-				fabStyle={{}}
+				style={styleFab}
+				variant={'primary'}
 			/>
 
 		</Portal>
 	)
+}
+
+
+const styleFab = {
+		marginBottom: 75
 }
 

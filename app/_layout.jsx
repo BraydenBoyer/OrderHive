@@ -1,7 +1,7 @@
 import {Stack, Tabs} from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import {basicScreenOption} from "./styles/basicScreenStyling.jsx";
-import {lightTheme} from "./styles/themes/lightTheme.jsx";
+import {lightTheme} from "./styles/themes/colors/lightTheme.jsx";
 
 export default function RootLayout() {
 	return (

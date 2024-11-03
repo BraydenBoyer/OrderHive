@@ -18,7 +18,9 @@ export default function LoginPage() {
 				This is login screen.
 			</Text>
 
-			<Button mode={'contained-tonal'} onPress={() => router.navigate('dashboardTab')}>
+			<Button style={{
+				height: 100,
+			}} mode={'elevated'} onPress={() => router.navigate('dashboardTab')}>
 				Click here to go to dashboard
 			</Button>
 
