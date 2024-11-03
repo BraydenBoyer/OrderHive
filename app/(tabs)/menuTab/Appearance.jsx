@@ -44,10 +44,8 @@ export default function MenuPage() {
     };
 
     return (
-        <BackDrop>
-            <View>
-                <Text style={styles.title}>Appearance</Text>
-            </View>
+        <BackDrop mainHeader={false} title='Appearance'>
+
 
             <View style={styles.container}>
                 <View style={styles.backgroundContainerTop}>

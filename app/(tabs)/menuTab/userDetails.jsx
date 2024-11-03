@@ -33,10 +33,8 @@ export default function MenuPage() {
         setIsEditablePN(!isEditablePN);
     };
     return (
-        <BackDrop title='User Details'>
-            <View>
-                <Text style={styles.title}>User Details</Text>
-            </View>
+        <BackDrop title='User Details' mainHeader={false}>
+
             <View style={styles.container}>
 
                 <View style={[styles.backgroundContainer,
