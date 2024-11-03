@@ -36,8 +36,8 @@ export default function MenuPage() {
                     <Text style={styles.text}>Admims</Text>
                     <View style={styles.inputContainer}>
                         <Text style={styles.subText}>Current Admins |</Text>
-                        <Text style={styles.subText}> X</Text>
-                        <Button title="Edit" onPress={handleEditToggleON} />
+                        <Text style={[styles.subText,{marginRight:150}]}> X</Text>
+                        <Button title="View All" onPress={handleEditToggleON} />
                     </View>
                 </View>
 
@@ -46,8 +46,8 @@ export default function MenuPage() {
                     <Text style={styles.text}>Editors</Text>
                     <View style={styles.inputContainer}>
                         <Text style={styles.subText}>Current Editors |</Text>
-                        <Text style={styles.subText}> X</Text>
-                        <Button title="Edit" onPress={handleEditTogglePn} />
+                        <Text style={[styles.subText,{marginRight:150}]}> X</Text>
+                        <Button title="View All" onPress={handleEditTogglePn} />
                     </View>
                 </View>
 
@@ -56,7 +56,7 @@ export default function MenuPage() {
                     <Text style={styles.text}>Collaborator Actions</Text>
                     <View style={styles.inputContainer}>
                         <Text style={styles.subText}>10/10/24 |</Text>
-                        <Text style={styles.subText}> 10:52AM</Text>
+                        <Text style={[styles.subText,{marginRight:150}]}> 10:52AM</Text>
                         <Button title='View All' onPress={handleEditToggleAdd} />
                     </View>
                 </View>
