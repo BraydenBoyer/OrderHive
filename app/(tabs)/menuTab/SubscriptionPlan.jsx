@@ -30,7 +30,7 @@ export default function MenuPage() {
 
                 <View style={[styles.backgroundContainer,
                     {borderBottomLeftRadius: 0,borderBottomRightRadius: 0,borderBottomWidth:.5,borderBottomColor:'white'}]}>
-                    <Text style={styles.text}>Organization Name</Text>
+                    <Text style={styles.text}>Current Plan</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={{width:'80%',height: 30}}
@@ -40,7 +40,14 @@ export default function MenuPage() {
                             editable={isEditableON}
 
                         />
-                        <Button title={isEditableON ? "Save" : "Edit"} onPress={handleEditToggleON} />
+                        <IconButton
+                            icon="pencil-outline"
+                            iconColor= "black"
+                            size={20}
+                            onPress={() => console.log('Pressed')}
+                            containerStyle={{ backgroundColor: '#000000', borderRadius: 10 }}
+                            onPress={handleEditTogglePn}
+                        />
                     </View>
                 </View>
 
@@ -60,10 +67,10 @@ export default function MenuPage() {
 
                             <IconButton
                                 icon="credit-card-edit"
-                                iconColor={MD3Colors.error50}
+                                iconColor= "black"
                                 size={20}
                                 onPress={() => console.log('Pressed')}
-                                containerStyle={{ backgroundColor: '#e0e0e0', borderRadius: 10 }}
+                                containerStyle={{ backgroundColor: '#000000', borderRadius: 10 }}
                                 onPress={handleEditTogglePn}
                             />
 
