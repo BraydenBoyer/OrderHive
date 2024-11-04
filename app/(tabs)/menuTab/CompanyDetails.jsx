@@ -35,7 +35,7 @@ export default function MenuPage() {
         setIsEditablePN(!isEditablePN);
     };
     return (
-        <BackDrop title='Comany Detals' mainHeader={false}>
+        <BackDrop title='Company Details' mainHeader={false}>
 
             <View style={styles.container}>
 
