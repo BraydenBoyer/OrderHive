@@ -32,14 +32,7 @@ export default function MenuPage() {
                     {borderBottomLeftRadius: 0,borderBottomRightRadius: 0,borderBottomWidth:.5,borderBottomColor:'white'}]}>
                     <Text style={styles.text}>Current Plan</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{width:'80%',height: 30}}
-                            mode="outlined"
-                            value={textON}
-                            onChangeText={textON => setTextON(textON)}
-                            editable={isEditableON}
-
-                        />
+                        <Text  style={[styles.text,{marginRight: 240}]}>Base Plan</Text>
                         <IconButton
                             icon="pencil-outline"
                             iconColor= "black"
@@ -52,16 +45,9 @@ export default function MenuPage() {
                 </View>
 
                 <View style={[styles.backgroundContainer, {borderTopLeftRadius: 0,borderTopRightRadius: 0}]}>
-                    <Text style={styles.text}>Payment Portal</Text>
+                    <Text style={styles.subtext}>Payment Portal</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{width:'80%',height: 30}}
-                            mode="outlined"
-                            value={textPM}
-                            onChangeText={textPM => setTextPM(textPM)}
-                            editable={isEditablePN}
-
-                        />
+                            <Text  style={[styles.text,{marginRight: 140}]}>Disover ending in 5764</Text>
 
 
 
@@ -89,8 +75,6 @@ const styles = StyleSheet.create({
 
     text: {
         fontSize: 20,
-        lineHeight: 21,
-        fontWeight: 'bold',
         letterSpacing: 0.25,
         color: lightTheme.colors.black,
     },
@@ -98,6 +82,11 @@ const styles = StyleSheet.create({
         fontSize: 45,
         fontWeight: 'bold',
         textAlign: 'left',
+    },
+    subtext: {
+        fontSize: 18,
+        letterSpacing: 0.25,
+        color: lightTheme.colors.black,
     },
 
 
