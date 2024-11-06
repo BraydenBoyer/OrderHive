@@ -1,4 +1,4 @@
-import { Link, Tabs } from "expo-router";
+
 import { Button, StyleSheet, Text, TouchableOpacity, View, Image, Dimensions, Platform } from "react-native";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import React, { useState } from "react";

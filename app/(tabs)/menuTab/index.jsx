@@ -34,27 +34,27 @@ export default function MenuPage() {
 
 			<View style={{alignItems: "center",flexDirection: 'column', justifyContent: 'center',rowGap:10}}>
 
-				<View style={{alignContent: 'center',paddingTop: 5, rowGap: 0}}>
+				<View style={{alignContent: 'center',paddingTop: 5, rowGap: 1}}>
 
-					<MyButton style={{backgroundColor: 'red', width: 200, height: 60}} />
-					<MyButton title={"Mine"} style={{width: 200, height: 100, backgroundColor: 'green'}} ></MyButton>
+					<MyButton title={'User Details'} onClick={ () => router.navigate('menuTab/userDetails')} style={styles.button} />
+					<MyButton title={"Company Details"} onClick={ () => router.navigate('menuTab/CompanyDetails')} style={styles.button} ></MyButton>
 
 				</View>
 
 
 				<View style={{alignContent: 'center'}}>
-					<MyButton title={'one'} onClick={ () => router.navigate('menuTab/Collaborators')} style={styles.button}>
+					<MyButton title={'Collaborators'} onClick={ () => router.navigate('menuTab/Collaborators')} style={styles.button}>
 						<Text style={styles.text}>Collaborators</Text> </MyButton>
 				</View>
 
 
 				<View style={{alignContent: 'center'}}>
 
-					<MyButton title={'two'} onClick={ () => router.navigate('menuTab/SubscriptionPlan')} style={styles.button }><Text style={styles.text}>Subscription Plan</Text></MyButton>
+					<MyButton title={'SubscriptionPlan'} onClick={ () => router.navigate('menuTab/SubscriptionPlan')} style={styles.button }><Text style={styles.text}>Subscription Plan</Text></MyButton>
 				</View>
 
 				<View style={{alignContent: 'center'}}>
-					<MyButton title={'three'} onClick={ () => router.navigate('menuTab/Appearance')} style={styles.button }><Text style={styles.text}>Appearance</Text></MyButton>
+					<MyButton title={'Appearance'} onClick={ () => router.navigate('menuTab/Appearance')} style={styles.button }><Text style={styles.text}>Appearance</Text></MyButton>
 				</View>
 
 			</View>
