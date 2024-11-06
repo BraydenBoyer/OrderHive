@@ -1,10 +1,11 @@
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
-import {Text, View, StyleSheet, TouchableOpacity} from "react-native";
-import {Button} from "react-native-paper";
+import {Text, View, StyleSheet, TouchableOpacity} from "react-native"
 import {router, useFocusEffect} from "expo-router";
 import React, {useCallback, useContext} from "react";
 import {AppContext} from "../_layout.jsx";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
+import {MyButton} from "../../../components/inputs/MyButton.jsx";
+import {Button} from 'react-native-paper'
 
 export default function MenuPage() {
 
@@ -31,36 +32,29 @@ export default function MenuPage() {
 				<Text style={styles.title}>Menu</Text>
 			</View>
 
-			<View style={{alignItems: "center",flexDirection: 'column', justifyContent: 'center',flex: 1}}>
-				<View style={{alignContent: 'center',paddingTop: 5}}>
+			<View style={{alignItems: "center",flexDirection: 'column', justifyContent: 'center',rowGap:10}}>
 
-					<Button onPress={ () => router.navigate('menuTab/userDetails')} style={{backgroundColor: lightTheme.colors.primaryContainer,paddingHorizontal: 15, borderRadius: 8,
-						opacity: 1,height: 75,width: 375,borderBottomLeftRadius: 0,borderBottomRightRadius: 0,borderBottomWidth:.5,borderBottomColor:'white',paddingVertical:20,}}>
-						<Text style={styles.text}>User Details</Text>
-					</Button>
+				<View style={{alignContent: 'center',paddingTop: 5, rowGap: 0}}>
 
+					<MyButton style={{backgroundColor: 'red', width: 200, height: 60}} />
+					<MyButton title={"Mine"} style={{width: 200, height: 100, backgroundColor: 'green'}} ></MyButton>
 
-
-
-					<Button onPress={ () => router.navigate('menuTab/CompanyDetails')}style={{backgroundColor:lightTheme.colors.primaryContainer,paddingHorizontal: 15, borderRadius: 8,
-						opacity: 1,height: 75,width: 375,borderTopLeftRadius: 0,borderTopRightRadius: 0,paddingVertical:20,marginBottom:20}}>
-						<Text style={styles.text}>Company Details</Text>
-					</Button>
-
-				</View>
-
-				<View style={{alignContent: 'center'}}>
-					<Button onPress={ () => router.navigate('menuTab/Collaborators')} style={styles.button}>
-						<Text style={styles.text}>Collaborators</Text> </Button>
 				</View>
 
 
 				<View style={{alignContent: 'center'}}>
-					<Button onPress={ () => router.navigate('menuTab/SubscriptionPlan')} style={styles.button }><Text style={styles.text}>Subscription Plan</Text></Button>
+					<MyButton title={'one'} onClick={ () => router.navigate('menuTab/Collaborators')} style={styles.button}>
+						<Text style={styles.text}>Collaborators</Text> </MyButton>
+				</View>
+
+
+				<View style={{alignContent: 'center'}}>
+
+					<MyButton title={'two'} onClick={ () => router.navigate('menuTab/SubscriptionPlan')} style={styles.button }><Text style={styles.text}>Subscription Plan</Text></MyButton>
 				</View>
 
 				<View style={{alignContent: 'center'}}>
-					<Button onPress={ () => router.navigate('menuTab/Appearance')} style={styles.button }><Text style={styles.text}>Appearance</Text></Button>
+					<MyButton title={'three'} onClick={ () => router.navigate('menuTab/Appearance')} style={styles.button }><Text style={styles.text}>Appearance</Text></MyButton>
 				</View>
 
 			</View>
@@ -86,13 +80,13 @@ const styles = StyleSheet.create({
 	},
 
 	button: {
-		marginBottom: 20,
-		paddingHorizontal: 15,
-		paddingVertical: 20,
+		//marginBottom: 20,
+		//paddingHorizontal: 15,
+		//paddingVertical: 20,
 		backgroundColor:  lightTheme.colors.primaryContainer,
-		borderRadius: 8,
-		alignItems: 'center',
-		opacity: 1,
+		//borderRadius: 8,
+		//alignItems: 'center',
+		//opacity: 1,
 		height: 75,
 		width: 375
 	},

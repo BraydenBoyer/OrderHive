@@ -3,9 +3,9 @@ import {Button, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {router} from 'expo-router'
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
 import React,{useState} from "react";
-import {TextInput} from "react-native-paper";
+import {TextInput, useTheme} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
-
+import {MyButton} from "../../../components/inputs/MyButton.jsx";
 
 export default function MenuPage() {
     const [textUN, setTextUN] = React.useState("");
@@ -50,7 +50,8 @@ export default function MenuPage() {
                             editable={isEditableUN}
 
                         />
-                        <Button title={isEditableUN ? "Save" : "Edit"} onPress={handleEditToggleUn} />
+                        <MyButton  title={isEditableUN ? "Save" : "Edit"} onClick={handleEditToggleUn}/>
+
                     </View>
                 </View>
 
@@ -68,7 +69,8 @@ export default function MenuPage() {
                             right={<TextInput.Icon icon="eye" />}
 
                         />
-                        <Button title={isEditablePass ? "Save" : "Edit"} onPress={handleEditTogglePass} />
+                        <MyButton title={isEditablePass ? "Save" : "Edit"} onClick={handleEditTogglePass}/>
+
                     </View>
                 </View>
 
@@ -84,7 +86,7 @@ export default function MenuPage() {
                             editable={isEditableEm}
 
                         />
-                        <Button title={isEditableEm ? "Save" : "Edit"} onPress={handleEditToggleEm} />
+                        <MyButton title={isEditableEm ? "Save" : "Edit"} onClick={handleEditToggleEm} />
                     </View>
                 </View>
 
@@ -99,7 +101,7 @@ export default function MenuPage() {
                             editable={isEditablePN}
 
                         />
-                        <Button title={isEditablePN ? "Save" : "Edit"} onPress={handleEditTogglePn} />
+                        <MyButton title={isEditablePN ? "Save" : "Edit"} onClick={handleEditTogglePn} />
                     </View>
                 </View>
 
