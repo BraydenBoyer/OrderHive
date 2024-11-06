@@ -1,10 +1,10 @@
 import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, FAB, Checkbox, Card, IconButton, useTheme, Menu, Divider } from "react-native-paper";
+import { Text, Button, Checkbox, Card, IconButton, useTheme, Divider } from "react-native-paper";
 import { router } from 'expo-router';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import { MyFAB } from "../../../components/overlays/FAB.jsx";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { AppContext } from "../_layout.jsx";
 
 const initialInventoryData = [
@@ -14,22 +14,16 @@ const initialInventoryData = [
 ];
 
 export default function InventoryPage() {
-
-  const { setFabVisible } = useContext(AppContext);
   const [isDeleteMode, setDeleteMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [inventoryData, setInventoryData] = useState(initialInventoryData);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
-  const [fabOpen, setFabOpen] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      setFabVisible(true);
-      return () => {
-        setFabVisible(false);
-      };
-    }, [])
-  );
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemPrice, setNewItemPrice] = useState('');
+  const [newItemCategory, setNewItemCategory] = useState('');
+
+  const { setFabVisible, setIcon, setActions } = useContext(AppContext);
 
   const handleSelectItem = (itemId) => {
     setSelectedItems((prevSelected) =>
@@ -43,20 +37,51 @@ export default function InventoryPage() {
     setDeleteMode(false);
   };
 
-  const openAddModal = () => {
-    setFabOpen(false);
-    setAddModalVisible(true);
+  const handleAddItems = () => {
+    if (!newItemName || !newItemPrice || !newItemCategory) return;
+
+    const newItem = {
+      id: inventoryData.length + 1,
+      category: newItemCategory,
+      name: newItemName,
+      price: `$${newItemPrice}`,
+      total: 0,
+      hold: 0,
+      source: "HG Farm",
+      type: newItemCategory,
+    };
+
+    setInventoryData([...inventoryData, newItem]);
+    setAddModalVisible(false);
+    setNewItemName('');
+    setNewItemPrice('');
+    setNewItemCategory('');
   };
 
-  const activateDeleteMode = () => {
-    setFabOpen(false);
-    setDeleteMode(true);
-  };
+  const exampleActions = [
+    {
+      icon: 'plus',
+      label: 'Add Item',
+      onPress: () => setAddModalVisible(true),
+    },
+    {
+      icon: 'delete',
+      label: 'Delete Selected',
+      onPress: () => setDeleteMode(true),
+    }
+  ];
 
-  const exitDeleteMode = () => {
-    setSelectedItems([]);
-    setDeleteMode(false);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      setFabVisible(true);
+      setActions(exampleActions);
+      setIcon(['plus', 'minus']); // Set to desired icons
+
+      return () => {
+        setFabVisible(false);
+      };
+    }, [setFabVisible, setActions, setIcon])
+  );
 
   return (
     <BackDrop style={styles.container}>
@@ -92,17 +117,6 @@ export default function InventoryPage() {
         </View>
       </ScrollView>
 
-      <FAB.Group
-        open={fabOpen}
-        icon={fabOpen ? 'close' : 'plus'}
-        actions={[
-          { icon: 'plus', label: 'Add', onPress: openAddModal },
-          { icon: 'delete', label: 'Delete', onPress: activateDeleteMode }
-        ]}
-        onStateChange={({ open }) => setFabOpen(open)}
-        style={styles.fab}
-      />
-
       {isDeleteMode && (
         <View style={styles.deleteFooter}>
           <IconButton
@@ -112,7 +126,7 @@ export default function InventoryPage() {
             onPress={handleDeleteItems}
             style={styles.trashIcon}
           />
-          <Button mode="text" onPress={exitDeleteMode} style={styles.cancelButton}>
+          <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton}>
             Cancel
           </Button>
         </View>
@@ -130,26 +144,27 @@ export default function InventoryPage() {
             <TextInput
               placeholder="Product Name"
               style={styles.input}
+              value={newItemName}
+              onChangeText={setNewItemName}
             />
             <TextInput
               placeholder="Sales Cost"
               style={styles.input}
               keyboardType="numeric"
+              value={newItemPrice}
+              onChangeText={setNewItemPrice}
             />
             <TextInput
-              placeholder="Manufacture Cost"
+              placeholder="Category (e.g., Lettuce, Bread)"
               style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Meta Data"
-              style={styles.input}
+              value={newItemCategory}
+              onChangeText={setNewItemCategory}
             />
             <View style={styles.buttonContainer}>
               <Button mode="outlined" onPress={() => setAddModalVisible(false)} style={styles.cancelButton}>
                 Cancel
               </Button>
-              <Button mode="contained" onPress={() => setAddModalVisible(false)} style={styles.confirmButton}>
+              <Button mode="contained" onPress={handleAddItems} style={styles.confirmButton}>
                 Confirm
               </Button>
             </View>
@@ -159,6 +174,8 @@ export default function InventoryPage() {
     </BackDrop>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

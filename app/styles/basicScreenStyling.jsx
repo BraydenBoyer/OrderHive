@@ -6,7 +6,7 @@ export const basicScreenOption = {
 	navigationBarHidden: false,
 	navigationBarColor: lightTheme.colors.primaryContainer,
 	statusBarColor: lightTheme.colors.primaryContainer,
-	statusBarStyle: 'dark',
+	//statusBarStyle: 'dark',
 }
 
 export const basicTabOptions = {
