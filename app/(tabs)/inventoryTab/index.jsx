@@ -6,6 +6,7 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import { MyFAB } from "../../../components/overlays/FAB.jsx";
 import { useCallback, useContext, useState } from "react";
 import { AppContext } from "../_layout.jsx";
+import {addInventoryItem} from '../../firebase/addItem.js'
 
 const initialInventoryData = [
   { id: 1, category: "Lettuce", name: "Butter Bib", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
@@ -19,9 +20,13 @@ export default function InventoryPage() {
   const [inventoryData, setInventoryData] = useState(initialInventoryData);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
 
-  const [newItemName, setNewItemName] = useState('');
-  const [newItemPrice, setNewItemPrice] = useState('');
-  const [newItemCategory, setNewItemCategory] = useState('');
+   const [newItemName, setNewItemName] = useState('');
+    const [newItemPrice, setNewItemPrice] = useState('');
+    const [newItemCategory, setNewItemCategory] = useState('');
+    const [newItemTotal, setNewItemTotal] = useState('');
+    const [newItemHold, setNewItemHold] = useState('');
+    const [newItemSource, setNewItemSource] = useState('');
+
 
   const { setFabVisible, setIcon, setActions } = useContext(AppContext);
 
@@ -37,26 +42,49 @@ export default function InventoryPage() {
     setDeleteMode(false);
   };
 
-  const handleAddItems = () => {
-    if (!newItemName || !newItemPrice || !newItemCategory) return;
+  const handleAddItems = async () => {
+      if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold || !newItemSource ) return;
 
-    const newItem = {
-      id: inventoryData.length + 1,
-      category: newItemCategory,
-      name: newItemName,
-      price: `$${newItemPrice}`,
-      total: 0,
-      hold: 0,
-      source: "HG Farm",
-      type: newItemCategory,
+      const newItem = {
+        category: newItemCategory,
+        name: newItemName,
+        price: newItemPrice,
+        total: newItemTotal,
+        hold: newItemHold,
+        source: newItemSource,
+
+      };
+
+      // Add item to Firebase
+      const result = await addInventoryItem(
+        newItem.category,
+        newItem.name,
+        newItem.price,
+        newItem.total,
+        newItem.hold,
+        newItem.source,
+
+      );
+
+      if (result === true) {
+        setInventoryData([...inventoryData, newItem]); // Update front-end state
+        setAddModalVisible(false); // Close modal
+        clearInputFields(); // Clear input fields
+      } else {
+        console.log("Error adding item:", result);
+      }
     };
 
-    setInventoryData([...inventoryData, newItem]);
-    setAddModalVisible(false);
-    setNewItemName('');
-    setNewItemPrice('');
-    setNewItemCategory('');
-  };
+    // Function to clear input fields after adding
+    const clearInputFields = () => {
+      setNewItemCategory('');
+      setNewItemName('');
+      setNewItemPrice('');
+      setNewItemTotal('');
+      setNewItemHold('');
+      setNewItemSource('');
+
+    };
 
   const exampleActions = [
     {
@@ -105,7 +133,7 @@ export default function InventoryPage() {
                         <Text style={styles.itemName}>{item.name}</Text>
                         <Text style={styles.price}>{item.price}</Text>
                         <Text style={styles.details}>Total: {item.total}   Hold: {item.hold}</Text>
-                        <Text style={styles.categorySource}>
+                        <Text style={styles.categorySource} value={newItemSource}>
                           {item.type} | {item.source}
                         </Text>
                       </View>
@@ -141,25 +169,13 @@ export default function InventoryPage() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Add Item</Text>
-            <TextInput
-              placeholder="Product Name"
-              style={styles.input}
-              value={newItemName}
-              onChangeText={setNewItemName}
-            />
-            <TextInput
-              placeholder="Sales Cost"
-              style={styles.input}
-              keyboardType="numeric"
-              value={newItemPrice}
-              onChangeText={setNewItemPrice}
-            />
-            <TextInput
-              placeholder="Category (e.g., Lettuce, Bread)"
-              style={styles.input}
-              value={newItemCategory}
-              onChangeText={setNewItemCategory}
-            />
+                        <TextInput placeholder="Product Name" style={styles.input} value={newItemName} onChangeText={setNewItemName} />
+                        <TextInput placeholder="Sales Cost" style={styles.input} keyboardType="numeric" value={newItemPrice} onChangeText={setNewItemPrice} />
+                        <TextInput placeholder="Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
+                        <TextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
+                        <TextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
+                        <TextInput placeholder="Source (e.g., HG Farm)" style={styles.input} value={newItemSource} onChangeText={setNewItemSource} />
+
             <View style={styles.buttonContainer}>
               <Button mode="outlined" onPress={() => setAddModalVisible(false)} style={styles.cancelButton}>
                 Cancel
