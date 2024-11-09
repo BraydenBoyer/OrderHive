@@ -79,7 +79,7 @@ export default function MenuPage() {
                     </View>
                 </View>
             </View>
-
+ 
 
             {isColorPickerVisible && (
                 <Modal

@@ -5,6 +5,7 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import WidgetButton from '../../../components/WidgetButton';
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
+import {StatusBar} from "expo-status-bar";
 
 export default function DashboardPage() {
   const { setFabVisible, setIcon, setActions } = useContext(AppContext);

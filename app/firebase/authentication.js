@@ -6,7 +6,6 @@ import {fireApp, fireAuth} from "./initializeFirebase.js";
 
 export const emailLogin = async (email, password, setErrorCode) => {
 
-
 	try {
 		const userCreds = await signInWithEmailAndPassword(fireAuth, email, password)
 		const user = userCreds.user

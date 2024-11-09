@@ -6,6 +6,7 @@ import { basicBackdropStyle } from '../../app/styles/basicScreenStyling.jsx';
 import {MyFAB} from "./FAB.jsx";
 import {BackHeader} from "./BackHeader.jsx";
 import {MainHeader} from "./MainHeader.jsx";
+import {StatusBar} from "expo-status-bar";
 
 
 /*

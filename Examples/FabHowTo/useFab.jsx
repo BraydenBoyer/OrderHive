@@ -1,9 +1,10 @@
-import {useCallback, useContext} from "react";
+import {useCallback, useContext, useState} from "react";
 import {Text} from "react-native-paper";
 import {router, useFocusEffect} from "expo-router";
 import {AppContext} from "../../app/(tabs)/_layout.jsx";
 import {BackDrop} from "../../components/overlays/Backdrop.jsx";
 import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
+import {LocalFAB} from "../../components/overlays/LocalFAB.jsx";
 
 
 
@@ -31,22 +32,23 @@ const exampleActions = [
     },
 ]
 
+
+/*
+    This is an example of how to properly set the local fab.
+ */
 export default function MenuPage() {
 
-    const {setFabVisible, setIcon, setActions} = useContext(AppContext)
+    const [visible, setVisible] = useState(false)
 
     useFocusEffect(
         useCallback(() => {
-            // If you want to do something when screen is focused
-            setFabVisible(true)
-            setActions(exampleActions)
-            setIcon(['bee', 'minus'])
+
+            setVisible(true)
 
             return () => {
-                // If you want to do something when screen is unfocused
-
+                setVisible(false)
             }
-        }, [])
+        }, [setVisible])
     )
 
 
@@ -55,6 +57,7 @@ export default function MenuPage() {
             <Text>
                 This is how you should set the fab.
             </Text>
+            <LocalFAB visible={visible} icon={['cloud', 'bee']} actions={exampleActions} />
         </BackDrop>
     )
 }

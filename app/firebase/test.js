@@ -1,6 +1,9 @@
 import {getDoc, collection, doc} from 'firebase/firestore'
 import {fireDb} from "./initializeFirebase.js";
 
+/*
+    Testing grab
+ */
 const getItems = async () => {
 
     const docRef = doc(fireDb, "users", "User.Miles.HlmTkj5HH7Q9SARyU8PyQKk4fWF2");
