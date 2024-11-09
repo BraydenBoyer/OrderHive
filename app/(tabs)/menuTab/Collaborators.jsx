@@ -3,6 +3,7 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import React, { useState } from "react";
 import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
 import CollaboratorsList from "./CollaboratorList.jsx";
+import { MyButton } from "../../../components/inputs/MyButton.jsx";
 
 export default function MenuPage() {
     const [visibleSections, setVisibleSections] = useState({
@@ -42,7 +43,6 @@ export default function MenuPage() {
         { id: 7, name: 'Grace' }
     ];
 
-
     const toggleSection = (section) => {
         setVisibleSections((prevState) => ({
             ...prevState,
@@ -51,15 +51,17 @@ export default function MenuPage() {
     };
 
     return (
-        <BackDrop title='Collaborators' mainHeader={false}>
+        <BackDrop title="Collaborators" mainHeader={false}>
             <View style={styles.container}>
-                {/* Admins Section */}
+
                 <View style={[styles.backgroundContainer, { borderBottomWidth: 0.5, borderBottomColor: 'white' }]}>
                     <Text style={styles.text}>Admins</Text>
                     <View style={styles.inputContainer}>
                         <Text style={styles.subText}>Current Admins |</Text>
-                        <Text style={[styles.subText, { marginRight: 150 }]}> X</Text>
-                        <Button title="View All" onPress={() => toggleSection('admins')} />
+                        <Text style={[styles.subText, { marginRight: 150 }]}>
+                            {admins.length} {/* Display the number of admins */}
+                        </Text>
+                        <MyButton title="View All" onClick={() => toggleSection('admins')} />
                     </View>
                     {visibleSections.admins && (
                         <View style={styles.listContainer}>
@@ -72,8 +74,10 @@ export default function MenuPage() {
                     <Text style={styles.text}>Editors</Text>
                     <View style={styles.inputContainer}>
                         <Text style={styles.subText}>Current Editors |</Text>
-                        <Text style={[styles.subText, { marginRight: 150 }]}> X</Text>
-                        <Button title="View All" onPress={() => toggleSection('editors')} />
+                        <Text style={[styles.subText, { marginRight: 150 }]}>
+                            {editors.length} {/* Display the number of editors */}
+                        </Text>
+                        <MyButton title="View All" onClick={() => toggleSection('editors')} />
                     </View>
                     {visibleSections.editors && (
                         <View style={styles.listContainer}>
@@ -86,8 +90,8 @@ export default function MenuPage() {
                     <Text style={styles.text}>Collaborator Actions</Text>
                     <View style={styles.inputContainer}>
                         <Text style={styles.subText}>10/10/24 |</Text>
-                        <Text style={[styles.subText, { marginRight: 150 }]}> 10:52AM</Text>
-                        <Button title='View All' onPress={() => toggleSection('collaborators')} />
+                        <Text style={[styles.subText, { marginRight: 150 }]}>10:52AM</Text>
+                        <MyButton title="View All" onClick={() => toggleSection('collaborators')} />
                     </View>
                     {visibleSections.collaborators && (
                         <View style={styles.listContainer}>
@@ -126,7 +130,7 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         flexDirection: 'row',
-        alignItems: "center",
+        alignItems: 'center',
         paddingTop: 10,
         paddingBottom: 40,
     },

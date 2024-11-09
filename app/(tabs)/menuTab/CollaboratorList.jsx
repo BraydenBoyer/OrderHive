@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, Button } from 'react-native';
 import { Checkbox } from 'react-native-paper';
+import {MyButton} from "../../../components/inputs/MyButton.jsx";
 
 const CollaboratorsList = ({ collaborators = [] }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -37,15 +38,15 @@ const CollaboratorsList = ({ collaborators = [] }) => {
                 )}
             />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 8 }}>
-                <Button
+                <MyButton
                     title="Previous"
-                    onPress={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                 />
                 <Text>Page {currentPage}</Text>
-                <Button
+                <MyButton
                     title="Next"
-                    onPress={() =>
+                    onClick={() =>
                         setCurrentPage((prev) =>
                             prev < Math.ceil(collaborators.length / itemsPerPage) ? prev + 1 : prev
                         )
