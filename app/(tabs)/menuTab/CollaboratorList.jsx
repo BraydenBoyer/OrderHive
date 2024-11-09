@@ -24,10 +24,12 @@ const CollaboratorsList = ({ collaborators = [] }) => {
 
     return (
         <View>
+            {/* Displays the Contents of each list*/}
             <FlatList
                 data={paginatedCollaborators}
+                //Here to check for unique keys
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
+                renderItem={({ item }) => (//executes for each item in the list
                     <View style={{ flexDirection: 'row', alignItems: 'center', padding: 8 }}>
                         <Checkbox
                             status={selectedCollaborators[item.id] ? 'checked' : 'unchecked'}
