@@ -1,5 +1,5 @@
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB } from "react-native-paper";
+import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB, Dialog } from "react-native-paper";
 import { useCallback, useContext, useState } from "react";
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
@@ -21,14 +21,18 @@ export default function CustomerPage() {
   const [customers, setCustomers] = useState(initialCustomers);
   const [addCustomerModalVisible, setAddCustomerModalVisible] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null); // To store the selected customer for viewing details
+  const [customerDetailVisible, setCustomerDetailVisible] = useState(false); // Controls the visibility of the customer detail modal
 
-  // Form state for adding a new customer
+  // Form state for adding a new customer, including totalOrders and completedOrders
   const [newCustomer, setNewCustomer] = useState({
     name: '',
     email: '',
     phone: '',
     location: '',
     notes: '',
+    totalOrders: '', // New field for total orders
+    completedOrders: '', // New field for completed orders
   });
 
   useFocusEffect(
@@ -64,18 +68,30 @@ export default function CustomerPage() {
       id: Date.now(), // Unique ID
       ...newCustomer,
       price: "$50", // Default price
-      totalOrders: 0,
-      completedOrders: 0,
+      totalOrders: parseInt(newCustomer.totalOrders) || 0, // Ensure it's an integer
+      completedOrders: parseInt(newCustomer.completedOrders) || 0, // Ensure it's an integer
     };
     setCustomers((prevCustomers) => ({
       ...prevCustomers,
       [location]: [...(prevCustomers[location] || []), newCustomerData],
     }));
     setAddCustomerModalVisible(false);
-    setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '' });
+    setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
   };
 
   const handleFabStateChange = ({ open }) => setFabOpen(open);
+
+  // Function to open customer details dialog
+  const openCustomerDetails = (customer) => {
+    setSelectedCustomer(customer);
+    setCustomerDetailVisible(true);
+  };
+
+  // Function to close customer details dialog
+  const closeCustomerDetails = () => {
+    setCustomerDetailVisible(false);
+    setSelectedCustomer(null);
+  };
 
   return (
     <View style={styles.container}>
@@ -85,7 +101,7 @@ export default function CustomerPage() {
             <Title style={styles.locationTitle}>{location}</Title>
             <Divider style={styles.divider} />
             {customers[location].map((customer) => (
-              <Card key={customer.id} style={styles.customerCard}>
+              <Card key={customer.id} style={styles.customerCard} onPress={() => openCustomerDetails(customer)}>
                 <Card.Content style={styles.cardContent}>
                   {isDeleteMode && (
                     <Checkbox
@@ -106,6 +122,29 @@ export default function CustomerPage() {
           </View>
         ))}
       </ScrollView>
+
+      {/* Customer Detail Dialog */}
+      <Portal>
+        <Dialog visible={customerDetailVisible} onDismiss={closeCustomerDetails}>
+          <Dialog.Title>Customer Details</Dialog.Title>
+          <Dialog.Content>
+            {selectedCustomer && (
+              <>
+                <Text>Name: {selectedCustomer.name}</Text>
+                <Text>Email: {selectedCustomer.email}</Text>
+                <Text>Phone: {selectedCustomer.phone}</Text>
+                <Text>Location: {selectedCustomer.location}</Text>
+                <Text>Notes: {selectedCustomer.notes}</Text>
+                <Text>Total Orders: {selectedCustomer.totalOrders}</Text>
+                <Text>Completed Orders: {selectedCustomer.completedOrders}</Text>
+              </>
+            )}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={closeCustomerDetails}>Close</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
 
       {/* Footer for Delete Mode */}
       {isDeleteMode && (
@@ -158,6 +197,8 @@ export default function CustomerPage() {
             <TextInput placeholder="Phone" style={styles.input} value={newCustomer.phone} onChangeText={(text) => setNewCustomer({ ...newCustomer, phone: text })} />
             <TextInput placeholder="Location" style={styles.input} value={newCustomer.location} onChangeText={(text) => setNewCustomer({ ...newCustomer, location: text })} />
             <TextInput placeholder="Notes" style={styles.input} value={newCustomer.notes} onChangeText={(text) => setNewCustomer({ ...newCustomer, notes: text })} />
+            <TextInput placeholder="Total Orders" style={styles.input} keyboardType="numeric" value={newCustomer.totalOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, totalOrders: text })} />
+            <TextInput placeholder="Completed Orders" style={styles.input} keyboardType="numeric" value={newCustomer.completedOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, completedOrders: text })} />
             <View style={styles.buttonContainer}>
               <Button mode="text" onPress={() => setAddCustomerModalVisible(false)}>Cancel</Button>
               <Button mode="contained" onPress={handleAddCustomer}>Add</Button>
@@ -168,6 +209,7 @@ export default function CustomerPage() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
