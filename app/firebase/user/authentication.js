@@ -1,5 +1,5 @@
-import {getAuth, signInWithEmailAndPassword} from 'firebase/auth'
-import {fireApp, fireAuth} from "./initializeFirebase.js";
+import {getAuth, signInWithEmailAndPassword, signOut} from 'firebase/auth'
+import {fireApp, fireAuth} from "../initializeFirebase.js";
 
 
 
@@ -17,4 +17,11 @@ export const emailLogin = async (email, password, setErrorCode) => {
 		console.log("Login error code:", error.code);
 		setErrorCode(error.code)
 	}
+}
+
+
+export const logoutCurrentUser = async () => {
+
+	await signOut(fireAuth)
+	console.log("Current user was signed out.")
 }
