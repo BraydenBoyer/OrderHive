@@ -33,9 +33,8 @@ export default function DashboardPage() {
   );
 
   return (
-    <BackDrop>
+    <BackDrop title='Dashboard'>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.title, { color: colors.onBackground }]}>Dashboard</Text>
 
         {/* Dashboard Widgets */}
         <View style={styles.widgetContainer}>
