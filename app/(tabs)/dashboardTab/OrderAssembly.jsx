@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Card, Checkbox } from 'react-native-paper';
-import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+
+const colors = lightTheme.colors;
 
 const orders = [
   { id: '1', name: 'Barry Allen', date: '10/3/24', items: ['Item 1', 'Item 2', 'Item 3'] },
@@ -29,13 +32,12 @@ const OrderAssembly = () => {
 
     setCompletedItems((prev) => ({ ...prev, [orderId]: updatedOrder }));
 
-    // Update the completedCount only if the state actually changes
     setCompletedCount((prevCount) => {
       if (isCompleted) {
-        return prevCount > 0 ? prevCount - 1 : 0; // Decrease if already completed
+        return prevCount > 0 ? prevCount - 1 : 0;
       } else {
         const totalItems = orders.reduce((acc, order) => acc + order.items.length, 0);
-        return prevCount < totalItems ? prevCount + 1 : prevCount; // Increase only if below total
+        return prevCount < totalItems ? prevCount + 1 : prevCount;
       }
     });
   };
@@ -65,10 +67,9 @@ const OrderAssembly = () => {
 
   return (
     <BackDrop title="Order Assembly" mainHeader={false}>
-
       {/* Order List */}
       {orders.map((order) => (
-        <Card key={order.id} style={styles.card}>
+        <Card key={order.id} style={[styles.card, { backgroundColor: colors.surface }]}>
           <View style={styles.cardContent}>
             <View style={styles.leftSection}>
               <Checkbox
@@ -78,12 +79,14 @@ const OrderAssembly = () => {
                 onPress={() => order.items.forEach((item) => handleToggleCheckbox(order.id, item))}
               />
               <View>
-                <Text style={styles.orderName}>{order.name}</Text>
-                <Text style={styles.orderDetails}>{order.date} • {order.items.length} items</Text>
+                <Text style={[styles.orderName, { color: colors.onSurface }]}>{order.name}</Text>
+                <Text style={[styles.orderDetails, { color: colors.onSurfaceVariant }]}>
+                  {order.date} • {order.items.length} items
+                </Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.viewButton} onPress={() => handleViewItems(order.id)}>
-              <Text style={styles.viewButtonText}>View Items</Text>
+            <TouchableOpacity style={[styles.viewButton, { backgroundColor: colors.primary }]} onPress={() => handleViewItems(order.id)}>
+              <Text style={[styles.viewButtonText, { color: colors.onPrimary }]}>View Items</Text>
             </TouchableOpacity>
           </View>
           {viewedOrder === order.id && (
@@ -94,9 +97,9 @@ const OrderAssembly = () => {
         </Card>
       ))}
 
-      <View style={styles.completedBox}>
-        <Text style={styles.completedText}>Completed</Text>
-        <Text style={styles.completedCounter}>
+      <View style={[styles.completedBox, { backgroundColor: colors.primaryContainer }]}>
+        <Text style={[styles.completedText, { color: colors.onPrimaryContainer }]}>Completed</Text>
+        <Text style={[styles.completedCounter, { color: colors.onPrimaryContainer }]}>
           {completedCount}/{orders.reduce((acc, order) => acc + order.items.length, 0)}
         </Text>
       </View>
@@ -105,13 +108,7 @@ const OrderAssembly = () => {
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   card: {
-    backgroundColor: '#f3e8ff',
     borderRadius: 10,
     marginBottom: 15,
     elevation: 2,
@@ -132,16 +129,13 @@ const styles = StyleSheet.create({
   },
   orderDetails: {
     fontSize: 14,
-    color: '#6e6e6e',
   },
   viewButton: {
-    backgroundColor: '#a685e2',
     paddingVertical: 6,
     paddingHorizontal: 15,
     borderRadius: 5,
   },
   viewButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -159,24 +153,21 @@ const styles = StyleSheet.create({
   },
   itemCompletedText: {
     textDecorationLine: 'line-through',
-    color: '#888',
+    color: colors.outline,
   },
   completedBox: {
     position: 'absolute',
     bottom: 20,
     left: 20,
-    backgroundColor: '#a685e2',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,
   },
   completedText: {
-    color: '#FFFFFF',
     fontSize: 14,
     textAlign: 'center',
   },
   completedCounter: {
-    color: '#FFFFFF',
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',

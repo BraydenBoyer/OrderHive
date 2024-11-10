@@ -6,6 +6,9 @@ import WidgetButton from '../../../components/WidgetButton';
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
 import {StatusBar} from "expo-status-bar";
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+
+const colors = lightTheme.colors;
 
 export default function DashboardPage() {
   const { setFabVisible, setIcon, setActions } = useContext(AppContext);
@@ -31,17 +34,41 @@ export default function DashboardPage() {
 
   return (
     <BackDrop>
-      <View style={styles.container}>
-        <Text style={styles.title}>Dashboard</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.title, { color: colors.onBackground }]}>Dashboard</Text>
 
         {/* Dashboard Widgets */}
         <View style={styles.widgetContainer}>
-          <WidgetButton title="Collection Info" route="dashboardTab/CollectionInfo" style={styles.widget} />
-          <WidgetButton title="Collaborator" route="dashboardTab/Collaborator" style={styles.widget} />
-          <WidgetButton title="Pickup" route="dashboardTab/Pickup" style={styles.widget} />
-          <WidgetButton title="Sales Forecasting" route="dashboardTab/SalesForecasting" style={styles.widget} />
-          <WidgetButton title="Order Assembly" route="dashboardTab/OrderAssembly" style={styles.widget} />
-          <WidgetButton title="Product Analysis" route="dashboardTab/ProductAnalysis" style={styles.widget} />
+          <WidgetButton
+            title="Collection Info"
+            route="dashboardTab/CollectionInfo"
+            style={[styles.widget, { backgroundColor: colors.surface }]}
+          />
+          <WidgetButton
+            title="Collaborator"
+            route="dashboardTab/Collaborator"
+            style={[styles.widget, { backgroundColor: colors.surface }]}
+          />
+          <WidgetButton
+            title="Pickup"
+            route="dashboardTab/Pickup"
+            style={[styles.widget, { backgroundColor: colors.surface }]}
+          />
+          <WidgetButton
+            title="Sales Forecasting"
+            route="dashboardTab/SalesForecasting"
+            style={[styles.widget, { backgroundColor: colors.surface }]}
+          />
+          <WidgetButton
+            title="Order Assembly"
+            route="dashboardTab/OrderAssembly"
+            style={[styles.widget, { backgroundColor: colors.surface }]}
+          />
+          <WidgetButton
+            title="Product Analysis"
+            route="dashboardTab/ProductAnalysis"
+            style={[styles.widget, { backgroundColor: colors.surface }]}
+          />
         </View>
       </View>
     </BackDrop>

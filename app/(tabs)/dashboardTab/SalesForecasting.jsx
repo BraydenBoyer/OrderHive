@@ -3,6 +3,9 @@ import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
 import { MyFAB } from "../../../components/overlays/FAB.jsx"; 
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+
+const colors = lightTheme.colors;
 const actions = [
   {
     icon: 'chart-line',
@@ -27,7 +30,9 @@ const actions = [
 export default function SalesForecasting() {
   return (
     <BackDrop title="Sales Forecasting" mainHeader={false}>
-      <Text style={styles.text}>This is the Sales Forecasting screen.</Text>
+      <Text style={[styles.text, { color: colors.onBackground }]}>
+        This is the Sales Forecasting screen.
+      </Text>
       <MyFAB actions={actions} visible={true} />
     </BackDrop>
   );

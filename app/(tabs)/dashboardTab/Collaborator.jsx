@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card } from 'react-native-paper';
-import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+
+const colors = lightTheme.colors;
 
 const initialCollaborators = [
   { id: '1', name: 'Collaborator Name 1', role: 'Role 1', email: 'email1@example.com' },
@@ -31,47 +34,51 @@ const Collaborators = () => {
 
   return (
     <BackDrop title="Collaborators" mainHeader={false}>
-
       {/* Collaborator List */}
       {collaborators.map((collaborator) => (
-        <Card key={collaborator.id} style={styles.card}>
+        <Card key={collaborator.id} style={[styles.card, { backgroundColor: colors.surface }]}>
           <View style={styles.cardContent}>
             <View style={styles.leftSection}>
               {editingId === collaborator.id ? (
                 <>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surfaceVariant, color: colors.onSurface }]}
                     placeholder="Name"
+                    placeholderTextColor={colors.onSurfaceVariant}
                     value={editedCollaborator.name}
                     onChangeText={(text) => setEditedCollaborator({ ...editedCollaborator, name: text })}
                   />
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surfaceVariant, color: colors.onSurface }]}
                     placeholder="Role"
+                    placeholderTextColor={colors.onSurfaceVariant}
                     value={editedCollaborator.role}
                     onChangeText={(text) => setEditedCollaborator({ ...editedCollaborator, role: text })}
                   />
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surfaceVariant, color: colors.onSurface }]}
                     placeholder="Email"
+                    placeholderTextColor={colors.onSurfaceVariant}
                     value={editedCollaborator.email}
                     onChangeText={(text) => setEditedCollaborator({ ...editedCollaborator, email: text })}
                   />
                 </>
               ) : (
                 <>
-                  <Text style={styles.collaboratorName}>{collaborator.name}</Text>
-                  <Text style={styles.collaboratorDetails}>{collaborator.role} | {collaborator.email}</Text>
+                  <Text style={[styles.collaboratorName, { color: colors.onSurface }]}>{collaborator.name}</Text>
+                  <Text style={[styles.collaboratorDetails, { color: colors.onSurfaceVariant }]}>
+                    {collaborator.role} | {collaborator.email}
+                  </Text>
                 </>
               )}
             </View>
             {editingId === collaborator.id ? (
-              <TouchableOpacity style={styles.saveButton} onPress={() => handleSavePress(collaborator.id)}>
-                <Text style={styles.buttonText}>Save</Text>
+              <TouchableOpacity style={[styles.saveButton, { backgroundColor: colors.tertiary }]} onPress={() => handleSavePress(collaborator.id)}>
+                <Text style={[styles.buttonText, { color: colors.onTertiary }]}>Save</Text>
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity style={styles.editButton} onPress={() => handleEditPress(collaborator)}>
-                <Text style={styles.buttonText}>Edit</Text>
+              <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.primary }]} onPress={() => handleEditPress(collaborator)}>
+                <Text style={[styles.buttonText, { color: colors.onPrimary }]}>Edit</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -82,13 +89,7 @@ const Collaborators = () => {
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   card: {
-    backgroundColor: '#f3e8ff',
     borderRadius: 10,
     marginBottom: 15,
     elevation: 2,
@@ -109,27 +110,22 @@ const styles = StyleSheet.create({
   },
   collaboratorDetails: {
     fontSize: 14,
-    color: '#6e6e6e',
   },
   editButton: {
-    backgroundColor: '#a685e2',
     paddingVertical: 6,
     paddingHorizontal: 15,
     borderRadius: 5,
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
     paddingVertical: 6,
     paddingHorizontal: 15,
     borderRadius: 5,
   },
   buttonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
   input: {
-    backgroundColor: '#eaeaea',
     padding: 8,
     marginVertical: 5,
     borderRadius: 5,

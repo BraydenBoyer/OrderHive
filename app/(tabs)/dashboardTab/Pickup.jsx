@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, TextInput, FlatList, TouchableOpacity, View } from 'react-native';
 import { IconButton, Card } from 'react-native-paper';
-import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+
+const colors = lightTheme.colors;
 
 const pickups = [
   { id: '1', name: 'Barry Allen', date: '10/3/24', items: 10, price: '$50' },
@@ -33,15 +36,15 @@ export default function Pickup() {
 
   return (
     <BackDrop title="Pickups" mainHeader={false}>
-
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, { backgroundColor: colors.surfaceVariant }]}>
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: colors.onSurface }]}
           placeholder="Hinted search text"
+          placeholderTextColor={colors.onSurfaceVariant}
         />
         <IconButton
           icon="magnify"
-          color="#6e6e6e"
+          color={colors.onSurfaceVariant}
           size={20}
           style={styles.searchIcon}
         />
@@ -52,29 +55,35 @@ export default function Pickup() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleCardPress(item)}>
-            <Card style={styles.card}>
+            <Card style={[styles.card, { backgroundColor: colors.surface }]}>
               <View style={styles.cardContent}>
                 <View style={styles.leftSection}>
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.date}>{item.date} • {item.items} items</Text>
+                  <Text style={[styles.name, { color: colors.onSurface }]}>{item.name}</Text>
+                  <Text style={[styles.date, { color: colors.onSurfaceVariant }]}>
+                    {item.date} • {item.items} items
+                  </Text>
                 </View>
                 <View style={styles.rightSection}>
-                  <Text style={styles.price}>{item.price}</Text>
+                  <Text style={[styles.price, { color: colors.primary }]}>{item.price}</Text>
                   <IconButton
                     icon="dots-vertical"
-                    color="#6e6e6e"
+                    color={colors.onSurfaceVariant}
                     size={20}
                     style={styles.moreIcon}
                   />
                 </View>
               </View>
               {selectedPickup === item.id && (
-                <View style={styles.extraContent}>
+                <View style={[styles.extraContent, { backgroundColor: colors.surfaceVariant }]}>
                   {groceryItems.map((category, index) => (
                     <View key={index} style={styles.categoryContainer}>
-                      <Text style={styles.categoryTitle}>{category.category}</Text>
+                      <Text style={[styles.categoryTitle, { color: colors.onSurface }]}>
+                        {category.category}
+                      </Text>
                       {category.items.map((groceryItem, idx) => (
-                        <Text key={idx} style={styles.groceryItem}>{groceryItem}</Text>
+                        <Text key={idx} style={[styles.groceryItem, { color: colors.onSurfaceVariant }]}>
+                          {groceryItem}
+                        </Text>
                       ))}
                     </View>
                   ))}
@@ -89,16 +98,10 @@ export default function Pickup() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    backgroundColor: '#F5F5F5',
     borderRadius: 25,
     paddingHorizontal: 10,
   },
@@ -107,13 +110,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 10,
     fontSize: 16,
-    color: '#6e6e6e',
   },
   searchIcon: {
     marginLeft: 10,
   },
   card: {
-    backgroundColor: '#f8c8c8',
     marginBottom: 15,
     borderRadius: 8,
   },
@@ -132,7 +133,6 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 14,
-    color: '#6e6e6e',
     marginTop: 5,
   },
   rightSection: {
@@ -147,9 +147,8 @@ const styles = StyleSheet.create({
   },
   extraContent: {
     padding: 10,
-    backgroundColor: '#eaeaea',
     borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    borderTopColor: colors.outline,
   },
   categoryContainer: {
     marginBottom: 10,
@@ -157,12 +156,10 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
     marginTop: 5,
   },
   groceryItem: {
     fontSize: 14,
-    color: '#555',
     marginLeft: 10,
   },
 });
