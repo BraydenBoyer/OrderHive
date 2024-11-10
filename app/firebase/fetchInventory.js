@@ -1,48 +1,72 @@
+/*
+    Purpose of this file is to handle functions related to inventory in Firestore
+*/
+
+import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
 import { fireDb } from "./initializeFirebase.js";
-import { collection, getDocs } from "firebase/firestore";
 
 export const fetchInventoryData = async () => {
     try {
-        console.log("Attempting to fetch categories in the 'inventory' collection...");
+        console.log("Attempting to fetch items in the 'inventory' collection...");
 
-
-        // Reference the 'inventory' collection
+        // Reference to the 'inventory' collection
         const inventoryRef = collection(fireDb, 'inventory');
-        const categoriesSnapshot = await getDocs(inventoryRef);
+
+        // Fetch all documents in the collection
+        const querySnapshot = await getDocs(inventoryRef);
 
         // Check if any documents are found
-        if (categoriesSnapshot.empty) {
+        if (querySnapshot.empty) {
             console.log("No documents found in 'inventory' collection.");
             return [];
         }
 
         // Map over each document to get its data
-        const categories = categoriesSnapshot.docs.map(doc => ({
+        const items = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
 
-        console.log("Fetched categories:", categories);
-        return categories;
+        console.log("Fetched items from inventory:", items);
+        return items;
     } catch (error) {
-        console.error("Error fetching categories from 'inventory':", error);
+        console.error("Error fetching inventory items:", error);
         return [];
     }
 };
 
-export const getMarker = async () => {
-  try {
-    const markers = [];
-      await firebase.firestore().collection('inventory').get()
-        .then(querySnapshot => {
-          querySnapshot.docs.forEach(doc => {
-          markers.push(doc.data());
-        });
-      });
-      return markers;
+/*
+    Fetches specific markers from the 'inventory' collection
 
-  } catch (error) {
-    console.error("Error fetching markers:", error);
-    throw error;
-  }
+    @returns Array of marker items from inventory
+*/
+export const getMarker = async () => {
+    try {
+        console.log("Attempting to fetch markers from the 'inventory' collection...");
+
+        // Reference to the 'inventory' collection
+        const inventoryRef = collection(fireDb, 'inventory');
+
+        // Query for documents with "marker" in a specific field
+        const markerQuery = query(inventoryRef, where("type", "==", "marker"));
+        const querySnapshot = await getDocs(markerQuery);
+
+        // Check if any documents are found
+        if (querySnapshot.empty) {
+            console.log("No markers found in 'inventory' collection.");
+            return [];
+        }
+
+        // Map over each document to get its data
+        const markers = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        console.log("Fetched markers:", markers);
+        return markers;
+    } catch (error) {
+        console.error("Error fetching markers:", error);
+        throw error;
+    }
 };

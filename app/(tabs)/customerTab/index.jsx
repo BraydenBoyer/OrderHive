@@ -4,7 +4,7 @@ import { useCallback, useContext, useState } from "react";
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
 import { addCustomer } from '../../firebase/addCustomer';
-
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 
 
 const initialCustomers = {
@@ -114,6 +114,7 @@ export default function CustomerPage() {
   };
 
   return (
+      <BackDrop title={"CustomerTab"}>
     <View style={styles.container}>
       <ScrollView>
         {Object.keys(customers).map((location) => (
@@ -227,6 +228,7 @@ export default function CustomerPage() {
         </View>
       </Modal>
     </View>
+    </BackDrop>
   );
 }
 
