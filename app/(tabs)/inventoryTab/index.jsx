@@ -157,15 +157,15 @@ export default function InventoryPage() {
         </View>
       )}
       <FAB.Group
-              open={fabOpen}
-              icon={fabOpen ? 'close' : 'plus'}
-              actions={[
-                { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
-                { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
-              ]}
-              onStateChange={({ open }) => setFabOpen(open)}
-              style={styles.fab}
-            />
+        open={fabOpen}
+        icon={fabOpen ? 'close' : 'plus'}
+        actions={[
+          { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
+          { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
+        ]}
+        onStateChange={({ open }) => setFabOpen(open)}
+        style={styles.fab}
+      />
       <Modal
         visible={isAddModalVisible}
         onRequestClose={() => setAddModalVisible(false)}
