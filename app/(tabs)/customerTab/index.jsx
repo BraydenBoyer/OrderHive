@@ -3,6 +3,9 @@ import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Po
 import { useCallback, useContext, useState } from "react";
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
+import { addCustomer } from '../../firebase/addCustomer';
+
+
 
 const initialCustomers = {
   "Location 1": [
@@ -62,22 +65,39 @@ export default function CustomerPage() {
     setDeleteMode(false);
   };
 
-  const handleAddCustomer = () => {
-    const location = newCustomer.location || 'Uncategorized';
-    const newCustomerData = {
-      id: Date.now(), // Unique ID
-      ...newCustomer,
-      price: "$50", // Default price
-      totalOrders: parseInt(newCustomer.totalOrders) || 0, // Ensure it's an integer
-      completedOrders: parseInt(newCustomer.completedOrders) || 0, // Ensure it's an integer
+  const handleAddCustomer = async () => {
+      const location = newCustomer.location || 'Uncategorized';
+      const newCustomerData = {
+        id: Date.now(), // Unique ID
+        ...newCustomer,
+        price: "$50", // Default price
+        totalOrders: parseInt(newCustomer.totalOrders) || 0, // Ensure it's an integer
+        completedOrders: parseInt(newCustomer.completedOrders) || 0, // Ensure it's an integer
+      };
+
+      // Add to Firestore
+      const result = await addCustomer(
+        newCustomer.name,
+        newCustomer.email,
+        newCustomer.phone,
+        newCustomer.location,
+        newCustomer.notes,
+        newCustomer.totalOrders,
+        newCustomer.completedOrders
+      );
+
+      if (result === true) {
+        // Add to front-end state if addition to Firestore was successful
+        setCustomers((prevCustomers) => ({
+          ...prevCustomers,
+          [location]: [...(prevCustomers[location] || []), newCustomerData],
+        }));
+        setAddCustomerModalVisible(false);
+        setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
+      } else {
+        console.error("Failed to add customer:", result); // Handle the error accordingly
+      }
     };
-    setCustomers((prevCustomers) => ({
-      ...prevCustomers,
-      [location]: [...(prevCustomers[location] || []), newCustomerData],
-    }));
-    setAddCustomerModalVisible(false);
-    setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
-  };
 
   const handleFabStateChange = ({ open }) => setFabOpen(open);
 
