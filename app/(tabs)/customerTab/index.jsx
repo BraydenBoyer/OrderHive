@@ -1,156 +1,171 @@
-import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import {
-  Text,
-  Button,
-  FAB,
-  Checkbox,
-  Card,
-  IconButton,
-  useTheme,
-  Menu,
-  Divider,
-  Title,
-  Paragraph,
-  Portal,
-  Dialog,
-  Icon
-} from "react-native-paper";
-import { router } from 'expo-router';
-import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-import { MyFAB } from "../../../components/overlays/FAB.jsx";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB } from "react-native-paper";
+import { useCallback, useContext, useState } from "react";
 import { AppContext } from "../_layout.jsx";
+import { useFocusEffect } from "expo-router";
 
-
-// Sample data structure for customers
-const customersByLocation = {
+const initialCustomers = {
   "Location 1": [
-    {
-      name: "Joey",
-      price: "$50",
-      notes: "Notes about the customer if there are any...",
-      totalOrders: 1,
-      completedOrders: 0,
-    },
-    {
-      name: "Nelly",
-      price: "$50",
-      notes: "",
-      totalOrders: 1,
-      completedOrders: 0,
-    },
+    { id: 1, name: "Joey", price: "$50", notes: "Customer notes", totalOrders: 1, completedOrders: 0 },
+    { id: 2, name: "Nelly", price: "$50", notes: "", totalOrders: 1, completedOrders: 0 },
   ],
   "Location 2": [
-    {
-      name: "Pat",
-      price: "$50",
-      notes: "",
-      totalOrders: 1,
-      completedOrders: 0,
-    },
+    { id: 3, name: "Pat", price: "$50", notes: "", totalOrders: 1, completedOrders: 0 },
   ],
 };
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
-  const [visible, setVisible] = useState(false);
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [isDeleteMode, setDeleteMode] = useState(false);
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [customers, setCustomers] = useState(initialCustomers);
+  const [addCustomerModalVisible, setAddCustomerModalVisible] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
+
+  // Form state for adding a new customer
+  const [newCustomer, setNewCustomer] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    notes: '',
+  });
 
   useFocusEffect(
     useCallback(() => {
-      setFabVisible(true);
+      setFabVisible(false); // Hide global FAB on this screen
       return () => setFabVisible(false);
     }, [])
   );
 
-  const openCustomerDetails = (customer) => {
-    setSelectedCustomer(customer);
-    setDialogVisible(true);
+  const handleSelectCustomer = (customerId) => {
+    setSelectedCustomers((prevSelected) =>
+      prevSelected.includes(customerId)
+        ? prevSelected.filter((id) => id !== customerId)
+        : [...prevSelected, customerId]
+    );
   };
 
-  const closeDialog = () => {
-    setDialogVisible(false);
-    setSelectedCustomer(null);
+  const handleDeleteCustomers = () => {
+    const updatedCustomers = {};
+    for (const location in customers) {
+      updatedCustomers[location] = customers[location].filter(
+        (customer) => !selectedCustomers.includes(customer.id)
+      );
+    }
+    setCustomers(updatedCustomers);
+    setSelectedCustomers([]);
+    setDeleteMode(false);
   };
+
+  const handleAddCustomer = () => {
+    const location = newCustomer.location || 'Uncategorized';
+    const newCustomerData = {
+      id: Date.now(), // Unique ID
+      ...newCustomer,
+      price: "$50", // Default price
+      totalOrders: 0,
+      completedOrders: 0,
+    };
+    setCustomers((prevCustomers) => ({
+      ...prevCustomers,
+      [location]: [...(prevCustomers[location] || []), newCustomerData],
+    }));
+    setAddCustomerModalVisible(false);
+    setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '' });
+  };
+
+  const handleFabStateChange = ({ open }) => setFabOpen(open);
 
   return (
-    <BackDrop style={styles.container}>
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <IconButton icon="filter" size={24} />
-        <TextInput
-          placeholder="Hinted search text"
-          mode="outlined"
-          style={styles.searchInput}
-        />
-        <Icon size={30} source={'magnify'} />
-      </View>
+    <View style={styles.container}>
+      <ScrollView>
+        {Object.keys(customers).map((location) => (
+          <View key={location} style={styles.locationContainer}>
+            <Title style={styles.locationTitle}>{location}</Title>
+            <Divider style={styles.divider} />
+            {customers[location].map((customer) => (
+              <Card key={customer.id} style={styles.customerCard}>
+                <Card.Content style={styles.cardContent}>
+                  {isDeleteMode && (
+                    <Checkbox
+                      status={selectedCustomers.includes(customer.id) ? "checked" : "unchecked"}
+                      onPress={() => handleSelectCustomer(customer.id)}
+                    />
+                  )}
+                  <View style={styles.cardText}>
+                    <Title style={styles.customerName}>{customer.name}</Title>
+                    <Paragraph style={styles.customerInfo}>Price: {customer.price}</Paragraph>
+                    <Paragraph style={styles.customerInfo}>Orders: {customer.totalOrders}</Paragraph>
+                    <Paragraph style={styles.customerInfo}>Completed: {customer.completedOrders}</Paragraph>
+                    <Paragraph style={styles.customerNotes}>{customer.notes}</Paragraph>
+                  </View>
+                </Card.Content>
+              </Card>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
 
-
-      {Object.keys(customersByLocation).map((location) => (
-        <View key={location} style={styles.locationContainer}>
-          <Title style={styles.locationTitle}>{location}</Title>
-          <Divider style={styles.divider} />
-          {customersByLocation[location].map((customer, index) => (
-            <Card
-              key={index}
-              style={styles.customerCard}
-              onPress={() => openCustomerDetails(customer)}
-            >
-              <Card.Content>
-                <Title style={styles.customerName}>{customer.name}</Title>
-                <Paragraph style={styles.customerInfo}>Price: {customer.price}</Paragraph>
-                <Paragraph style={styles.customerInfo}>Orders: {customer.totalOrders}</Paragraph>
-                <Paragraph style={styles.customerInfo}>Completed: {customer.completedOrders}</Paragraph>
-                <Paragraph style={styles.customerNotes}>{customer.notes}</Paragraph>
-              </Card.Content>
-            </Card>
-          ))}
+      {/* Footer for Delete Mode */}
+      {isDeleteMode && (
+        <View style={styles.deleteFooter}>
+          <IconButton
+            icon="delete"
+            size={30}
+            color="red"
+            onPress={handleDeleteCustomers}
+            style={styles.trashIcon}
+          />
+          <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton}>
+            Cancel
+          </Button>
         </View>
-      ))}
+      )}
 
+      {/* FAB Group */}
+      <FAB.Group
+        open={fabOpen}
+        icon={fabOpen ? "close" : "plus"}
+        actions={[
+          {
+            icon: "plus",
+            label: "Add Customer",
+            onPress: () => setAddCustomerModalVisible(true),
+          },
+          {
+            icon: "delete",
+            label: "Delete Selected",
+            onPress: () => setDeleteMode(true), // Toggle delete mode on trash icon click
+          },
+        ]}
+        onStateChange={handleFabStateChange}
+        style={styles.fabGroup}
+      />
 
-      <Portal>
-        <Dialog visible={dialogVisible} onDismiss={closeDialog} style={styles.dialog}>
-          <Dialog.Title>Customer Details</Dialog.Title>
-          <Dialog.Content>
-            {selectedCustomer && (
-              <>
-                <Text style={styles.dialogText}>Name: {selectedCustomer.name}</Text>
-                <Text style={styles.dialogText}>Phone: 123-456-7890</Text>
-                <Text style={styles.dialogText}>Email: example@example.com</Text>
-                <Text style={styles.dialogText}>Location: Northeast</Text>
-                <Text style={styles.dialogText}>Notes: {selectedCustomer.notes}</Text>
-                <Text style={styles.dialogText}>Total Orders: {selectedCustomer.totalOrders}</Text>
-                <Text style={styles.dialogText}>Completed Orders: {selectedCustomer.completedOrders}</Text>
-              </>
-            )}
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={closeDialog}>Close</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-
-      {
-        true ? <></> :
-
-      <Portal>
-        <FAB.Group
-          open={visible}
-          icon={visible ? "close" : "plus"}
-          actions={[
-            { icon: "plus", label: "Add", onPress: () => console.log("Add pressed") },
-            { icon: "cancel", label: "Cancel", onPress: () => setVisible(false) },
-          ]}
-          onStateChange={() => setVisible(!visible)}
-          style={styles.fabGroup}
-        />
-      </Portal>
-      }
-    </BackDrop>
+      {/* Add Customer Modal */}
+      <Modal
+        visible={addCustomerModalVisible}
+        onRequestClose={() => setAddCustomerModalVisible(false)}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Add Customer</Text>
+            <TextInput placeholder="Name" style={styles.input} value={newCustomer.name} onChangeText={(text) => setNewCustomer({ ...newCustomer, name: text })} />
+            <TextInput placeholder="Email" style={styles.input} value={newCustomer.email} onChangeText={(text) => setNewCustomer({ ...newCustomer, email: text })} />
+            <TextInput placeholder="Phone" style={styles.input} value={newCustomer.phone} onChangeText={(text) => setNewCustomer({ ...newCustomer, phone: text })} />
+            <TextInput placeholder="Location" style={styles.input} value={newCustomer.location} onChangeText={(text) => setNewCustomer({ ...newCustomer, location: text })} />
+            <TextInput placeholder="Notes" style={styles.input} value={newCustomer.notes} onChangeText={(text) => setNewCustomer({ ...newCustomer, notes: text })} />
+            <View style={styles.buttonContainer}>
+              <Button mode="text" onPress={() => setAddCustomerModalVisible(false)}>Cancel</Button>
+              <Button mode="contained" onPress={handleAddCustomer}>Add</Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
@@ -158,15 +173,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
   },
   locationContainer: {
     marginBottom: 16,
@@ -185,6 +191,14 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
   },
+  cardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardText: {
+    marginLeft: 8,
+    flex: 1,
+  },
   customerName: {
     fontSize: 18,
     fontWeight: "bold",
@@ -196,13 +210,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "gray",
   },
-  dialog: {
-    backgroundColor: "#FAD4D4",
-    borderRadius: 8,
-    padding: 16,
+  deleteFooter: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 8,
+    backgroundColor: "#f8d7da",
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
   },
-  dialogText: {
-    fontSize: 16,
+  trashIcon: {
     marginBottom: 4,
   },
   fabGroup: {
@@ -210,5 +229,38 @@ const styles = StyleSheet.create({
     right: 16,
     bottom: 16,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  input: {
+    marginBottom: 12,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 4,
+    fontSize: 16,
+    width: "100%",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  cancelButton: {
+    fontSize: 16,
+  },
 });
-

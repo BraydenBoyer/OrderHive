@@ -4,15 +4,17 @@ import { Text, Button, Checkbox, Card, IconButton, useTheme, Divider } from "rea
 import { router } from 'expo-router';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import { MyFAB } from "../../../components/overlays/FAB.jsx";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useState, useEffect } from "react";
 import { AppContext } from "../_layout.jsx";
 import {addInventoryItem} from '../../firebase/addItem.js'
+import {fetchInventoryData, getMarker} from '../../firebase/fetchInventory.js'
 
 const initialInventoryData = [
   { id: 1, category: "Lettuce", name: "Butter Bib", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
   { id: 2, category: "Lettuce", name: "Red Romaine", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
   { id: 3, category: "Bread", name: "Italian Bread", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Bread" }
 ];
+
 
 export default function InventoryPage() {
   const [isDeleteMode, setDeleteMode] = useState(false);
@@ -29,12 +31,26 @@ export default function InventoryPage() {
 
 
   const { setFabVisible, setIcon, setActions } = useContext(AppContext);
+/*
+    // Fetch data from Firebase on component mount
+      useEffect(() => {
+        const loadData = async () => {
+          const data = await fetchInventoryData();
+          console.log("Fetched data in component:", data); // Log data fetched in component
+          setInventoryData(data); // Update state with fetched data
+        };
+        loadData();
+      }, []);
+*/
+
 
   const handleSelectItem = (itemId) => {
     setSelectedItems((prevSelected) =>
       prevSelected.includes(itemId) ? prevSelected.filter((id) => id !== itemId) : [...prevSelected, itemId]
     );
   };
+
+
 
   const handleDeleteItems = () => {
     setInventoryData((prevData) => prevData.filter(item => !selectedItems.includes(item.id)));
