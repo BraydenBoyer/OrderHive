@@ -1,6 +1,6 @@
 import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme } from "react-native-paper";
+import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB } from "react-native-paper";
 import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
 import { addInventoryItem } from '../../firebase/addItem.js';
@@ -27,12 +27,14 @@ export default function InventoryPage() {
   const [newItemTotal, setNewItemTotal] = useState('');
   const [newItemHold, setNewItemHold] = useState('');
   const [newItemSource, setNewItemSource] = useState('');
+  const [fabOpen, setFabOpen] = useState(false);
 
-  const { setFabVisible, setIcon, setActions } = useContext(AppContext);
+
 
     const theme = useTheme()
     const colors = theme.colors;
 
+/*
   useFocusEffect(
     useCallback(() => {
       setFabVisible(true);
@@ -52,7 +54,7 @@ export default function InventoryPage() {
       return () => setFabVisible(false);
     }, [setFabVisible, setActions, setIcon])
   );
-
+*/
   const handleSelectItem = (itemId) => {
     setSelectedItems((prevSelected) =>
       prevSelected.includes(itemId) ? prevSelected.filter((id) => id !== itemId) : [...prevSelected, itemId]
@@ -104,6 +106,8 @@ export default function InventoryPage() {
     setNewItemSource('');
   };
 
+  const handleFabStateChange = ({ open }) => setFabOpen(open);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -152,7 +156,16 @@ export default function InventoryPage() {
           </Button>
         </View>
       )}
-
+      <FAB.Group
+              open={fabOpen}
+              icon={fabOpen ? 'close' : 'plus'}
+              actions={[
+                { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
+                { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
+              ]}
+              onStateChange={({ open }) => setFabOpen(open)}
+              style={styles.fab}
+            />
       <Modal
         visible={isAddModalVisible}
         onRequestClose={() => setAddModalVisible(false)}
