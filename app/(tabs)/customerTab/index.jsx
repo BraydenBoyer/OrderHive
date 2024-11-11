@@ -1,11 +1,10 @@
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB, Dialog } from "react-native-paper";
+import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB, Dialog, useTheme } from "react-native-paper";
 import { useCallback, useContext, useState } from "react";
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
 import { addCustomer } from '../../firebase/addCustomer';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-
 
 const initialCustomers = {
   "Location 1": [
@@ -24,23 +23,24 @@ export default function CustomerPage() {
   const [customers, setCustomers] = useState(initialCustomers);
   const [addCustomerModalVisible, setAddCustomerModalVisible] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null); // To store the selected customer for viewing details
-  const [customerDetailVisible, setCustomerDetailVisible] = useState(false); // Controls the visibility of the customer detail modal
-
-  // Form state for adding a new customer, including totalOrders and completedOrders
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [customerDetailVisible, setCustomerDetailVisible] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
     name: '',
     email: '',
     phone: '',
     location: '',
     notes: '',
-    totalOrders: '', // New field for total orders
-    completedOrders: '', // New field for completed orders
+    totalOrders: '',
+    completedOrders: '',
   });
+
+  const theme = useTheme();
+  const colors = theme.colors;
 
   useFocusEffect(
     useCallback(() => {
-      setFabVisible(false); // Hide global FAB on this screen
+      setFabVisible(false);
       return () => setFabVisible(false);
     }, [])
   );
@@ -68,14 +68,13 @@ export default function CustomerPage() {
   const handleAddCustomer = async () => {
       const location = newCustomer.location || 'Uncategorized';
       const newCustomerData = {
-        id: Date.now(), // Unique ID
+        id: Date.now(),
         ...newCustomer,
-        price: "$50", // Default price
-        totalOrders: parseInt(newCustomer.totalOrders) || 0, // Ensure it's an integer
-        completedOrders: parseInt(newCustomer.completedOrders) || 0, // Ensure it's an integer
+        price: "$50",
+        totalOrders: parseInt(newCustomer.totalOrders) || 0,
+        completedOrders: parseInt(newCustomer.completedOrders) || 0,
       };
 
-      // Add to Firestore
       const result = await addCustomer(
         newCustomer.name,
         newCustomer.email,
@@ -87,7 +86,6 @@ export default function CustomerPage() {
       );
 
       if (result === true) {
-        // Add to front-end state if addition to Firestore was successful
         setCustomers((prevCustomers) => ({
           ...prevCustomers,
           [location]: [...(prevCustomers[location] || []), newCustomerData],
@@ -95,19 +93,17 @@ export default function CustomerPage() {
         setAddCustomerModalVisible(false);
         setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
       } else {
-        console.error("Failed to add customer:", result); // Handle the error accordingly
+        console.error("Failed to add customer:", result);
       }
     };
 
   const handleFabStateChange = ({ open }) => setFabOpen(open);
 
-  // Function to open customer details dialog
   const openCustomerDetails = (customer) => {
     setSelectedCustomer(customer);
     setCustomerDetailVisible(true);
   };
 
-  // Function to close customer details dialog
   const closeCustomerDetails = () => {
     setCustomerDetailVisible(false);
     setSelectedCustomer(null);
@@ -115,14 +111,14 @@ export default function CustomerPage() {
 
   return (
       <BackDrop title={"CustomerTab"}>
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView>
         {Object.keys(customers).map((location) => (
           <View key={location} style={styles.locationContainer}>
-            <Title style={styles.locationTitle}>{location}</Title>
-            <Divider style={styles.divider} />
+            <Title style={[styles.locationTitle, { color: colors.primary }]}>{location}</Title>
+            <Divider style={[styles.divider, { backgroundColor: colors.onSurface }]} />
             {customers[location].map((customer) => (
-              <Card key={customer.id} style={styles.customerCard} onPress={() => openCustomerDetails(customer)}>
+              <Card key={customer.id} style={[styles.customerCard, { backgroundColor: colors.surface }]} onPress={() => openCustomerDetails(customer)}>
                 <Card.Content style={styles.cardContent}>
                   {isDeleteMode && (
                     <Checkbox
@@ -131,11 +127,11 @@ export default function CustomerPage() {
                     />
                   )}
                   <View style={styles.cardText}>
-                    <Title style={styles.customerName}>{customer.name}</Title>
-                    <Paragraph style={styles.customerInfo}>Price: {customer.price}</Paragraph>
-                    <Paragraph style={styles.customerInfo}>Orders: {customer.totalOrders}</Paragraph>
-                    <Paragraph style={styles.customerInfo}>Completed: {customer.completedOrders}</Paragraph>
-                    <Paragraph style={styles.customerNotes}>{customer.notes}</Paragraph>
+                    <Title style={[styles.customerName, { color: colors.onSurface }]}>{customer.name}</Title>
+                    <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Price: {customer.price}</Paragraph>
+                    <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Orders: {customer.totalOrders}</Paragraph>
+                    <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Completed: {customer.completedOrders}</Paragraph>
+                    <Paragraph style={[styles.customerNotes, { color: colors.secondary }]}>{customer.notes}</Paragraph>
                   </View>
                 </Card.Content>
               </Card>
@@ -144,7 +140,6 @@ export default function CustomerPage() {
         ))}
       </ScrollView>
 
-      {/* Customer Detail Dialog */}
       <Portal>
         <Dialog visible={customerDetailVisible} onDismiss={closeCustomerDetails}>
           <Dialog.Title>Customer Details</Dialog.Title>
@@ -167,23 +162,21 @@ export default function CustomerPage() {
         </Dialog>
       </Portal>
 
-      {/* Footer for Delete Mode */}
       {isDeleteMode && (
-        <View style={styles.deleteFooter}>
+        <View style={[styles.deleteFooter, { backgroundColor: colors.errorContainer }]}>
           <IconButton
             icon="delete"
             size={30}
-            color="red"
+            color={colors.onError}
             onPress={handleDeleteCustomers}
             style={styles.trashIcon}
           />
-          <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton}>
+          <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton} color={colors.onError}>
             Cancel
           </Button>
         </View>
       )}
 
-      {/* FAB Group */}
       <FAB.Group
         open={fabOpen}
         icon={fabOpen ? "close" : "plus"}
@@ -196,14 +189,13 @@ export default function CustomerPage() {
           {
             icon: "delete",
             label: "Delete Selected",
-            onPress: () => setDeleteMode(true), // Toggle delete mode on trash icon click
+            onPress: () => setDeleteMode(true),
           },
         ]}
         onStateChange={handleFabStateChange}
         style={styles.fabGroup}
       />
 
-      {/* Add Customer Modal */}
       <Modal
         visible={addCustomerModalVisible}
         onRequestClose={() => setAddCustomerModalVisible(false)}
@@ -211,8 +203,8 @@ export default function CustomerPage() {
         transparent={true}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Customer</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Add Customer</Text>
             <TextInput placeholder="Name" style={styles.input} value={newCustomer.name} onChangeText={(text) => setNewCustomer({ ...newCustomer, name: text })} />
             <TextInput placeholder="Email" style={styles.input} value={newCustomer.email} onChangeText={(text) => setNewCustomer({ ...newCustomer, email: text })} />
             <TextInput placeholder="Phone" style={styles.input} value={newCustomer.phone} onChangeText={(text) => setNewCustomer({ ...newCustomer, phone: text })} />
@@ -221,8 +213,12 @@ export default function CustomerPage() {
             <TextInput placeholder="Total Orders" style={styles.input} keyboardType="numeric" value={newCustomer.totalOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, totalOrders: text })} />
             <TextInput placeholder="Completed Orders" style={styles.input} keyboardType="numeric" value={newCustomer.completedOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, completedOrders: text })} />
             <View style={styles.buttonContainer}>
-              <Button mode="text" onPress={() => setAddCustomerModalVisible(false)}>Cancel</Button>
-              <Button mode="contained" onPress={handleAddCustomer}>Add</Button>
+              <Button mode="text" onPress={() => setAddCustomerModalVisible(false)} color={colors.onSurface}>
+                Cancel
+              </Button>
+              <Button mode="contained" onPress={handleAddCustomer} color={colors.primary}>
+                Add
+              </Button>
             </View>
           </View>
         </View>
@@ -231,7 +227,6 @@ export default function CustomerPage() {
     </BackDrop>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -250,7 +245,6 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   customerCard: {
-    backgroundColor: "#FAD4D4",
     marginVertical: 8,
     padding: 8,
     borderRadius: 8,
@@ -272,7 +266,6 @@ const styles = StyleSheet.create({
   },
   customerNotes: {
     fontSize: 12,
-    color: "gray",
   },
   deleteFooter: {
     position: "absolute",
@@ -280,7 +273,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingVertical: 8,
-    backgroundColor: "#f8d7da",
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
@@ -302,7 +294,6 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "90%",
     padding: 20,
-    backgroundColor: "#fff",
     borderRadius: 8,
   },
   modalTitle: {
@@ -323,8 +314,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
-  },
-  cancelButton: {
-    fontSize: 16,
   },
 });
