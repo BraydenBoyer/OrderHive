@@ -18,7 +18,7 @@ const initialInventoryData = [
 export default function InventoryPage() {
   const [isDeleteMode, setDeleteMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [inventoryData, setInventoryData] = useState(initialInventoryData);
+  //const [inventoryData, setInventoryData] = useState(initialInventoryData);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
 
   const [newItemName, setNewItemName] = useState('');
@@ -29,22 +29,27 @@ export default function InventoryPage() {
   const [newItemSource, setNewItemSource] = useState('');
   const [fabOpen, setFabOpen] = useState(false);
 
+  const [groupedInventoryData, setGroupedInventoryData] = useState({});
 
 
     const theme = useTheme()
     const colors = theme.colors;
 
-/*
-useEffect(() => {
+
+  useEffect(() => {
     const fetchData = async () => {
       const data = await fetchInventoryData();
-      console.log("Fetched inventory data:", data);  // Console log to verify data
-      setInventoryData(data); // Update state with fetched data
+      const groupedData = data.reduce((acc, item) => {
+        acc[item.category] = acc[item.category] || [];
+        acc[item.category].push(item);
+        return acc;
+      }, {});
+      setGroupedInventoryData(groupedData);
     };
 
     fetchData();
   }, []);
-  */
+
 /*
   useFocusEffect(
     useCallback(() => {
@@ -91,16 +96,19 @@ useEffect(() => {
     };
 
     const result = await addInventoryItem(
-      newItem.category,
-      newItem.name,
-      newItem.price,
-      newItem.total,
-      newItem.hold,
-      newItem.source
+        newItem.category,
+        newItem.name,
+        newItem.price,
+        newItem.total,
+        newItem.hold,
+        newItem.source
     );
 
     if (result === true) {
-      setInventoryData([...inventoryData, newItem]);
+      setGroupedInventoryData((prevData) => ({
+        ...prevData,
+        [newItemCategory]: [...(prevData[newItemCategory] || []), newItem]
+      }));
       setAddModalVisible(false);
       clearInputFields();
     } else {
@@ -121,92 +129,94 @@ useEffect(() => {
 
   return (
       <BackDrop title={"InventoryTab"}>
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.inventoryList}>
-          {["Lettuce", "Bread"].map((category) => (
-            <View key={category} style={styles.categorySection}>
-              <Text style={[styles.categoryTitle, { color: colors.onBackground }]}>{category}</Text>
-              {inventoryData
-                .filter((item) => item.category === category)
-                .map((item) => (
-                  <Card key={item.id} style={[styles.card, { backgroundColor: colors.primary }]}>
-                    <Card.Content style={styles.cardContent}>
-                      {isDeleteMode && (
-                        <Checkbox
-                          status={selectedItems.includes(item.id) ? "checked" : "unchecked"}
-                          onPress={() => handleSelectItem(item.id)}
-                        />
-                      )}
-                      <View style={styles.cardText}>
-                        <Text style={[styles.itemName, { color: colors.onSurface }]}>{item.name}</Text>
-                        <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>{item.price}</Text>
-                        <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>Total: {item.total}   Hold: {item.hold}</Text>
-                        <Text style={[styles.categorySource, { color: colors.onSurfaceVariant }]}>
-                          {item.type} | {item.source}
-                        </Text>
-                      </View>
-                    </Card.Content>
-                  </Card>
-                ))}
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.inventoryList}>
+              {Object.keys(groupedInventoryData).map((category) => (
+                  <View key={category} style={styles.categorySection}>
+                    <Text style={[styles.categoryTitle, { color: colors.onBackground }]}>{category}</Text>
+                    {groupedInventoryData[category].map((item) => (
+                        <Card key={item.id} style={[styles.card, { backgroundColor: colors.primary }]}>
+                          <Card.Content style={styles.cardContent}>
+                            {isDeleteMode && (
+                                <Checkbox
+                                    status={selectedItems.includes(item.id) ? "checked" : "unchecked"}
+                                    onPress={() => handleSelectItem(item.id)}
+                                />
+                            )}
+                            <View style={styles.cardText}>
+                              <Text style={[styles.itemName, { color: colors.onSurface }]}>{item.name}</Text>
+                              <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>{item.price}</Text>
+                              <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>
+                                Total: {item.total}   Hold: {item.hold}
+                              </Text>
+                              <Text style={[styles.categorySource, { color: colors.onSurfaceVariant }]}>
+                                {item.type} | {item.source}
+                              </Text>
+                            </View>
+                          </Card.Content>
+                        </Card>
+                    ))}
+                  </View>
+              ))}
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          </ScrollView>
 
-      {isDeleteMode && (
-        <View style={[styles.deleteFooter, { backgroundColor: colors.errorContainer }]}>
-          <IconButton
-            icon="delete"
-            size={30}
-            color={colors.onError}
-            onPress={handleDeleteItems}
-            style={styles.trashIcon}
+          {isDeleteMode && (
+              <View style={[styles.deleteFooter, { backgroundColor: colors.errorContainer }]}>
+                <IconButton
+                    icon="delete"
+                    size={30}
+                    color={colors.onError}
+                    onPress={handleDeleteItems}
+                    style={styles.trashIcon}
+                />
+                <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton} color={colors.onError}>
+                  Cancel
+                </Button>
+              </View>
+          )}
+
+          <FAB.Group
+              open={fabOpen}
+              icon={fabOpen ? 'close' : 'plus'}
+              actions={[
+                { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
+                { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
+              ]}
+              onStateChange={({ open }) => setFabOpen(open)}
+              style={styles.fab}
           />
-          <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton} color={colors.onError}>
-            Cancel
-          </Button>
-        </View>
-      )}
-      <FAB.Group
-        open={fabOpen}
-        icon={fabOpen ? 'close' : 'plus'}
-        actions={[
-          { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
-          { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
-        ]}
-        onStateChange={({ open }) => setFabOpen(open)}
-        style={styles.fab}
-      />
-      <Modal
-        visible={isAddModalVisible}
-        onRequestClose={() => setAddModalVisible(false)}
-        animationType="slide"
-        transparent={true}
-      >
-        <View style={styles.modalContainer}>
-          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Add Item</Text>
-            <TextInput placeholder="Product Name" style={styles.input} value={newItemName} onChangeText={setNewItemName} />
-            <TextInput placeholder="Sales Cost" style={styles.input} keyboardType="numeric" value={newItemPrice} onChangeText={setNewItemPrice} />
-            <TextInput placeholder="Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
-            <TextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
-            <TextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
-            <TextInput placeholder="Source (e.g., HG Farm)" style={styles.input} value={newItemSource} onChangeText={setNewItemSource} />
 
-            <View style={styles.buttonContainer}>
-              <Button mode="outlined" onPress={() => setAddModalVisible(false)} style={styles.cancelButton} color={colors.onSurface}>
-                Cancel
-              </Button>
-              <Button mode="contained" onPress={handleAddItems} style={styles.confirmButton} color={colors.primary}>
-                Confirm
-              </Button>
+          <Modal
+              visible={isAddModalVisible}
+              onRequestClose={() => setAddModalVisible(false)}
+              animationType="slide"
+              transparent={true}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Add Item</Text>
+                <TextInput placeholder="Product Name" style={styles.input} value={newItemName} onChangeText={setNewItemName} />
+                <TextInput placeholder="Sales Cost" style={styles.input} keyboardType="numeric" value={newItemPrice} onChangeText={setNewItemPrice} />
+                <TextInput placeholder="Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
+                <TextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
+                <TextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
+                <TextInput placeholder="Source (e.g., HG Farm)" style={styles.input} value={newItemSource} onChangeText={setNewItemSource} />
+
+                <View style={styles.buttonContainer}>
+                  <Button mode="outlined" onPress={() => setAddModalVisible(false)} style={styles.cancelButton} color={colors.onSurface}>
+                    Cancel
+                  </Button>
+                  <Button mode="contained" onPress={handleAddItems} style={styles.confirmButton} color={colors.primary}>
+                    Confirm
+                  </Button>
+                </View>
+              </View>
             </View>
-          </View>
+          </Modal>
         </View>
-      </Modal>
-    </View>
-    </BackDrop>
+      </BackDrop>
   );
 }
 
