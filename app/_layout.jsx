@@ -12,10 +12,11 @@ export default function RootLayout() {
 
 	return (
 		<PaperProvider theme={lightTheme}>
-
 			<Stack screenOptions={basicScreenOption}>
 				<Stack.Screen name={'index'} />
-				<Stack.Screen name={'(createUser)/createUser'} />
+				<Stack.Screen name={'(login)/createUser'} />
+				<Stack.Screen name={'(login)/joinOrgPage'} />
+				<Stack.Screen name={'(login)/createOrgPage'} />
 				<Stack.Screen name={'(tabs)'}/>
 			</Stack>
 		</PaperProvider>

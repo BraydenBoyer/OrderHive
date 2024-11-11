@@ -1,15 +1,15 @@
 import {StyleSheet, View} from "react-native";
 import {BackDrop} from "../components/overlays/Backdrop.jsx";
-import {Header} from "../components/overlays/BackHeader.jsx";
-import {router} from "expo-router";
-import {Button, Icon, Portal, Snackbar, Text, TextInput, useTheme} from "react-native-paper";
+import {router, useFocusEffect} from "expo-router";
+import {Button, Icon, Portal, Snackbar, Text, useTheme} from "react-native-paper";
 import {MyTextInput} from "../components/inputs/MyTextInput.jsx";
 import {MyButton} from "../components/inputs/MyButton.jsx";
 import {roundness} from "./styles/themes/roundness/roundness.jsx";
-import {useEffect, useState} from "react";
-import {emailLogin} from "./firebase/authentication.js";
-
-
+import {useCallback, useEffect, useState} from "react";
+import {emailLogin, logoutCurrentUser} from "./firebase/user/authentication.js";
+import {userHasOrg} from "./firebase/user/userFunctions.js";
+import {fireAuth} from "./firebase/initializeFirebase.js";
+import {creationPageStyles} from "./styles/pageType/creationPageStyles.jsx";
 
 
 const interpretLoginError = (error) => {
@@ -40,7 +40,7 @@ const toCreateUser = () => {
 export default function LoginPage() {
 
 	const colors = useTheme().colors
-	const styles = fileStyles()
+	const styles = creationPageStyles()
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -57,15 +57,47 @@ export default function LoginPage() {
 
 	useEffect(() => {
 
-		if (errorCode === '') return
+		if (errorCode === ''){}
 		else if (errorCode === '0') {
-			toDashboard()
-			return
+
+			(
+				async () => {
+
+					const hasOrg = await userHasOrg()
+
+					// If the user has an org, they can log in
+					if (hasOrg) {
+						toDashboard()
+					}
+					// If the user does not, they must join or create an org
+					else {
+						console.log("User has org: ", hasOrg)
+						router.navigate('/joinOrgPage')
+					}
+				}
+			)()
+		}
+		else{
+			setLoginErrorString(interpretLoginError(errorCode))
+			setIsVisibleSnack(true)
 		}
 
-		setLoginErrorString(interpretLoginError(errorCode))
-		setIsVisibleSnack(true)
+		setErrorCode('')
+
 	}, [errorCode]);
+
+
+	useFocusEffect(
+		useCallback(() => {
+
+			(
+				async () => {
+					await logoutCurrentUser()
+				}
+			)()
+		}, [])
+	)
+
 
 	return(
 
@@ -115,7 +147,12 @@ export default function LoginPage() {
 				/>
 			</View>
 
-			<Button buttonColor={colors.secondaryContainer} onPress={() => router.replace('dashboardTab')}>Dev Door</Button>
+			<Button
+				buttonColor={colors.secondaryContainer}
+				onPress={() => emailLogin('admin@gmail.com', '1234abcd', setErrorCode)}
+			>
+				Dev Door
+			</Button>
 
 			<Portal>
 				<Snackbar
@@ -130,47 +167,4 @@ export default function LoginPage() {
 		</BackDrop>
 
 	)
-}
-
-
-
-const fileStyles = () => {
-
-	const colors = useTheme().colors
-
-	return StyleSheet.create({
-		button: {
-			alignSelf: 'center',
-			height: 50,
-			width: '100%',
-			flex: 0,
-			backgroundColor: colors.primary,
-			borderRadius: roundness.largeRadius,
-		},
-
-		clearButton: {
-			alignSelf: 'center',
-			height: 50,
-			width: '100%',
-			flex: 0,
-			backgroundColor: 'transparent',
-			borderRadius: roundness.largeRadius,
-		},
-
-		middleView: {
-			rowGap: 15,
-			paddingHorizontal: 10
-		},
-
-		topView: {
-			marginVertical: 75,
-			alignItems: 'center'
-		},
-
-		bottomView: {
-			marginTop: 40,
-			paddingHorizontal: 10,
-			flex: 1
-		}
-	})
 }

@@ -6,7 +6,7 @@ import { AppContext } from "../_layout.jsx";
 import { addInventoryItem } from '../../firebase/addItem.js';
 import { fetchInventoryData } from '../../firebase/fetchInventory.js';
 import { colors } from "../../styles/themes/colors/lightTheme.jsx";
-
+import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 
 
 const initialInventoryData = [
@@ -34,6 +34,17 @@ export default function InventoryPage() {
     const theme = useTheme()
     const colors = theme.colors;
 
+/*
+useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchInventoryData();
+      console.log("Fetched inventory data:", data);  // Console log to verify data
+      setInventoryData(data); // Update state with fetched data
+    };
+
+    fetchData();
+  }, []);
+  */
 /*
   useFocusEffect(
     useCallback(() => {
@@ -109,6 +120,7 @@ export default function InventoryPage() {
   const handleFabStateChange = ({ open }) => setFabOpen(open);
 
   return (
+      <BackDrop title={"InventoryTab"}>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.inventoryList}>
@@ -157,15 +169,15 @@ export default function InventoryPage() {
         </View>
       )}
       <FAB.Group
-              open={fabOpen}
-              icon={fabOpen ? 'close' : 'plus'}
-              actions={[
-                { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
-                { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
-              ]}
-              onStateChange={({ open }) => setFabOpen(open)}
-              style={styles.fab}
-            />
+        open={fabOpen}
+        icon={fabOpen ? 'close' : 'plus'}
+        actions={[
+          { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
+          { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
+        ]}
+        onStateChange={({ open }) => setFabOpen(open)}
+        style={styles.fab}
+      />
       <Modal
         visible={isAddModalVisible}
         onRequestClose={() => setAddModalVisible(false)}
@@ -194,6 +206,7 @@ export default function InventoryPage() {
         </View>
       </Modal>
     </View>
+    </BackDrop>
   );
 }
 

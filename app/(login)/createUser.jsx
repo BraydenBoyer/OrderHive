@@ -7,14 +7,18 @@ import {MyTextInput} from "../../components/inputs/MyTextInput.jsx";
 import {MyButton} from "../../components/inputs/MyButton.jsx";
 import {roundness} from "./../styles/themes/roundness/roundness.jsx";
 import {useEffect, useState} from "react";
-import {emailLogin} from "./../firebase/authentication.js";
-import {userCreation} from "../firebase/userCreation.js";
-
+import {createUser} from "../firebase/user/userFunctions.js";
+import {creationPageStyles} from "../styles/pageType/creationPageStyles.jsx";
 
 
 const handleCreateUser = async (email, password, number, name, setVisible, setSnackText) => {
 
-    const res = await userCreation(email, password, name, number)
+	email = email.trim()
+	password = password.trim()
+	number = password.trim()
+	name = name.trim()
+
+    const res = await createUser(email, password, name, number)
 
     if (res === true) {
         setVisible(false)
@@ -46,7 +50,7 @@ const handleCreateUser = async (email, password, number, name, setVisible, setSn
 export default function CreateUserPage() {
 
 	const colors = useTheme().colors
-	const styles = fileStyles()
+	const styles = creationPageStyles()
 
 	const [email, setEmail] = useState('')
     const [name, setName] = useState('')
@@ -88,6 +92,14 @@ export default function CreateUserPage() {
 					variant={'titleMedium'}
 					elevation={2}
 				/>
+
+				<MyButton
+					title={'Cancel'}
+					style={styles.button}
+					onClick={() => router.back() }
+					variant={'titleMedium'}
+					elevation={2}
+				/>
 			</View>
 
 			<View style={styles.bottomView}>
@@ -112,47 +124,4 @@ export default function CreateUserPage() {
 		</BackDrop>
 
 	)
-}
-
-
-
-const fileStyles = () => {
-
-	const colors = useTheme().colors
-
-	return StyleSheet.create({
-		button: {
-			alignSelf: 'center',
-			height: 50,
-			width: '100%',
-			flex: 0,
-			backgroundColor: colors.primary,
-			borderRadius: roundness.largeRadius,
-		},
-
-		clearButton: {
-			alignSelf: 'center',
-			height: 50,
-			width: '100%',
-			flex: 0,
-			backgroundColor: 'transparent',
-			borderRadius: roundness.largeRadius,
-		},
-
-		middleView: {
-			rowGap: 15,
-			paddingHorizontal: 10
-		},
-
-		topView: {
-			marginVertical: 75,
-			alignItems: 'center'
-		},
-
-		bottomView: {
-			marginTop: 40,
-			paddingHorizontal: 10,
-			flex: 1
-		}
-	})
 }
