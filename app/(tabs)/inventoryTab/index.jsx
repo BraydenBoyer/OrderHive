@@ -60,28 +60,28 @@ export default function InventoryPage() {
 useEffect(() => {
   const fetchData = async () => {
     try {
-      // Reference the 'inventory' collection
+      //reference the 'inventory' collection
       const inventoryRef = collection(fireDb, 'inventory');
       const inventorySnapshot = await getDocs(inventoryRef);
 
-      // Initialize an object to store categories and their items
+      //initialize an object to store categories and their items
       const groupedData = {};
 
-      // Loop through each category in the 'inventory' collection
+      //loop through each category in the 'inventory' collection
       for (const categoryDoc of inventorySnapshot.docs) {
         const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
 
-        // Reference to the 'items' subcollection within each category
+        //reference to the 'items' subcollection within each category
         const itemsRef = collection(fireDb, 'inventory', categoryName, 'items');
         const itemsSnapshot = await getDocs(itemsRef);
 
-        // Map through each item in the 'items' subcollection and store the data
+        //map through each item in the 'items' subcollection and store the data
         const items = itemsSnapshot.docs.map((doc) => doc.data());
 
-        // Add the category and its items to the grouped data object
+        //add category to groupedData
         groupedData[categoryName] = items;
 
-        // Log each category and its items to the console
+        //log category
         console.log(`Items in category '${categoryName}':`, items);
       }
 
@@ -185,31 +185,32 @@ useEffect(() => {
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.inventoryList}>
               {Object.keys(groupedInventoryData).map((category) => (
-                  <View key={category} style={styles.categorySection}>
-                    <Text style={[styles.categoryTitle, { color: colors.onBackground }]}>{category}</Text>
-                    {groupedInventoryData[category].map((item) => (
-                        <Card key={item.id} style={[styles.card, { backgroundColor: colors.primary }]}>
-                          <Card.Content style={styles.cardContent}>
-                            {isDeleteMode && (
-                                <Checkbox
-                                    status={selectedItems.includes(item.id) ? "checked" : "unchecked"}
-                                    onPress={() => handleSelectItem(item.id)}
-                                />
-                            )}
-                            <View style={styles.cardText}>
-                              <Text style={[styles.itemName, { color: colors.onSurface }]}>{item.name}</Text>
-                              <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>{item.price}</Text>
-                              <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>
-                                Total: {item.total}   Hold: {item.hold}
-                              </Text>
-                              <Text style={[styles.categorySource, { color: colors.onSurfaceVariant }]}>
-                                {item.type} | {item.source}
-                              </Text>
-                            </View>
-                          </Card.Content>
-                        </Card>
-                    ))}
-                  </View>
+                <View key={category} style={styles.categorySection}>
+                  <Text style={[styles.categoryTitle, { color: colors.onBackground }]}>{category}</Text>
+                  {groupedInventoryData[category].map((item) => (
+                    // Ensure each Card has a unique key based on item.id
+                    <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.primary }]}>
+                      <Card.Content style={styles.cardContent}>
+                        {isDeleteMode && (
+                          <Checkbox
+                            status={selectedItems.includes(item.id) ? "checked" : "unchecked"}
+                            onPress={() => handleSelectItem(item.id)}
+                          />
+                        )}
+                        <View style={styles.cardText}>
+                          <Text style={[styles.itemName, { color: colors.onSurface }]}>{item.name}</Text>
+                          <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>{item.price}</Text>
+                          <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>
+                            Total: {item.total}   Hold: {item.hold}
+                          </Text>
+                          <Text style={[styles.categorySource, { color: colors.onSurfaceVariant }]}>
+                            {item.type} | {item.source}
+                          </Text>
+                        </View>
+                      </Card.Content>
+                    </Card>
+                  ))}
+                </View>
               ))}
             </View>
           </ScrollView>
