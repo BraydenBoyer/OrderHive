@@ -116,36 +116,36 @@ useEffect(() => {
   };
 
   const handleAddCustomer = async () => {
-      const location = newCustomer.location || 'Uncategorized';
-      const newCustomerData = {
-        id: Date.now(),
-        ...newCustomer,
-        price: "$50",
-        totalOrders: parseInt(newCustomer.totalOrders) || 0,
-        completedOrders: parseInt(newCustomer.completedOrders) || 0,
-      };
-
-      const result = await addCustomer(
-        newCustomer.name,
-        newCustomer.email,
-        newCustomer.phone,
-        newCustomer.location,
-        newCustomer.notes,
-        newCustomer.totalOrders,
-        newCustomer.completedOrders
-      );
-
-      if (result === true) {
-        setCustomers((prevCustomers) => ({
-          ...prevCustomers,
-          [location]: [...(prevCustomers[location] || []), newCustomerData],
-        }));
-        setAddCustomerModalVisible(false);
-        setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
-      } else {
-        console.error("Failed to add customer:", result);
-      }
+    const location = newCustomer.location || 'Uncategorized';
+    const newCustomerData = {
+      id: Date.now(),
+      ...newCustomer,
+      price: "$50",
+      totalOrders: parseInt(newCustomer.totalOrders) || 0,
+      completedOrders: parseInt(newCustomer.completedOrders) || 0,
     };
+
+    const result = await addCustomer(
+      newCustomer.name,
+      newCustomer.email,
+      newCustomer.phone,
+      newCustomer.location,
+      newCustomer.notes,
+      newCustomer.totalOrders,
+      newCustomer.completedOrders
+    );
+
+    if (result === true) {
+      setGroupedCustomerData((prevData) => ({
+        ...prevData,
+        [location]: [...(prevData[location] || []), newCustomerData],
+      }));
+      setAddCustomerModalVisible(false);
+      setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
+    } else {
+      console.error("Failed to add customer:", result);
+    }
+  };
 
   const handleFabStateChange = ({ open }) => setFabOpen(open);
 
