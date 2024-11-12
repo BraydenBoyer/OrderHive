@@ -9,6 +9,8 @@ import { colors } from "../../styles/themes/colors/lightTheme.jsx";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
 import { fireDb } from '../../firebase/initializeFirebase';
+import {deleteInventoryItem} from '../../firebase/deleteInventoryItem'
+
 
 const initialInventoryData = [
   { id: 1, category: "Lettuce", name: "Butter Bib", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
@@ -21,7 +23,7 @@ export default function InventoryPage() {
   const [selectedItems, setSelectedItems] = useState([]);
   //const [inventoryData, setInventoryData] = useState(initialInventoryData);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
-
+const [selectedItem, setSelectedItem] = useState(null)
   const [newItemName, setNewItemName] = useState('');
   const [newItemPrice, setNewItemPrice] = useState('');
   const [newItemCategory, setNewItemCategory] = useState('');
@@ -99,32 +101,10 @@ useEffect(() => {
   fetchData();
 }, []);
 
-/*
-  useFocusEffect(
-    useCallback(() => {
-      setFabVisible(true);
-      setActions([
-        {
-          icon: 'plus',
-          label: 'Add Item',
-          onPress: () => setAddModalVisible(true),
-        },
-        {
-          icon: 'delete',
-          label: 'Delete Selected',
-          onPress: () => setDeleteMode(true),
-        }
-      ]);
-      setIcon(['plus', 'minus']);
-      return () => setFabVisible(false);
-    }, [setFabVisible, setActions, setIcon])
-  );
-*/
+
 
   const handleSelectItem = (itemId) => {
-    setSelectedItems((prevSelected) =>
-      prevSelected.includes(itemId) ? prevSelected.filter((id) => id !== itemId) : [...prevSelected, itemId]
-    );
+    setSelectedItem((prevSelected) => (prevSelected === itemId ? null : itemId));
   };
 
   const handleDeleteItems = () => {
@@ -189,11 +169,11 @@ useEffect(() => {
                   <Text style={[styles.categoryTitle, { color: colors.onBackground }]}>{category}</Text>
                   {groupedInventoryData[category].map((item) => (
                     // Ensure each Card has a unique key based on item.id
-                    <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.primary }]}>
+                    <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.secondary }]}>
                       <Card.Content style={styles.cardContent}>
                         {isDeleteMode && (
                           <Checkbox
-                            status={selectedItems.includes(item.id) ? "checked" : "unchecked"}
+                            status={selectedItem === item.id ? "checked" : "unchecked"}
                             onPress={() => handleSelectItem(item.id)}
                           />
                         )}
