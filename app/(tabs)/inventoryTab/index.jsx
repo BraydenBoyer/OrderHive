@@ -7,7 +7,8 @@ import { addInventoryItem } from '../../firebase/addItem.js';
 import { fetchInventoryData } from '../../firebase/fetchInventory.js';
 import { colors } from "../../styles/themes/colors/lightTheme.jsx";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-
+import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
+import { fireDb } from '../../firebase/initializeFirebase';
 
 const initialInventoryData = [
   { id: 1, category: "Lettuce", name: "Butter Bib", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
@@ -35,7 +36,7 @@ export default function InventoryPage() {
     const theme = useTheme()
     const colors = theme.colors;
 
-
+/*
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchInventoryData();
@@ -44,11 +45,59 @@ export default function InventoryPage() {
         acc[item.category].push(item);
         return acc;
       }, {});
+
       setGroupedInventoryData(groupedData);
+
+      // Log groupedInventoryData to see the structure after fetching
+      console.log("Grouped Inventory Data after fetching:", groupedData);
+
     };
 
     fetchData();
   }, []);
+*/
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Reference the 'inventory' collection
+      const inventoryRef = collection(fireDb, 'inventory');
+      const inventorySnapshot = await getDocs(inventoryRef);
+
+      // Initialize an object to store categories and their items
+      const groupedData = {};
+
+      // Loop through each category in the 'inventory' collection
+      for (const categoryDoc of inventorySnapshot.docs) {
+        const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
+
+        // Reference to the 'items' subcollection within each category
+        const itemsRef = collection(fireDb, 'inventory', categoryName, 'items');
+        const itemsSnapshot = await getDocs(itemsRef);
+
+        // Map through each item in the 'items' subcollection and store the data
+        const items = itemsSnapshot.docs.map((doc) => doc.data());
+
+        // Add the category and its items to the grouped data object
+        groupedData[categoryName] = items;
+
+        // Log each category and its items to the console
+        console.log(`Items in category '${categoryName}':`, items);
+      }
+
+      // Set the grouped data in state
+      setGroupedInventoryData(groupedData);
+
+      // Log the full grouped data structure after fetching and setting it in state
+      console.log("Grouped Inventory Data after fetching and setting state:", groupedData);
+
+    } catch (error) {
+      console.error("Error fetching inventory data:", error);
+    }
+  };
+
+  fetchData();
+}, []);
 
 /*
   useFocusEffect(
@@ -71,6 +120,7 @@ export default function InventoryPage() {
     }, [setFabVisible, setActions, setIcon])
   );
 */
+
   const handleSelectItem = (itemId) => {
     setSelectedItems((prevSelected) =>
       prevSelected.includes(itemId) ? prevSelected.filter((id) => id !== itemId) : [...prevSelected, itemId]
@@ -125,9 +175,11 @@ export default function InventoryPage() {
     setNewItemSource('');
   };
 
+
   const handleFabStateChange = ({ open }) => setFabOpen(open);
 
   return (
+
       <BackDrop title={"InventoryTab"}>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
