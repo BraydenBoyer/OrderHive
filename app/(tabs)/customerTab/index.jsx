@@ -1,10 +1,14 @@
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
 import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB, Dialog, useTheme } from "react-native-paper";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useState, useEffect } from "react";
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
 import { addCustomer } from '../../firebase/addCustomer';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
+import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
+import { fireDb } from '../../firebase/initializeFirebase';
+
+
 
 const initialCustomers = {
   "Location 1": [
@@ -25,6 +29,8 @@ export default function CustomerPage() {
   const [fabOpen, setFabOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerDetailVisible, setCustomerDetailVisible] = useState(false);
+  const [groupedCustomerData, setGroupedCustomerData] = useState({});
+
   const [newCustomer, setNewCustomer] = useState({
     name: '',
     email: '',
@@ -37,13 +43,57 @@ export default function CustomerPage() {
 
   const theme = useTheme();
   const colors = theme.colors;
-
+/*
   useFocusEffect(
     useCallback(() => {
       setFabVisible(false);
       return () => setFabVisible(false);
     }, [])
   );
+*/
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      console.log('attempting to fetch customers');
+
+      const customerRef = collection(fireDb, 'customers');
+      const querySnapshot = await getDocs(customerRef);
+
+      //check if documents are found
+      if (querySnapshot.empty) {
+        console.log("No documents found in 'customers' collection.");
+        return;
+      }
+
+      //group customers by location
+      const customerData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      //organize customers by location
+      const groupedData = customerData.reduce((acc, customer) => {
+        const location = customer.location || 'Uncategorized'; // Default location if none specified
+        if (!acc[location]) {
+          acc[location] = [];
+        }
+        acc[location].push(customer);
+        return acc;
+      }, {});
+
+      setGroupedCustomerData(groupedData); //set grouped data in state
+      console.log('Grouped Customer Data:', groupedData); //log to verify structure
+    } catch (error) {
+      console.error('Error fetching customer items:', error);
+    }
+  };
+
+  fetchData();
+}, []);
+
+
+
+
 
   const handleSelectCustomer = (customerId) => {
     setSelectedCustomers((prevSelected) =>
@@ -113,12 +163,18 @@ export default function CustomerPage() {
       <BackDrop title={"CustomerTab"}>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView>
-        {Object.keys(customers).map((location) => (
+        {Object.keys(groupedCustomerData).map((location) => (
           <View key={location} style={styles.locationContainer}>
             <Title style={[styles.locationTitle, { color: colors.primary }]}>{location}</Title>
             <Divider style={[styles.divider, { backgroundColor: colors.onSurface }]} />
-            {customers[location].map((customer) => (
-              <Card key={customer.id} style={[styles.customerCard, { backgroundColor: colors.surface }]} onPress={() => openCustomerDetails(customer)}>
+
+            {/* Map over customers in each location */}
+            {groupedCustomerData[location].map((customer) => (
+              <Card
+                key={customer.id}
+                style={[styles.customerCard, { backgroundColor: colors.surface }]}
+                onPress={() => openCustomerDetails(customer)}
+              >
                 <Card.Content style={styles.cardContent}>
                   {isDeleteMode && (
                     <Checkbox
