@@ -7,9 +7,8 @@ import { addInventoryItem } from '../../firebase/addItem.js';
 import { fetchInventoryData } from '../../firebase/fetchInventory.js';
 import { colors } from "../../styles/themes/colors/lightTheme.jsx";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
+import {collection, doc, setDoc, query, where, getDocs, deleteDoc} from "firebase/firestore";
 import { fireDb } from '../../firebase/initializeFirebase';
-import {deleteInventoryItem} from '../../firebase/deleteInventoryItem'
 
 
 const initialInventoryData = [
@@ -102,9 +101,24 @@ useEffect(() => {
 }, []);
 
 
-
+/*
   const handleSelectItem = (itemId) => {
-    setSelectedItem((prevSelected) => (prevSelected === itemId ? null : itemId));
+    setSelectedItem((prevSelected) =>
+        prevSelected.includes(inventoryI)
+            ? prevSelected.filter((id) => id !== customerId)
+            : [...prevSelected, customerId] => (prevSelected === itemId ? null : itemId));
+  };
+
+ */
+
+  const deleteItem = async (inventoryID) => {
+    try {
+      await deleteDoc(doc(fireDb, "inventory", inventoryID));
+      return true;
+    } catch (error) {
+      console.error("Error deleting inventory:", error);
+      return false;
+    }
   };
 
   const handleDeleteItems = () => {
