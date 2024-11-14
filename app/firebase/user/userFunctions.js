@@ -1,6 +1,7 @@
 import { fireApp, fireAuth, fireDb } from "../initializeFirebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword , updateEmail,updatePassword,getAuth} from "firebase/auth";
 import {doc, getDoc, setDoc, updateDoc} from "firebase/firestore";
+import {useState} from "react";
 
 
 /*
@@ -89,4 +90,72 @@ export const addOrgToUser = async (orgName, role) => {
 	}
 
 	await updateDoc( userRef, update )
+}
+
+/*
+	function to allow users to change their username
+
+	@author Brayden
+ */
+export const updateUserUsername = async (username) => {
+	const userInfo = await getCurrentUserInfo()
+	const userID = userInfo.userID
+	const userRef = doc(fireDb, `users`, userID)
+	const update = {
+		name: username
+	}
+	await updateDoc(userRef, update )
+}
+/*
+	function to allow users to change their phone number
+
+	@author Brayden
+ */
+export const updateUserPhoneNumber = async (phone_number) => {
+	const userInfo = await getCurrentUserInfo()
+	const userID = userInfo.userID
+	const phoneRef = doc(fireDb, `users`, userID)
+	const update = {
+		phone: phone_number
+	}
+	await updateDoc(phoneRef, update )
+}
+
+/*
+	function to allow users to change their password
+
+	@author Brayden
+ */
+export const updateUserPassword = async (password) => {
+	const userInfo = await getCurrentUserInfo()
+	const userID = userInfo.userID
+	const passRef = doc(fireDb, `users`, userID)
+	const update = {
+		password: password
+	}
+	await updateDoc(passRef, update )
+}
+/*
+	function to allow users to change their email
+
+	@author Brayden
+ */
+export const updateUserEmail = async (email) => {
+
+	const userInfo = await getCurrentUserInfo()
+	const userID = userInfo.userID
+	const EmailRef = doc(fireDb, `users`, userID)
+	const update = {
+		email: email
+	}
+	await updateDoc( EmailRef,update )
+
+
+	const auth = await getAuth()
+	const user = auth.currentUser
+
+
+	await updateEmail(user, email)
+
+
 }
