@@ -2,6 +2,7 @@ import {Button, Icon, Surface, Text, TextInput, TouchableRipple, useTheme} from 
 import {StyleSheet, View} from "react-native";
 import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
 import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
+import {buttonStyle} from "../../app/styles/components/inputs/buttons.jsx";
 
 
 export const MyButton = ({
@@ -23,13 +24,13 @@ export const MyButton = ({
 	return(
 
 		<Surface
-			style={style}
+			style={[buttonStyle.basicButtonTemplate, style]}
 			elevation={elevation}
 			mode={'elevated'}
 		>
 			<TouchableRipple
 				onPress={onClick}
-				style={[style]}
+				style={[buttonStyle.basicButtonTemplate, style]}
 				underlayColor={'red'}
 				borderless={true}
 				rippleColor={colors.backdrop}
