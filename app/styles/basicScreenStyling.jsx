@@ -5,7 +5,7 @@ export const basicScreenOption = {
 	headerShown: false,
 	navigationBarHidden: false,
 	navigationBarColor: lightTheme.colors.primaryContainer,
-	statusBarColor: lightTheme.colors.primaryContainer,
+	//statusBarColor: lightTheme.colors.primaryContainer,
 	//statusBarStyle: 'dark',
 }
 

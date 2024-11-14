@@ -10,6 +10,7 @@ import {emailLogin, logoutCurrentUser} from "./firebase/user/authentication.js";
 import {userHasOrg} from "./firebase/user/userFunctions.js";
 import {fireAuth} from "./firebase/initializeFirebase.js";
 import {creationPageStyles} from "./styles/pageType/creationPageStyles.jsx";
+import {globalVariable} from "./_layout.jsx";
 
 
 const interpretLoginError = (error) => {
@@ -29,8 +30,8 @@ const interpretLoginError = (error) => {
 	return response
 }
 
-const toDashboard = () => {
-	router.navigate('./dashboardTab')
+const toOrgSelection = () => {
+	router.navigate('./selectOrgPage')
 }
 
 const toCreateUser = () => {
@@ -67,7 +68,9 @@ export default function LoginPage() {
 
 					// If the user has an org, they can log in
 					if (hasOrg) {
-						toDashboard()
+
+						// Should send to org selection screen first
+						toOrgSelection()
 					}
 					// If the user does not, they must join or create an org
 					else {
@@ -93,8 +96,10 @@ export default function LoginPage() {
 			(
 				async () => {
 					await logoutCurrentUser()
+					globalVariable.currentOrg = ''
 				}
 			)()
+
 		}, [])
 	)
 

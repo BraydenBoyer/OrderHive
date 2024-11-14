@@ -1,7 +1,6 @@
 import { fireApp, fireAuth, fireDb } from "../initializeFirebase.js";
-import { createUserWithEmailAndPassword , updateEmail,updatePassword,getAuth} from "firebase/auth";
-import {doc, getDoc, setDoc, updateDoc} from "firebase/firestore";
-import {useState} from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import {collection, doc, getDoc, getDocs, setDoc, updateDoc} from "firebase/firestore";
 
 
 /*
@@ -62,9 +61,13 @@ export const getCurrentUserInfo = async () => {
  */
 export async function userHasOrg(){
 
-	const userData = await getCurrentUserInfo()
+	const docRef = await doc(fireDb, 'users', fireAuth.currentUser.uid)
+	const collectionName = 'organizations'
 
-	return userData.hasOwnProperty('organizations');
+	const collectionRef = collection(docRef, collectionName);
+	const snapshot = await getDocs(collectionRef);
+
+	return !snapshot.empty;
 }
 
 
@@ -74,88 +77,36 @@ export async function userHasOrg(){
 
 	@author Miles
  */
-export const addOrgToUser = async (orgName, role) => {
+export const addOrgToUser = async (orgName, role, location) => {
+
+	if( location === undefined ){
+		location = await getUserOrgs().location
+
+	}
 
 	const userInfo = await getCurrentUserInfo()
 	const userID = userInfo.userID
+	const orgID = 'Org.' + orgName
 
-	const userRef = doc(fireDb, `users`, userID)
+	const userRef = doc(fireDb, `users/${userID}/organizations`, orgName)
 
-	const update = {
-		organizations: {
-			['Org.' + orgName]: {
-				role: role
-			}
-		}
+	const orgInfo = {
+		name: orgName,
+		role: role,
+		location: location,
 	}
 
-	await updateDoc( userRef, update )
+	await setDoc( userRef, orgInfo )
 }
 
-/*
-	function to allow users to change their username
 
-	@author Brayden
- */
-export const updateUserUsername = async (username) => {
-	const userInfo = await getCurrentUserInfo()
-	const userID = userInfo.userID
-	const userRef = doc(fireDb, `users`, userID)
-	const update = {
-		name: username
-	}
-	await updateDoc(userRef, update )
-}
-/*
-	function to allow users to change their phone number
+export const getUserOrgs = async () => {
 
-	@author Brayden
- */
-export const updateUserPhoneNumber = async (phone_number) => {
-	const userInfo = await getCurrentUserInfo()
-	const userID = userInfo.userID
-	const phoneRef = doc(fireDb, `users`, userID)
-	const update = {
-		phone: phone_number
-	}
-	await updateDoc(phoneRef, update )
-}
+	const docRef = doc(fireDb, 'users', fireAuth.currentUser.uid)
+	const collectionName = 'organizations'
 
-/*
-	function to allow users to change their password
+	const collectionRef = collection(docRef, collectionName);
+	const snapshot = await getDocs(collectionRef);
 
-	@author Brayden
- */
-export const updateUserPassword = async (password) => {
-	const userInfo = await getCurrentUserInfo()
-	const userID = userInfo.userID
-	const passRef = doc(fireDb, `users`, userID)
-	const update = {
-		password: password
-	}
-	await updateDoc(passRef, update )
-}
-/*
-	function to allow users to change their email
-
-	@author Brayden
- */
-export const updateUserEmail = async (email) => {
-
-	const userInfo = await getCurrentUserInfo()
-	const userID = userInfo.userID
-	const EmailRef = doc(fireDb, `users`, userID)
-	const update = {
-		email: email
-	}
-	await updateDoc( EmailRef,update )
-
-
-	const auth = await getAuth()
-	const user = auth.currentUser
-
-
-	await updateEmail(user, email)
-
-
+	return snapshot.docs.map(doc => doc.data());
 }

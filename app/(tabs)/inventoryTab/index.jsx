@@ -20,9 +20,9 @@ const initialInventoryData = [
 export default function InventoryPage() {
   const [isDeleteMode, setDeleteMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
-  //const [inventoryData, setInventoryData] = useState(initialInventoryData);
+ // const [inventoryData, setInventoryData] = useState(initialInventoryData);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
-const [selectedItem, setSelectedItem] = useState(null)
+const [selectedItem, setSelectedItem] = useState([])
   const [newItemName, setNewItemName] = useState('');
   const [newItemPrice, setNewItemPrice] = useState('');
   const [newItemCategory, setNewItemCategory] = useState('');
@@ -58,58 +58,67 @@ const [selectedItem, setSelectedItem] = useState(null)
   }, []);
 */
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      //reference the 'inventory' collection
-      const inventoryRef = collection(fireDb, 'inventory');
-      const inventorySnapshot = await getDocs(inventoryRef);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Reference the 'inventory' collection
+        const inventoryRef = collection(fireDb, 'inventory');
+        const inventorySnapshot = await getDocs(inventoryRef);
 
-      //initialize an object to store categories and their items
-      const groupedData = {};
+        // Initialize an object to store categories and their items
+        const groupedData = {};
 
-      //loop through each category in the 'inventory' collection
-      for (const categoryDoc of inventorySnapshot.docs) {
-        const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
+        // Loop through each category in the 'inventory' collection
+        for (const categoryDoc of inventorySnapshot.docs) {
+          const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
 
-        //reference to the 'items' subcollection within each category
-        const itemsRef = collection(fireDb, 'inventory', categoryName, 'items');
-        const itemsSnapshot = await getDocs(itemsRef);
+          // Reference the 'items' subcollection within each category
+          const itemsRef = collection(fireDb, 'inventory', categoryName, 'items');
+          const itemsSnapshot = await getDocs(itemsRef);
 
-        //map through each item in the 'items' subcollection and store the data
-        const items = itemsSnapshot.docs.map((doc) => doc.data());
+          // Map through each item in the 'items' subcollection and store the data
+          const items = itemsSnapshot.docs.map((doc) => {
+            const item = { id: doc.id, ...doc.data() }; // Add the document ID as 'id'
+            console.log(`Fetched item in category '${categoryName}':`, item); // Log each item with its id
+            return item;
+          });
 
-        //add category to groupedData
-        groupedData[categoryName] = items;
+          // Add category to groupedData
+          groupedData[categoryName] = items;
 
-        //log category
-        console.log(`Items in category '${categoryName}':`, items);
+          // Log category and its items
+          console.log(`Items in category '${categoryName}':`, items);
+        }
+
+        // Set the grouped data in state
+        setGroupedInventoryData(groupedData);
+
+        // Log the full grouped data structure after fetching and setting it in state
+        console.log("Grouped Inventory Data after fetching and setting state:", groupedData);
+
+      } catch (error) {
+        console.error("Error fetching inventory data:", error);
       }
+    };
 
-      // Set the grouped data in state
-      setGroupedInventoryData(groupedData);
+    fetchData();
+  }, []);
 
-      // Log the full grouped data structure after fetching and setting it in state
-      console.log("Grouped Inventory Data after fetching and setting state:", groupedData);
 
-    } catch (error) {
-      console.error("Error fetching inventory data:", error);
-    }
+
+
+  const handleSelectItem = (inventoryID) => {
+    setSelectedItem((prevSelected) => {
+      const updatedSelected = prevSelected.includes(inventoryID)
+          ? prevSelected.filter((id) => id !== inventoryID)
+          : [...prevSelected, inventoryID];
+
+      console.log("Updated selected items:", updatedSelected); // Log the updated selection
+      return updatedSelected;
+    });
   };
 
-  fetchData();
-}, []);
 
-
-/*
-  const handleSelectItem = (itemId) => {
-    setSelectedItem((prevSelected) =>
-        prevSelected.includes(inventoryI)
-            ? prevSelected.filter((id) => id !== customerId)
-            : [...prevSelected, customerId] => (prevSelected === itemId ? null : itemId));
-  };
-
- */
 
   const deleteItem = async (inventoryID) => {
     try {
@@ -122,10 +131,25 @@ useEffect(() => {
   };
 
   const handleDeleteItems = () => {
-    setInventoryData((prevData) => prevData.filter(item => !selectedItems.includes(item.id)));
-    setSelectedItems([]);
-    setDeleteMode(false);
+    setGroupedInventoryData((prevData) => {
+      const updatedData = { ...prevData };
+      selectedItems.forEach((itemId) => {
+        for (const category in updatedData) {
+          // Remove the selected item from the category
+          updatedData[category] = updatedData[category].filter((item) => item.id !== itemId);
+
+          // Optionally delete the category if it's empty
+          if (updatedData[category].length === 0) {
+            delete updatedData[category];
+          }
+        }
+      });
+      return updatedData;
+    });
+    setSelectedItems([]); // Clear selected items
+    setDeleteMode(false); // Exit delete mode
   };
+
 
   const handleAddItems = async () => {
     if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold || !newItemSource) return;
@@ -181,29 +205,31 @@ useEffect(() => {
               {Object.keys(groupedInventoryData).map((category) => (
                 <View key={category} style={styles.categorySection}>
                   <Text style={[styles.categoryTitle, { color: colors.onBackground }]}>{category}</Text>
-                  {groupedInventoryData[category].map((item) => (
-                    // Ensure each Card has a unique key based on item.id
-                    <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.secondary }]}>
-                      <Card.Content style={styles.cardContent}>
-                        {isDeleteMode && (
-                          <Checkbox
-                            status={selectedItem === item.id ? "checked" : "unchecked"}
-                            onPress={() => handleSelectItem(item.id)}
-                          />
-                        )}
-                        <View style={styles.cardText}>
-                          <Text style={[styles.itemName, { color: colors.onSurface }]}>{item.name}</Text>
-                          <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>{item.price}</Text>
-                          <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>
-                            Total: {item.total}   Hold: {item.hold}
-                          </Text>
-                          <Text style={[styles.categorySource, { color: colors.onSurfaceVariant }]}>
-                            {item.type} | {item.source}
-                          </Text>
-                        </View>
-                      </Card.Content>
-                    </Card>
-                  ))}
+                  {groupedInventoryData[category].map((item) => {
+                    console.log("Rendering item:", item); // Log the item being rendered
+                    return (
+                        <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.secondary }]}>
+                          <Card.Content style={styles.cardContent}>
+                            {isDeleteMode && (
+                                <Checkbox
+                                    status={selectedItem.includes(item.id) ? "checked" : "unchecked"}
+                                    onPress={() => handleSelectItem(item.id)}
+                                />
+                            )}
+                            <View style={styles.cardText}>
+                              <Text style={[styles.itemName, { color: colors.onSurface }]}>{item.name}</Text>
+                              <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>{item.price}</Text>
+                              <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>
+                                Total: {item.total}   Hold: {item.hold}
+                              </Text>
+                              <Text style={[styles.categorySource, { color: colors.onSurfaceVariant }]}>
+                                {item.type} | {item.source}
+                              </Text>
+                            </View>
+                          </Card.Content>
+                        </Card>
+                    );
+                  })}
                 </View>
               ))}
             </View>
