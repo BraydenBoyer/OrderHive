@@ -37,27 +37,8 @@ const [selectedItem, setSelectedItem] = useState([])
     const theme = useTheme()
     const colors = theme.colors;
 
-/*
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchInventoryData();
-      const groupedData = data.reduce((acc, item) => {
-        acc[item.category] = acc[item.category] || [];
-        acc[item.category].push(item);
-        return acc;
-      }, {});
 
-      setGroupedInventoryData(groupedData);
-
-      // Log groupedInventoryData to see the structure after fetching
-      console.log("Grouped Inventory Data after fetching:", groupedData);
-
-    };
-
-    fetchData();
-  }, []);
-*/
-
+    //how items are added to inventory
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,35 +46,35 @@ const [selectedItem, setSelectedItem] = useState([])
         const inventoryRef = collection(fireDb, 'inventory');
         const inventorySnapshot = await getDocs(inventoryRef);
 
-        // Initialize an object to store categories and their items
+        //initialize an object to store categories and their items
         const groupedData = {};
 
-        // Loop through each category in the 'inventory' collection
+        //loop through each category in the 'inventory' collection
         for (const categoryDoc of inventorySnapshot.docs) {
           const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
 
-          // Reference the 'items' subcollection within each category
+          //reference the 'items' subcollection within each category
           const itemsRef = collection(fireDb, 'inventory', categoryName, 'items');
           const itemsSnapshot = await getDocs(itemsRef);
 
-          // Map through each item in the 'items' subcollection and store the data
+          //map through each item in the 'items' subcollection and store the data
           const items = itemsSnapshot.docs.map((doc) => {
             const item = { id: doc.id, ...doc.data() }; // Add the document ID as 'id'
             console.log(`Fetched item in category '${categoryName}':`, item); // Log each item with its id
             return item;
           });
 
-          // Add category to groupedData
+          //add category to groupedData
           groupedData[categoryName] = items;
 
-          // Log category and its items
+
           console.log(`Items in category '${categoryName}':`, items);
         }
 
-        // Set the grouped data in state
+        //set the grouped data in state
         setGroupedInventoryData(groupedData);
 
-        // Log the full grouped data structure after fetching and setting it in state
+        //log the full grouped data structure after fetching and setting it in state
         console.log("Grouped Inventory Data after fetching and setting state:", groupedData);
 
       } catch (error) {
@@ -108,54 +89,154 @@ const [selectedItem, setSelectedItem] = useState([])
 
 
   const handleSelectItem = (inventoryID) => {
-    setSelectedItem((prevSelected) => {
-      const updatedSelected = prevSelected.includes(inventoryID)
-          ? prevSelected.filter((id) => id !== inventoryID)
-          : [...prevSelected, inventoryID];
+    setSelectedItems((prevSelected) => {
+      //check if item has been selected already
+      const isSelected = prevSelected.includes(inventoryID);
 
-      console.log("Updated selected items:", updatedSelected); // Log the updated selection
+      //add or remove item based on selection status
+      const updatedSelected = isSelected
+        ? prevSelected.filter((id) => id !== inventoryID)
+        : [...prevSelected, inventoryID];
+
+      console.log("Updated selected items (IDs):", updatedSelected); // Debugging log
       return updatedSelected;
     });
   };
 
 
 
-  const deleteItem = async (inventoryID) => {
+  const deleteItemsByName = async (itemIDs) => {
     try {
-      await deleteDoc(doc(fireDb, "inventory", inventoryID));
-      return true;
+      //map ids to names
+      const itemNames = itemIDs.map((id) => getItemNameById(id)).filter(Boolean); // Filter out nulls
+
+      //log item being deleted
+      console.log("Item names for deletion:", itemNames);
+
+      const inventoryRef = collection(fireDb, "inventory");
+      const inventorySnapshot = await getDocs(inventoryRef);
+
+      for (const itemName of itemNames) {
+        let itemDeleted = false;
+
+        for (const categoryDoc of inventorySnapshot.docs) {
+          const categoryName = categoryDoc.id;
+
+          const itemsRef = collection(fireDb, "inventory", categoryName, "items");
+          const itemsSnapshot = await getDocs(itemsRef);
+
+          for (const itemDoc of itemsSnapshot.docs) {
+            const itemData = itemDoc.data();
+
+            if (itemData.name === itemName) {
+              const itemRef = doc(fireDb, "inventory", categoryName, "items", itemDoc.id);
+              await deleteDoc(itemRef);
+              console.log(`Deleted item '${itemName}' in category '${categoryName}'`);
+              itemDeleted = true;
+              break;
+            }
+          }
+
+          if (itemDeleted) break;
+        }
+
+        if (!itemDeleted) {
+          console.warn(`Item '${itemName}' not found in any category.`);
+        }
+      }
+
+      console.log("All items processed for deletion.");
     } catch (error) {
-      console.error("Error deleting inventory:", error);
-      return false;
+      console.error("Error deleting items by name:", error);
     }
   };
 
-  const handleDeleteItems = () => {
-    setGroupedInventoryData((prevData) => {
-      const updatedData = { ...prevData };
-      selectedItems.forEach((itemId) => {
-        for (const category in updatedData) {
-          // Remove the selected item from the category
-          updatedData[category] = updatedData[category].filter((item) => item.id !== itemId);
 
-          // Optionally delete the category if it's empty
-          if (updatedData[category].length === 0) {
-            delete updatedData[category];
-          }
+  const handleDeleteItems = async () => {
+    if (selectedItems.length === 0) {
+      console.warn("No items selected for deletion.");
+      return;
+    }
+
+    console.log("Items selected for deletion:", selectedItems);
+
+    //update the UI by removing items from local state
+    const updatedGroupedData = { ...groupedInventoryData };
+    selectedItems.forEach((inventoryID) => {
+      for (const categoryName in updatedGroupedData) {
+        updatedGroupedData[categoryName] = updatedGroupedData[categoryName].filter(
+          (item) => item.id !== inventoryID
+        );
+
+        if (updatedGroupedData[categoryName].length === 0) {
+          delete updatedGroupedData[categoryName]; // Remove empty categories
         }
-      });
-      return updatedData;
+      }
     });
+
+    setGroupedInventoryData(updatedGroupedData); // Update the UI immediately
     setSelectedItems([]); // Clear selected items
-    setDeleteMode(false); // Exit delete mode
+
+    try {
+      //delete items from the database using deleteItemFromDatabase function
+      await Promise.all(selectedItems.map((inventoryID) => deleteItemFromDatabase(inventoryID)));
+      console.log("Items successfully deleted from Firestore.");
+    } catch (error) {
+      console.error("Error deleting items:", error);
+      //ensure inventory matches database
+      fetchInventoryData(); //data fetching logic
+    }
+
+    setDeleteMode(false); //exit delete
   };
 
+const deleteItemFromDatabase = async (inventoryID) => {
+  for (const categoryName in groupedInventoryData) {
+    const categoryItems = groupedInventoryData[categoryName];
+    const item = categoryItems.find((item) => item.id === inventoryID);
+
+    if (item) {
+      const itemRef = doc(fireDb, "inventory", categoryName, "items", inventoryID);
+      await deleteDoc(itemRef);
+      console.log(`Deleted item '${item.name}' from category '${categoryName}'`);
+      return;
+    }
+  }
+
+  throw new Error(`Item with ID '${inventoryID}' not found in database.`);
+};
+const getItemNameById = (inventoryID) => {
+  for (const category in groupedInventoryData) {
+    const foundItem = groupedInventoryData[category].find((item) => item.id === inventoryID);
+    if (foundItem) {
+      return foundItem.name; // Return the item's name
+    }
+  }
+  return null; // Return null if not found
+};
+
+    const clearInputFields = () => {
+      setNewItemName('');
+      setNewItemPrice('');
+      setNewItemCategory('');
+      setNewItemTotal('');
+      setNewItemHold('');
+      setNewItemSource('');
+    };
 
   const handleAddItems = async () => {
-    if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold || !newItemSource) return;
+    if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold || !newItemSource) {
+      console.warn("All fields are required to add a new item.");
+      return;
+    }
+
+    // Capitalize the first letter of the category and make the rest lowercase
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    const normalizedCategory = capitalize(newItemCategory.trim());
+    console.log(normalizedCategory)
 
     const newItem = {
-      category: newItemCategory,
+      category: normalizedCategory,
       name: newItemName,
       price: newItemPrice,
       total: newItemTotal,
@@ -163,34 +244,24 @@ const [selectedItem, setSelectedItem] = useState([])
       source: newItemSource,
     };
 
-    const result = await addInventoryItem(
-        newItem.category,
-        newItem.name,
-        newItem.price,
-        newItem.total,
-        newItem.hold,
-        newItem.source
-    );
+    try {
+      const docRef = doc(collection(fireDb, "inventory", normalizedCategory, "items")); // Use normalized category
+      await setDoc(docRef, newItem);
 
-    if (result === true) {
-      setGroupedInventoryData((prevData) => ({
-        ...prevData,
-        [newItemCategory]: [...(prevData[newItemCategory] || []), newItem]
-      }));
+      // Immediately fetch updated inventory to refresh state
+      const updatedGroupedData = { ...groupedInventoryData };
+      updatedGroupedData[normalizedCategory] = [
+        ...(updatedGroupedData[normalizedCategory] || []),
+        { ...newItem, id: docRef.id }, // Add unique ID
+      ];
+      setGroupedInventoryData(updatedGroupedData); // Update state
+
+      console.log("Added new item:", newItem);
       setAddModalVisible(false);
       clearInputFields();
-    } else {
-      console.log("Error adding item:", result);
+    } catch (error) {
+      console.error("Error adding item:", error);
     }
-  };
-
-  const clearInputFields = () => {
-    setNewItemCategory('');
-    setNewItemName('');
-    setNewItemPrice('');
-    setNewItemTotal('');
-    setNewItemHold('');
-    setNewItemSource('');
   };
 
 
@@ -212,8 +283,8 @@ const [selectedItem, setSelectedItem] = useState([])
                           <Card.Content style={styles.cardContent}>
                             {isDeleteMode && (
                                 <Checkbox
-                                    status={selectedItem.includes(item.id) ? "checked" : "unchecked"}
-                                    onPress={() => handleSelectItem(item.id)}
+                                  status={selectedItems.includes(item.id) ? "checked" : "unchecked"} // Use ID for selection
+                                  onPress={() => handleSelectItem(item.id)} // Pass ID directly
                                 />
                             )}
                             <View style={styles.cardText}>
