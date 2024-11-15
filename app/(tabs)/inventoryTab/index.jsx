@@ -10,12 +10,8 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import {collection, doc, setDoc, query, where, getDocs, deleteDoc} from "firebase/firestore";
 import { fireDb } from '../../firebase/initializeFirebase';
 import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
+import {globalVariable} from '../../_layout.jsx'
 
-const initialInventoryData = [
-  { id: 1, category: "Lettuce", name: "Butter Bib", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
-  { id: 2, category: "Lettuce", name: "Red Romaine", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
-  { id: 3, category: "Bread", name: "Italian Bread", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Bread" }
-];
 
 export default function InventoryPage() {
   const [isDeleteMode, setDeleteMode] = useState(false);
@@ -29,6 +25,8 @@ const [selectedItem, setSelectedItem] = useState([])
   const [newItemTotal, setNewItemTotal] = useState('');
   const [newItemHold, setNewItemHold] = useState('');
   const [newItemSource, setNewItemSource] = useState('');
+  const [currentOrg, setCurrentOrg] = useState('')
+
 
   //for local fab
   const [visible, setVisible] = useState(false)
@@ -40,7 +38,7 @@ const [selectedItem, setSelectedItem] = useState([])
     const colors = theme.colors;
 
 
-    //how items are added to inventory
+    //how items are shown when inventory component is mounted
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,6 +48,10 @@ const [selectedItem, setSelectedItem] = useState([])
 
         //initialize an object to store categories and their items
         const groupedData = {};
+
+        const currOrg = globalVariable.currentOrg
+        setCurrentOrg(currOrg);
+        console.log('current organization: ',currOrg)
 
         //loop through each category in the 'inventory' collection
         for (const categoryDoc of inventorySnapshot.docs) {
@@ -280,7 +282,8 @@ const getItemNameById = (inventoryID) => {
 
   return (
 
-      <BackDrop title={"InventoryTab"}>
+      <BackDrop title={"InventoryTab"} >
+          <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.inventoryList}>
@@ -374,6 +377,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  orgTitle: {
+      fontSize: 16,
+      color: 'black',
+      fontWeight: 'bold',
+    },
   scrollContainer: {
     alignItems: "center",
   },
