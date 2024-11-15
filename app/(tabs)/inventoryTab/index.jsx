@@ -9,7 +9,7 @@ import { colors } from "../../styles/themes/colors/lightTheme.jsx";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import {collection, doc, setDoc, query, where, getDocs, deleteDoc} from "firebase/firestore";
 import { fireDb } from '../../firebase/initializeFirebase';
-
+import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
 
 const initialInventoryData = [
   { id: 1, category: "Lettuce", name: "Butter Bib", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
@@ -29,7 +29,9 @@ const [selectedItem, setSelectedItem] = useState([])
   const [newItemTotal, setNewItemTotal] = useState('');
   const [newItemHold, setNewItemHold] = useState('');
   const [newItemSource, setNewItemSource] = useState('');
-  const [fabOpen, setFabOpen] = useState(false);
+
+  //for local fab
+  const [visible, setVisible] = useState(false)
 
   const [groupedInventoryData, setGroupedInventoryData] = useState({});
 
@@ -263,9 +265,18 @@ const getItemNameById = (inventoryID) => {
       console.error("Error adding item:", error);
     }
   };
+    //for local fab
+    useFocusEffect(
+        useCallback(() => {
 
+            setVisible(true)
 
-  const handleFabStateChange = ({ open }) => setFabOpen(open);
+            return () => {
+                setVisible(false)
+            }
+        }, [setVisible])
+    )
+
 
   return (
 
@@ -320,17 +331,11 @@ const getItemNameById = (inventoryID) => {
                 </Button>
               </View>
           )}
+        <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
+            { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
+            { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
+            ]} />
 
-          <FAB.Group
-              open={fabOpen}
-              icon={fabOpen ? 'close' : 'plus'}
-              actions={[
-                { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
-                { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
-              ]}
-              onStateChange={({ open }) => setFabOpen(open)}
-              style={styles.fab}
-          />
 
           <Modal
               visible={isAddModalVisible}
