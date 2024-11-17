@@ -1,5 +1,6 @@
 import { fireDb } from "./initializeFirebase.js";
 import { doc, setDoc, collection, getDoc } from "firebase/firestore";
+import {globalVariable} from '../_layout.jsx'
 
 export const addInventoryItem = async (category, name, price, total, hold, source) => {
     try {
@@ -8,8 +9,9 @@ export const addInventoryItem = async (category, name, price, total, hold, sourc
             return 'Empty';
         }
 
+        const orgName = "Org." + globalVariable.currentOrg
         // Reference to the category document
-        const categoryRef = doc(fireDb, 'inventory', category);
+        const categoryRef = doc(fireDb, 'organizations/${orgName}/inventory', category);
 
         // Check if the category document already exists
         const categorySnapshot = await getDoc(categoryRef);
