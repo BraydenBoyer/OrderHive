@@ -1,10 +1,12 @@
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
 import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB, Dialog, useTheme } from "react-native-paper";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
 import { collection, doc, setDoc, deleteDoc, getDocs, addDoc } from "firebase/firestore";
 import { fireDb } from '../../firebase/initializeFirebase';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
+import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
+import { Tabs, useFocusEffect } from "expo-router";
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
@@ -15,6 +17,9 @@ export default function CustomerPage() {
   const [fabOpen, setFabOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerDetailVisible, setCustomerDetailVisible] = useState(false);
+  //for local fab
+    const [visible, setVisible] = useState(false)
+
 
   const [newCustomer, setNewCustomer] = useState({
     name: '',
@@ -135,6 +140,18 @@ export default function CustomerPage() {
     setSelectedCustomer(null);
   };
 
+  //for local fab
+      useFocusEffect(
+          useCallback(() => {
+
+              setVisible(true)
+
+              return () => {
+                  setVisible(false)
+              }
+          }, [setVisible])
+      )
+
   return (
     <BackDrop title={"CustomerTab"}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -207,17 +224,11 @@ export default function CustomerPage() {
             </Button>
           </View>
         )}
-
-        <FAB.Group
-          open={fabOpen}
-          icon={fabOpen ? "close" : "plus"}
-          actions={[
+        <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
             { icon: "plus", label: "Add Customer", onPress: () => setAddCustomerModalVisible(true) },
             { icon: "delete", label: "Delete Selected", onPress: () => setDeleteMode(true) },
-          ]}
-          onStateChange={handleFabStateChange}
-          style={styles.fabGroup}
-        />
+
+                    ]} />
 
         <Modal
           visible={addCustomerModalVisible}

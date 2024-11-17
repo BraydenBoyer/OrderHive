@@ -9,13 +9,9 @@ import { colors } from "../../styles/themes/colors/lightTheme.jsx";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import {collection, doc, setDoc, query, where, getDocs, deleteDoc} from "firebase/firestore";
 import { fireDb } from '../../firebase/initializeFirebase';
+import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
+import {globalVariable} from '../../_layout.jsx'
 
-
-const initialInventoryData = [
-  { id: 1, category: "Lettuce", name: "Butter Bib", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
-  { id: 2, category: "Lettuce", name: "Red Romaine", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Greens" },
-  { id: 3, category: "Bread", name: "Italian Bread", price: "$50", total: 8, hold: 5, source: "HG Farm", type: "Bread" }
-];
 
 export default function InventoryPage() {
   const [isDeleteMode, setDeleteMode] = useState(false);
@@ -29,7 +25,11 @@ const [selectedItem, setSelectedItem] = useState([])
   const [newItemTotal, setNewItemTotal] = useState('');
   const [newItemHold, setNewItemHold] = useState('');
   const [newItemSource, setNewItemSource] = useState('');
-  const [fabOpen, setFabOpen] = useState(false);
+  const [currentOrg, setCurrentOrg] = useState('')
+
+
+  //for local fab
+  const [visible, setVisible] = useState(false)
 
   const [groupedInventoryData, setGroupedInventoryData] = useState({});
 
@@ -37,27 +37,8 @@ const [selectedItem, setSelectedItem] = useState([])
     const theme = useTheme()
     const colors = theme.colors;
 
-/*
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchInventoryData();
-      const groupedData = data.reduce((acc, item) => {
-        acc[item.category] = acc[item.category] || [];
-        acc[item.category].push(item);
-        return acc;
-      }, {});
 
-      setGroupedInventoryData(groupedData);
-
-      // Log groupedInventoryData to see the structure after fetching
-      console.log("Grouped Inventory Data after fetching:", groupedData);
-
-    };
-
-    fetchData();
-  }, []);
-*/
-
+    //how items are shown when inventory component is mounted
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,35 +46,39 @@ const [selectedItem, setSelectedItem] = useState([])
         const inventoryRef = collection(fireDb, 'inventory');
         const inventorySnapshot = await getDocs(inventoryRef);
 
-        // Initialize an object to store categories and their items
+        //initialize an object to store categories and their items
         const groupedData = {};
 
-        // Loop through each category in the 'inventory' collection
+        const currOrg = globalVariable.currentOrg
+        setCurrentOrg(currOrg);
+        console.log('current organization: ',currOrg)
+
+        //loop through each category in the 'inventory' collection
         for (const categoryDoc of inventorySnapshot.docs) {
           const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
 
-          // Reference the 'items' subcollection within each category
+          //reference the 'items' subcollection within each category
           const itemsRef = collection(fireDb, 'inventory', categoryName, 'items');
           const itemsSnapshot = await getDocs(itemsRef);
 
-          // Map through each item in the 'items' subcollection and store the data
+          //map through each item in the 'items' subcollection and store the data
           const items = itemsSnapshot.docs.map((doc) => {
             const item = { id: doc.id, ...doc.data() }; // Add the document ID as 'id'
             console.log(`Fetched item in category '${categoryName}':`, item); // Log each item with its id
             return item;
           });
 
-          // Add category to groupedData
+          //add category to groupedData
           groupedData[categoryName] = items;
 
-          // Log category and its items
+
           console.log(`Items in category '${categoryName}':`, items);
         }
 
-        // Set the grouped data in state
+        //set the grouped data in state
         setGroupedInventoryData(groupedData);
 
-        // Log the full grouped data structure after fetching and setting it in state
+        //log the full grouped data structure after fetching and setting it in state
         console.log("Grouped Inventory Data after fetching and setting state:", groupedData);
 
       } catch (error) {
@@ -108,54 +93,154 @@ const [selectedItem, setSelectedItem] = useState([])
 
 
   const handleSelectItem = (inventoryID) => {
-    setSelectedItem((prevSelected) => {
-      const updatedSelected = prevSelected.includes(inventoryID)
-          ? prevSelected.filter((id) => id !== inventoryID)
-          : [...prevSelected, inventoryID];
+    setSelectedItems((prevSelected) => {
+      //check if item has been selected already
+      const isSelected = prevSelected.includes(inventoryID);
 
-      console.log("Updated selected items:", updatedSelected); // Log the updated selection
+      //add or remove item based on selection status
+      const updatedSelected = isSelected
+        ? prevSelected.filter((id) => id !== inventoryID)
+        : [...prevSelected, inventoryID];
+
+      console.log("Updated selected items (IDs):", updatedSelected); // Debugging log
       return updatedSelected;
     });
   };
 
 
 
-  const deleteItem = async (inventoryID) => {
+  const deleteItemsByName = async (itemIDs) => {
     try {
-      await deleteDoc(doc(fireDb, "inventory", inventoryID));
-      return true;
+      //map ids to names
+      const itemNames = itemIDs.map((id) => getItemNameById(id)).filter(Boolean); // Filter out nulls
+
+      //log item being deleted
+      console.log("Item names for deletion:", itemNames);
+
+      const inventoryRef = collection(fireDb, "inventory");
+      const inventorySnapshot = await getDocs(inventoryRef);
+
+      for (const itemName of itemNames) {
+        let itemDeleted = false;
+
+        for (const categoryDoc of inventorySnapshot.docs) {
+          const categoryName = categoryDoc.id;
+
+          const itemsRef = collection(fireDb, "inventory", categoryName, "items");
+          const itemsSnapshot = await getDocs(itemsRef);
+
+          for (const itemDoc of itemsSnapshot.docs) {
+            const itemData = itemDoc.data();
+
+            if (itemData.name === itemName) {
+              const itemRef = doc(fireDb, "inventory", categoryName, "items", itemDoc.id);
+              await deleteDoc(itemRef);
+              console.log(`Deleted item '${itemName}' in category '${categoryName}'`);
+              itemDeleted = true;
+              break;
+            }
+          }
+
+          if (itemDeleted) break;
+        }
+
+        if (!itemDeleted) {
+          console.warn(`Item '${itemName}' not found in any category.`);
+        }
+      }
+
+      console.log("All items processed for deletion.");
     } catch (error) {
-      console.error("Error deleting inventory:", error);
-      return false;
+      console.error("Error deleting items by name:", error);
     }
   };
 
-  const handleDeleteItems = () => {
-    setGroupedInventoryData((prevData) => {
-      const updatedData = { ...prevData };
-      selectedItems.forEach((itemId) => {
-        for (const category in updatedData) {
-          // Remove the selected item from the category
-          updatedData[category] = updatedData[category].filter((item) => item.id !== itemId);
 
-          // Optionally delete the category if it's empty
-          if (updatedData[category].length === 0) {
-            delete updatedData[category];
-          }
+  const handleDeleteItems = async () => {
+    if (selectedItems.length === 0) {
+      console.warn("No items selected for deletion.");
+      return;
+    }
+
+    console.log("Items selected for deletion:", selectedItems);
+
+    //update the UI by removing items from local state
+    const updatedGroupedData = { ...groupedInventoryData };
+    selectedItems.forEach((inventoryID) => {
+      for (const categoryName in updatedGroupedData) {
+        updatedGroupedData[categoryName] = updatedGroupedData[categoryName].filter(
+          (item) => item.id !== inventoryID
+        );
+
+        if (updatedGroupedData[categoryName].length === 0) {
+          delete updatedGroupedData[categoryName]; // Remove empty categories
         }
-      });
-      return updatedData;
+      }
     });
+
+    setGroupedInventoryData(updatedGroupedData); // Update the UI immediately
     setSelectedItems([]); // Clear selected items
-    setDeleteMode(false); // Exit delete mode
+
+    try {
+      //delete items from the database using deleteItemFromDatabase function
+      await Promise.all(selectedItems.map((inventoryID) => deleteItemFromDatabase(inventoryID)));
+      console.log("Items successfully deleted from Firestore.");
+    } catch (error) {
+      console.error("Error deleting items:", error);
+      //ensure inventory matches database
+      fetchInventoryData(); //data fetching logic
+    }
+
+    setDeleteMode(false); //exit delete
   };
 
+const deleteItemFromDatabase = async (inventoryID) => {
+  for (const categoryName in groupedInventoryData) {
+    const categoryItems = groupedInventoryData[categoryName];
+    const item = categoryItems.find((item) => item.id === inventoryID);
+
+    if (item) {
+      const itemRef = doc(fireDb, "inventory", categoryName, "items", inventoryID);
+      await deleteDoc(itemRef);
+      console.log(`Deleted item '${item.name}' from category '${categoryName}'`);
+      return;
+    }
+  }
+
+  throw new Error(`Item with ID '${inventoryID}' not found in database.`);
+};
+const getItemNameById = (inventoryID) => {
+  for (const category in groupedInventoryData) {
+    const foundItem = groupedInventoryData[category].find((item) => item.id === inventoryID);
+    if (foundItem) {
+      return foundItem.name; // Return the item's name
+    }
+  }
+  return null; // Return null if not found
+};
+
+    const clearInputFields = () => {
+      setNewItemName('');
+      setNewItemPrice('');
+      setNewItemCategory('');
+      setNewItemTotal('');
+      setNewItemHold('');
+      setNewItemSource('');
+    };
 
   const handleAddItems = async () => {
-    if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold || !newItemSource) return;
+    if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold || !newItemSource) {
+      console.warn("All fields are required to add a new item.");
+      return;
+    }
+
+    // Capitalize the first letter of the category and make the rest lowercase
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    const normalizedCategory = capitalize(newItemCategory.trim());
+    console.log(normalizedCategory)
 
     const newItem = {
-      category: newItemCategory,
+      category: normalizedCategory,
       name: newItemName,
       price: newItemPrice,
       total: newItemTotal,
@@ -163,42 +248,42 @@ const [selectedItem, setSelectedItem] = useState([])
       source: newItemSource,
     };
 
-    const result = await addInventoryItem(
-        newItem.category,
-        newItem.name,
-        newItem.price,
-        newItem.total,
-        newItem.hold,
-        newItem.source
-    );
+    try {
+      const docRef = doc(collection(fireDb, "inventory", normalizedCategory, "items")); // Use normalized category
+      await setDoc(docRef, newItem);
 
-    if (result === true) {
-      setGroupedInventoryData((prevData) => ({
-        ...prevData,
-        [newItemCategory]: [...(prevData[newItemCategory] || []), newItem]
-      }));
+      // Immediately fetch updated inventory to refresh state
+      const updatedGroupedData = { ...groupedInventoryData };
+      updatedGroupedData[normalizedCategory] = [
+        ...(updatedGroupedData[normalizedCategory] || []),
+        { ...newItem, id: docRef.id }, // Add unique ID
+      ];
+      setGroupedInventoryData(updatedGroupedData); // Update state
+
+      console.log("Added new item:", newItem);
       setAddModalVisible(false);
       clearInputFields();
-    } else {
-      console.log("Error adding item:", result);
+    } catch (error) {
+      console.error("Error adding item:", error);
     }
   };
+    //for local fab
+    useFocusEffect(
+        useCallback(() => {
 
-  const clearInputFields = () => {
-    setNewItemCategory('');
-    setNewItemName('');
-    setNewItemPrice('');
-    setNewItemTotal('');
-    setNewItemHold('');
-    setNewItemSource('');
-  };
+            setVisible(true)
 
+            return () => {
+                setVisible(false)
+            }
+        }, [setVisible])
+    )
 
-  const handleFabStateChange = ({ open }) => setFabOpen(open);
 
   return (
 
-      <BackDrop title={"InventoryTab"}>
+      <BackDrop title={"InventoryTab"} >
+          <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.inventoryList}>
@@ -212,8 +297,8 @@ const [selectedItem, setSelectedItem] = useState([])
                           <Card.Content style={styles.cardContent}>
                             {isDeleteMode && (
                                 <Checkbox
-                                    status={selectedItem.includes(item.id) ? "checked" : "unchecked"}
-                                    onPress={() => handleSelectItem(item.id)}
+                                  status={selectedItems.includes(item.id) ? "checked" : "unchecked"} // Use ID for selection
+                                  onPress={() => handleSelectItem(item.id)} // Pass ID directly
                                 />
                             )}
                             <View style={styles.cardText}>
@@ -249,17 +334,11 @@ const [selectedItem, setSelectedItem] = useState([])
                 </Button>
               </View>
           )}
+        <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
+            { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
+            { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
+            ]} />
 
-          <FAB.Group
-              open={fabOpen}
-              icon={fabOpen ? 'close' : 'plus'}
-              actions={[
-                { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
-                { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
-              ]}
-              onStateChange={({ open }) => setFabOpen(open)}
-              style={styles.fab}
-          />
 
           <Modal
               visible={isAddModalVisible}
@@ -298,6 +377,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  orgTitle: {
+      fontSize: 16,
+      color: 'black',
+      fontWeight: 'bold',
+    },
   scrollContainer: {
     alignItems: "center",
   },
