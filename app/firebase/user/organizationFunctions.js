@@ -104,3 +104,27 @@ export const getOrg = async (orgName) => {
 
     return docSnap.data()
 }
+
+//function just to get all organizations for inventory
+export async function getAllOrganizations() {
+    try {
+        const organizationsRef = collection(fireDb, "organizations"); // Replace with your collection name
+        const snapshot = await getDocs(organizationsRef);
+
+        if (snapshot.empty) {
+            console.log("No organizations found.");
+            return [];
+        }
+
+        const organizationsArray = [];
+        snapshot.forEach(doc => {
+            organizationsArray.push({ id: doc.id, ...doc.data() });
+        });
+
+        console.log("Organizations fetched successfully:", organizationsArray);
+        return organizationsArray;
+    } catch (error) {
+        console.error("Error fetching organizations:", error);
+        throw new Error("Failed to fetch organizations.");
+    }
+}

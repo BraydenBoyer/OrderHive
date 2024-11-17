@@ -1,6 +1,6 @@
 import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB } from "react-native-paper";
+import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB, Menu } from "react-native-paper";
 import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
 import { addInventoryItem } from '../../firebase/addItem.js';
@@ -11,6 +11,10 @@ import {collection, doc, setDoc, query, where, getDocs, deleteDoc} from "firebas
 import { fireDb } from '../../firebase/initializeFirebase';
 import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
 import {globalVariable} from '../../_layout.jsx'
+import {getAllOrganizations} from '../../firebase/user/organizationFunctions.js'
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 
 
 export default function InventoryPage() {
@@ -26,6 +30,11 @@ const [selectedItem, setSelectedItem] = useState([])
   const [newItemHold, setNewItemHold] = useState('');
   const [newItemSource, setNewItemSource] = useState('');
   const [currentOrg, setCurrentOrg] = useState('')
+  const [allOrgs , setAllOrgs] = useState([])
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [dropdownItems, setDropdownItems] = useState([])
+
+  const [isFocus, setIsFocus] = useState(false)
 
 
   //for local fab
@@ -51,7 +60,10 @@ const [selectedItem, setSelectedItem] = useState([])
 
         const currOrg = globalVariable.currentOrg
         setCurrentOrg(currOrg);
-        console.log('current organization: ',currOrg)
+
+        const organizations = await getAllOrganizations()
+        setAllOrgs(organizations)
+        console.log("fetched organizations", organizations) //works
 
         //loop through each category in the 'inventory' collection
         for (const categoryDoc of inventorySnapshot.docs) {
@@ -283,6 +295,7 @@ const getItemNameById = (inventoryID) => {
   return (
 
       <BackDrop title={"InventoryTab"} >
+
           <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -354,8 +367,36 @@ const getItemNameById = (inventoryID) => {
                 <TextInput placeholder="Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
                 <TextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
                 <TextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
-                <TextInput placeholder="Source (e.g., HG Farm)" style={styles.input} value={newItemSource} onChangeText={setNewItemSource} />
 
+                    <Dropdown
+                      style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      iconStyle={styles.iconStyle}
+                      data={allOrgs.map((org) => ({ label: org.name, value: org.id }))}
+                      search
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={newItemSource || 'Select an Organization'}
+                      searchPlaceholder="Search Organizations..."
+                      value={newItemSource}
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={(item) => {
+                        setNewItemSource(item.label); // Update the selected organization
+                        setIsFocus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <AntDesign
+                          style={styles.icon}
+                          color={isFocus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
+                        />
+                      )}
+                    />
                 <View style={styles.buttonContainer}>
                   <Button mode="outlined" onPress={() => setAddModalVisible(false)} style={styles.cancelButton} color={colors.onSurface}>
                     Cancel
