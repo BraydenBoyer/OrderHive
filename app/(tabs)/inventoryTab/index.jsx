@@ -266,7 +266,7 @@ const getItemNameById = (inventoryID) => {
       const orgName = "Org." + globalVariable.currentOrg; // Current organization
       const categoryDocRef = doc(fireDb, `organizations/${orgName}/inventory`, normalizedCategory);
 
-      // Ensure the category document is created with a field matching the category name
+      //ensure the category document is created with a field matching the category name
       await setDoc(categoryDocRef, { [normalizedCategory]: "" }, { merge: true });
 
       const itemDocRef = doc(collection(categoryDocRef, "items")); // Path to items subcollection
