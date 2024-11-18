@@ -1,6 +1,6 @@
 import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB } from "react-native-paper";
+import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB, Menu } from "react-native-paper";
 import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
 import { addInventoryItem } from '../../firebase/addItem.js';
@@ -11,6 +11,10 @@ import {collection, doc, setDoc, query, where, getDocs, deleteDoc} from "firebas
 import { fireDb } from '../../firebase/initializeFirebase';
 import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
 import {globalVariable} from '../../_layout.jsx'
+import {getAllOrganizations} from '../../firebase/user/organizationFunctions.js'
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 
 
 export default function InventoryPage() {
@@ -24,9 +28,14 @@ const [selectedItem, setSelectedItem] = useState([])
   const [newItemCategory, setNewItemCategory] = useState('');
   const [newItemTotal, setNewItemTotal] = useState('');
   const [newItemHold, setNewItemHold] = useState('');
-  const [newItemSource, setNewItemSource] = useState('');
-  const [currentOrg, setCurrentOrg] = useState('')
 
+  const [currentOrg, setCurrentOrg] = useState('')
+  const [allOrgs , setAllOrgs] = useState([])
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [dropdownItems, setDropdownItems] = useState([])
+
+  const [isFocus, setIsFocus] = useState(false)
+    const orgName = "Org." + globalVariable.currentOrg
 
   //for local fab
   const [visible, setVisible] = useState(false)
@@ -43,7 +52,10 @@ const [selectedItem, setSelectedItem] = useState([])
     const fetchData = async () => {
       try {
         // Reference the 'inventory' collection
-        const inventoryRef = collection(fireDb, 'inventory');
+        const orgName = "Org." + globalVariable.currentOrg
+        // Reference to the category document
+
+        const inventoryRef = collection(fireDb, 'organizations/'+orgName+'/inventory');
         const inventorySnapshot = await getDocs(inventoryRef);
 
         //initialize an object to store categories and their items
@@ -51,14 +63,17 @@ const [selectedItem, setSelectedItem] = useState([])
 
         const currOrg = globalVariable.currentOrg
         setCurrentOrg(currOrg);
-        console.log('current organization: ',currOrg)
+
+        const organizations = await getAllOrganizations()
+        setAllOrgs(organizations)
+        console.log("fetched organizations", organizations) //works
 
         //loop through each category in the 'inventory' collection
         for (const categoryDoc of inventorySnapshot.docs) {
           const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
 
           //reference the 'items' subcollection within each category
-          const itemsRef = collection(fireDb, 'inventory', categoryName, 'items');
+          const itemsRef = collection(fireDb, 'organizations/'+orgName+'/inventory', categoryName, 'items');
           const itemsSnapshot = await getDocs(itemsRef);
 
           //map through each item in the 'items' subcollection and store the data
@@ -116,8 +131,8 @@ const [selectedItem, setSelectedItem] = useState([])
 
       //log item being deleted
       console.log("Item names for deletion:", itemNames);
-
-      const inventoryRef = collection(fireDb, "inventory");
+        const orgName = globalVariable.currentOrg
+      const inventoryRef = collection(fireDb, 'organizations/'+orgName+'/inventory');
       const inventorySnapshot = await getDocs(inventoryRef);
 
       for (const itemName of itemNames) {
@@ -126,14 +141,14 @@ const [selectedItem, setSelectedItem] = useState([])
         for (const categoryDoc of inventorySnapshot.docs) {
           const categoryName = categoryDoc.id;
 
-          const itemsRef = collection(fireDb, "inventory", categoryName, "items");
+          const itemsRef = collection(fireDb, 'organizations/'+orgName+'/inventory', categoryName, "items");
           const itemsSnapshot = await getDocs(itemsRef);
 
           for (const itemDoc of itemsSnapshot.docs) {
             const itemData = itemDoc.data();
 
             if (itemData.name === itemName) {
-              const itemRef = doc(fireDb, "inventory", categoryName, "items", itemDoc.id);
+              const itemRef = doc(fireDb, 'organizations/'+orgName+'/inventory', categoryName, "items", itemDoc.id);
               await deleteDoc(itemRef);
               console.log(`Deleted item '${itemName}' in category '${categoryName}'`);
               itemDeleted = true;
@@ -200,7 +215,7 @@ const deleteItemFromDatabase = async (inventoryID) => {
     const item = categoryItems.find((item) => item.id === inventoryID);
 
     if (item) {
-      const itemRef = doc(fireDb, "inventory", categoryName, "items", inventoryID);
+      const itemRef = doc(fireDb, 'organizations/'+orgName+'/inventory', categoryName, "items", inventoryID);
       await deleteDoc(itemRef);
       console.log(`Deleted item '${item.name}' from category '${categoryName}'`);
       return;
@@ -225,11 +240,11 @@ const getItemNameById = (inventoryID) => {
       setNewItemCategory('');
       setNewItemTotal('');
       setNewItemHold('');
-      setNewItemSource('');
+
     };
 
   const handleAddItems = async () => {
-    if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold || !newItemSource) {
+    if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold) {
       console.warn("All fields are required to add a new item.");
       return;
     }
@@ -237,34 +252,39 @@ const getItemNameById = (inventoryID) => {
     // Capitalize the first letter of the category and make the rest lowercase
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     const normalizedCategory = capitalize(newItemCategory.trim());
-    console.log(normalizedCategory)
+    console.log("Normalized Category:", normalizedCategory);
 
     const newItem = {
       category: normalizedCategory,
-      name: newItemName,
+      name: newItemName, // Add the "name" field to the item
       price: newItemPrice,
       total: newItemTotal,
       hold: newItemHold,
-      source: newItemSource,
     };
 
     try {
-      const docRef = doc(collection(fireDb, "inventory", normalizedCategory, "items")); // Use normalized category
-      await setDoc(docRef, newItem);
+      const orgName = "Org." + globalVariable.currentOrg; // Current organization
+      const categoryDocRef = doc(fireDb, `organizations/${orgName}/inventory`, normalizedCategory);
 
-      // Immediately fetch updated inventory to refresh state
+      //ensure the category document is created with a field matching the category name
+      await setDoc(categoryDocRef, { [normalizedCategory]: "" }, { merge: true });
+
+      const itemDocRef = doc(collection(categoryDocRef, "items")); // Path to items subcollection
+      await setDoc(itemDocRef, newItem); // Add the new item
+
+      // Immediately update grouped data in the UI
       const updatedGroupedData = { ...groupedInventoryData };
       updatedGroupedData[normalizedCategory] = [
         ...(updatedGroupedData[normalizedCategory] || []),
-        { ...newItem, id: docRef.id }, // Add unique ID
+        { ...newItem, id: itemDocRef.id }, // Add unique ID
       ];
-      setGroupedInventoryData(updatedGroupedData); // Update state
+      setGroupedInventoryData(updatedGroupedData);
 
       console.log("Added new item:", newItem);
       setAddModalVisible(false);
       clearInputFields();
     } catch (error) {
-      console.error("Error adding item:", error);
+      console.error("Error adding item or creating category:", error);
     }
   };
     //for local fab
@@ -283,6 +303,7 @@ const getItemNameById = (inventoryID) => {
   return (
 
       <BackDrop title={"InventoryTab"} >
+
           <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -307,9 +328,7 @@ const getItemNameById = (inventoryID) => {
                               <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>
                                 Total: {item.total}   Hold: {item.hold}
                               </Text>
-                              <Text style={[styles.categorySource, { color: colors.onSurfaceVariant }]}>
-                                {item.type} | {item.source}
-                              </Text>
+
                             </View>
                           </Card.Content>
                         </Card>
@@ -354,7 +373,27 @@ const getItemNameById = (inventoryID) => {
                 <TextInput placeholder="Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
                 <TextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
                 <TextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
-                <TextInput placeholder="Source (e.g., HG Farm)" style={styles.input} value={newItemSource} onChangeText={setNewItemSource} />
+                <Menu
+                                        visible={menuVisible}
+                                        onDismiss={() => setMenuVisible(false)}
+                                        anchor={
+                                          <Button
+                                            mode="outlined"
+                                            onPress={() => setMenuVisible(true)}
+                                            style={styles.dropdownButton}
+                                          >
+                                            {currentOrg || "Select an Organization"}
+                                          </Button>
+                                        }
+                                      >
+                                        {allOrgs.map((org) => (
+                                          <Menu.Item
+                                            key={org.id}
+                                            onPress={() => handleSelectOrganization(org)}
+                                            title={org.name}
+                                          />
+                                        ))}
+                                      </Menu>
 
                 <View style={styles.buttonContainer}>
                   <Button mode="outlined" onPress={() => setAddModalVisible(false)} style={styles.cancelButton} color={colors.onSurface}>
@@ -467,5 +506,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
+  },
+  dropdown: {
+    height: 50,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: '#aaa',
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    color: '#000',
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+    color: '#000',
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
   },
 });

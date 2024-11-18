@@ -7,6 +7,7 @@ import { fireDb } from '../../firebase/initializeFirebase';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
 import { Tabs, useFocusEffect } from "expo-router";
+import {globalVariable} from '../../_layout.jsx'
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
@@ -17,8 +18,10 @@ export default function CustomerPage() {
   const [fabOpen, setFabOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerDetailVisible, setCustomerDetailVisible] = useState(false);
+  const [currentOrg, setCurrentOrg] = useState('')
   //for local fab
     const [visible, setVisible] = useState(false)
+    const orgName = "Org." + globalVariable.currentOrg
 
 
   const [newCustomer, setNewCustomer] = useState({
@@ -37,12 +40,15 @@ export default function CustomerPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const customerRef = collection(fireDb, 'customers');
+        const customerRef = collection(fireDb, 'organizations/'+orgName+'/customers');
         const querySnapshot = await getDocs(customerRef);
         const customerData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
+
+        const currOrg = globalVariable.currentOrg
+        setCurrentOrg(currOrg)
 
         const groupedData = customerData.reduce((acc, customer) => {
           const location = customer.location || 'Uncategorized';
@@ -64,7 +70,9 @@ export default function CustomerPage() {
 
   const deleteCustomer = async (customerId) => {
     try {
-      await deleteDoc(doc(fireDb, "customers", customerId));
+        const orgName = "Org." + globalVariable.currentOrg
+      await deleteDoc(doc(fireDb, 'organizations/'+orgName+'/customers', customerId));
+
       return true;
     } catch (error) {
       console.error("Error deleting customer:", error);
@@ -113,7 +121,8 @@ export default function CustomerPage() {
     };
 
     try {
-      const docRef = await addDoc(collection(fireDb, "customers"), newCustomerData);
+        const orgName = "Org." + globalVariable.currentOrg
+      const docRef = await addDoc(collection(fireDb, 'organizations/'+orgName+'/customers'), newCustomerData);
       const addedCustomer = { id: docRef.id, ...newCustomerData };
 
       setGroupedCustomerData((prevData) => ({
@@ -154,6 +163,7 @@ export default function CustomerPage() {
 
   return (
     <BackDrop title={"CustomerTab"}>
+        <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView>
           {Object.keys(groupedCustomerData).map((location) => (
@@ -164,7 +174,7 @@ export default function CustomerPage() {
               {groupedCustomerData[location].map((customer) => (
                 <Card
                   key={customer.id}
-                  style={[styles.customerCard, { backgroundColor: colors.surface }]}
+                  style={[styles.customerCard, { backgroundColor: colors.tertiary }]}
                   onPress={() => openCustomerDetails(customer)} // Open details on card press
                 >
                   <Card.Content style={styles.cardContent}>
@@ -179,7 +189,7 @@ export default function CustomerPage() {
                       <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Price: {customer.price}</Paragraph>
                       <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Orders: {customer.totalOrders}</Paragraph>
                       <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Completed: {customer.completedOrders}</Paragraph>
-                      <Paragraph style={[styles.customerNotes, { color: colors.secondary }]}>{customer.notes}</Paragraph>
+                      <Paragraph style={[styles.customerNotes, { color: colors.onPrimary }]}>{customer.notes}</Paragraph>
                     </View>
                   </Card.Content>
                 </Card>
@@ -263,6 +273,12 @@ export default function CustomerPage() {
 }
 
 const styles = StyleSheet.create({
+    orgTitle:{
+        fontSize: 16,
+        color: 'black',
+        fontWeight: 'bold',
+
+        },
   container: {
     flex: 1,
     padding: 16,
