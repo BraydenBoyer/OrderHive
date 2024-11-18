@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Card, Checkbox } from 'react-native-paper';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; 
 
 const colors = lightTheme.colors;
 
