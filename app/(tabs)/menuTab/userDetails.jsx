@@ -1,13 +1,20 @@
-import {Link, Tabs} from "expo-router";
+
 import {Button, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {router} from 'expo-router'
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
-import React,{useState} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import {TextInput, useTheme} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
+import { auth, db } from "../../firebase/initializeFirebase.js";
+import { doc, getDoc, updateDoc} from "firebase/firestore";
+
+import { fireDb } from "../../firebase/initializeFirebase.js";
+import {getCurrentUserInfo,updateUserPhoneNumber,updateUserPassword,updateUserUsername,updateUserEmail} from "../../firebase/user/userFunctions.js";
+import {useFocusEffect} from "expo-router";
+
 
 export default function MenuPage() {
+
     const [textUN, setTextUN] = React.useState("");
     const [textPass, setTextPass] = React.useState("");
     const [textEm, setTextEm] = React.useState("");
@@ -18,8 +25,30 @@ export default function MenuPage() {
     const [isEditableEm, setIsEditableEm] = useState(false);
     const [isEditablePN, setIsEditablePN] = useState(false);
 
+    useEffect(() => {
+        (
+            async () =>{
+                let userDetails = await getCurrentUserInfo()
+                setTextUN(userDetails.name);
+                setTextPass(userDetails.password);
+                setTextPM(userDetails.phone);
+                setTextEm(userDetails.email);
+            }
+        )()
+    }, []);
+
+
+
     const handleEditToggleUn = () => {
         setIsEditableUN(!isEditableUN);
+        if (isEditableUN) {
+            (
+                async () => {
+                    await updateUserUsername(textUN)
+                }
+            )()
+
+        }
     };
 
     const handleEditTogglePass = () => {
@@ -28,6 +57,13 @@ export default function MenuPage() {
 
     const handleEditToggleEm = () => {
         setIsEditableEm(!isEditableEm);
+        if(isEditableEm){
+            (
+                async () => {
+                    await updateUserEmail(setIsEditableEm)
+                }
+            )()
+        }
     };
 
     const handleEditTogglePn = () => {
@@ -46,8 +82,9 @@ export default function MenuPage() {
                             style={{width:'80%',height: 30}}
                             mode="outlined"
                             value={textUN}
-                            onChangeText={textUN => setTextUN(textUN)}
+                            onChangeText={setTextUN}
                             editable={isEditableUN}
+
 
                         />
                         <MyButton  title={isEditableUN ? "Save" : "Edit"} onClick={handleEditToggleUn}/>
@@ -63,10 +100,10 @@ export default function MenuPage() {
                             style={{width:'80%',height: 30}}
                             mode="outlined"
                             value={textPass}
-                            onChangeText={textPass => setTextPass(textPass)}
+                            onChangeText={setTextPass}
                             editable={isEditablePass}
-                            secureTextEntry
-                            right={<TextInput.Icon icon="eye" />}
+                            //secureTextEntry
+                            //right={<TextInput.Icon icon="eye" />}
 
                         />
                         <MyButton title={isEditablePass ? "Save" : "Edit"} onClick={handleEditTogglePass}/>
@@ -82,7 +119,7 @@ export default function MenuPage() {
                             style={{width:'80%',height: 30}}
                             mode="outlined"
                             value={textEm}
-                            onChangeText={textEm => setTextEm(textEm)}
+                            onChangeText={setTextEm}
                             editable={isEditableEm}
 
                         />
@@ -97,7 +134,7 @@ export default function MenuPage() {
                             style={{width:'80%',height: 30}}
                             mode="outlined"
                             value={textPM}
-                            onChangeText={textPM => setTextPM(textPM)}
+                            onChangeText={setTextPM}
                             editable={isEditablePN}
 
                         />
