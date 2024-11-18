@@ -1,9 +1,12 @@
 import {StyleSheet, Text,View} from "react-native";
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
-import React,{useState} from "react";
+import React, {useEffect, useState} from "react";
 import {TextInput, useTheme} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
+import {auth, db, fireDb} from "../../firebase/initializeFirebase.js";
+import {collection, doc, getDoc, getDocs, updateDoc} from "firebase/firestore";
+import {getCurrentUserInfo} from "../../firebase/user/userFunctions.js";
 
 
 export default function MenuPage() {
@@ -17,6 +20,26 @@ export default function MenuPage() {
     const [isEditableAdd, setIsEditableAdd] = useState(false);
     const [isEditableEm, setIsEditableEm] = useState(false);
     const [isEditablePN, setIsEditablePN] = useState(false);
+
+
+    useEffect(() => {
+        (
+            async () =>{
+                let userDetails = await getCurrentUserInfo()
+                let userID = userDetails.id;
+
+                /*
+                const orgRef = collection(fireDb,`users/'+userId+'/organizations`);
+                const userRef = await getDocs(orgRef);
+                console.log(userRef)
+                */
+
+
+
+            }
+        )()
+    }, []);
+
 
     const handleEditToggleON = () => {
         setIsEditableON(!isEditableON);

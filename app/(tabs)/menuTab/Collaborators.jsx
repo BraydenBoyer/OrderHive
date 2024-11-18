@@ -9,11 +9,16 @@ import {
     TextInput,
 } from "react-native";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
 import { MyButton } from "../../../components/inputs/MyButton.jsx";
+import {getCurrentUserInfo} from "../../firebase/user/userFunctions.js";
 
 export default function MenuPage() {
+
+
+
+
     const [visibleSections, setVisibleSections] = useState({
         admins: false,
         editors: false,
@@ -153,7 +158,7 @@ export default function MenuPage() {
                                     style={styles.listItem}
                                     onPress={() =>
                                         Alert.alert(
-                                            "Modify Item",
+                                            "Modify Person",
                                             `What do you want to do with ${item.name}?`,
                                             [
                                                 {
@@ -171,7 +176,7 @@ export default function MenuPage() {
                             scrollEnabled={false}
                         />
                         {editMode[section] && (
-                            <MyButton title="Add Item" onClick={() => handleAddItem(section)} />
+                            <MyButton title="Add Person" onClick={() => handleAddItem(section)} />
                         )}
                         <View style={styles.paginationContainer}>
                             <MyButton
