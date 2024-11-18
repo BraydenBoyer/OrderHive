@@ -34,6 +34,7 @@ const [selectedItem, setSelectedItem] = useState([])
   const [menuVisible, setMenuVisible] = useState(false);
   const [dropdownItems, setDropdownItems] = useState([])
 
+   const [value, setValue] = useState(null)
   const [isFocus, setIsFocus] = useState(false)
     const orgName = "Org." + globalVariable.currentOrg
 
@@ -48,61 +49,54 @@ const [selectedItem, setSelectedItem] = useState([])
 
 
     //how items are shown when inventory component is mounted
-  useEffect(() => {
+
+useEffect(() => {
     const fetchData = async () => {
-      try {
-        // Reference the 'inventory' collection
-        const orgName = "Org." + globalVariable.currentOrg
-        // Reference to the category document
+        try {
+            const orgName = "Org." + globalVariable.currentOrg;
+            const inventoryRef = collection(fireDb, `organizations/${orgName}/inventory`);
+            const inventorySnapshot = await getDocs(inventoryRef);
 
-        const inventoryRef = collection(fireDb, 'organizations/'+orgName+'/inventory');
-        const inventorySnapshot = await getDocs(inventoryRef);
+            const groupedData = {};
+            const dropArray = [];
+            const currOrg = globalVariable.currentOrg;
 
-        //initialize an object to store categories and their items
-        const groupedData = {};
+            setCurrentOrg(currOrg);
 
-        const currOrg = globalVariable.currentOrg
-        setCurrentOrg(currOrg);
+            const organizations = await getAllOrganizations();
+            setAllOrgs(organizations);
 
-        const organizations = await getAllOrganizations()
-        setAllOrgs(organizations)
-        console.log("fetched organizations", organizations) //works
+            console.log("fetched organizations", organizations);
 
-        //loop through each category in the 'inventory' collection
-        for (const categoryDoc of inventorySnapshot.docs) {
-          const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
+            for (const categoryDoc of inventorySnapshot.docs) {
+                const categoryName = categoryDoc.id; // e.g., "Barley" or "Water"
 
-          //reference the 'items' subcollection within each category
-          const itemsRef = collection(fireDb, 'organizations/'+orgName+'/inventory', categoryName, 'items');
-          const itemsSnapshot = await getDocs(itemsRef);
+                dropArray.push({ label: categoryName, value: categoryName }); // Adjusted format
 
-          //map through each item in the 'items' subcollection and store the data
-          const items = itemsSnapshot.docs.map((doc) => {
-            const item = { id: doc.id, ...doc.data() }; // Add the document ID as 'id'
-            console.log(`Fetched item in category '${categoryName}':`, item); // Log each item with its id
-            return item;
-          });
+                const itemsRef = collection(fireDb, `organizations/${orgName}/inventory/${categoryName}/items`);
+                const itemsSnapshot = await getDocs(itemsRef);
 
-          //add category to groupedData
-          groupedData[categoryName] = items;
+                const items = itemsSnapshot.docs.map((doc) => {
+                    const item = { id: doc.id, ...doc.data() };
+                    console.log(`Fetched item in category '${categoryName}':`, item);
+                    return item;
+                });
 
+                groupedData[categoryName] = items;
 
-          console.log(`Items in category '${categoryName}':`, items);
+                console.log(`Items in category '${categoryName}':`, items);
+            }
+
+            setGroupedInventoryData(groupedData);
+            setDropdownItems(dropArray);
+            console.log('Dropdown items:', dropArray);
+        } catch (error) {
+            console.error("Error fetching inventory data:", error);
         }
-
-        //set the grouped data in state
-        setGroupedInventoryData(groupedData);
-
-        //log the full grouped data structure after fetching and setting it in state
-        console.log("Grouped Inventory Data after fetching and setting state:", groupedData);
-
-      } catch (error) {
-        console.error("Error fetching inventory data:", error);
-      }
     };
 
     fetchData();
-  }, []);
+}, []);
 
 
 
@@ -370,9 +364,39 @@ const getItemNameById = (inventoryID) => {
                 <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Add Item</Text>
                 <TextInput placeholder="Product Name" style={styles.input} value={newItemName} onChangeText={setNewItemName} />
                 <TextInput placeholder="Sales Cost" style={styles.input} keyboardType="numeric" value={newItemPrice} onChangeText={setNewItemPrice} />
-                <TextInput placeholder="Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
+                <TextInput placeholder="New Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
                 <TextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
                 <TextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
+                <Dropdown
+                  style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  iconStyle={styles.iconStyle}
+                  data={dropdownItems}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocus ? 'Select Category' : '...'}
+                  searchPlaceholder="Search..."
+                  value={value}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={item => {
+                    setNewItemCategory(item.value); // Update the category state
+                    setValue(item.value); // Update dropdown's selected value
+                    setIsFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <AntDesign
+                      style={styles.icon}
+                      color={isFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
                 <Menu
                                         visible={menuVisible}
                                         onDismiss={() => setMenuVisible(false)}
