@@ -21,6 +21,7 @@ export default function CustomerPage() {
   const [currentOrg, setCurrentOrg] = useState('')
   //for local fab
     const [visible, setVisible] = useState(false)
+    const orgName = "Org." + globalVariable.currentOrg
 
 
   const [newCustomer, setNewCustomer] = useState({
@@ -39,7 +40,7 @@ export default function CustomerPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const customerRef = collection(fireDb, 'customers');
+        const customerRef = collection(fireDb, 'organizations/'+orgName+'/customers');
         const querySnapshot = await getDocs(customerRef);
         const customerData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -69,7 +70,9 @@ export default function CustomerPage() {
 
   const deleteCustomer = async (customerId) => {
     try {
-      await deleteDoc(doc(fireDb, "customers", customerId));
+        const orgName = "Org." + globalVariable.currentOrg
+      await deleteDoc(doc(fireDb, 'organizations/'+orgName+'/customers', customerId));
+
       return true;
     } catch (error) {
       console.error("Error deleting customer:", error);
@@ -118,7 +121,8 @@ export default function CustomerPage() {
     };
 
     try {
-      const docRef = await addDoc(collection(fireDb, "customers"), newCustomerData);
+        const orgName = "Org." + globalVariable.currentOrg
+      const docRef = await addDoc(collection(fireDb, 'organizations/'+orgName+'/customers'), newCustomerData);
       const addedCustomer = { id: docRef.id, ...newCustomerData };
 
       setGroupedCustomerData((prevData) => ({
@@ -170,7 +174,7 @@ export default function CustomerPage() {
               {groupedCustomerData[location].map((customer) => (
                 <Card
                   key={customer.id}
-                  style={[styles.customerCard, { backgroundColor: colors.primary }]}
+                  style={[styles.customerCard, { backgroundColor: colors.tertiary }]}
                   onPress={() => openCustomerDetails(customer)} // Open details on card press
                 >
                   <Card.Content style={styles.cardContent}>
