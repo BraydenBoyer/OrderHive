@@ -6,14 +6,20 @@ import { collection, doc, setDoc, query, where, getDocs } from "firebase/firesto
 import { fireDb } from "./initializeFirebase.js";
 
 export const fetchInventoryData = async () => {
+
     try {
         console.log("Attempting to fetch items in the 'inventory' collection...");
 
         // Reference to the 'inventory' collection
-        const inventoryRef = collection(fireDb, 'inventory');
+        const inventoryRef = collection(fireDb, `inventory`);
+
+
+        const querySnap = query(inventoryRef)
 
         // Fetch all documents in the collection
-        const querySnapshot = await getDocs(inventoryRef);
+        const querySnapshot = await getDocs(querySnap);
+
+        console.log("Inventory docs:", querySnapshot.docs)
 
         // Check if any documents are found
         if (querySnapshot.empty) {

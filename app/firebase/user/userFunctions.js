@@ -1,6 +1,6 @@
 import { fireApp, fireAuth, fireDb } from "../initializeFirebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import {doc, getDoc, setDoc, updateDoc} from "firebase/firestore";
+import {collection, doc, getDoc, getDocs, setDoc, updateDoc} from "firebase/firestore";
 
 
 /*
@@ -61,9 +61,13 @@ export const getCurrentUserInfo = async () => {
  */
 export async function userHasOrg(){
 
-	const userData = await getCurrentUserInfo()
+	const docRef = await doc(fireDb, 'users', fireAuth.currentUser.uid)
+	const collectionName = 'organizations'
 
-	return userData.hasOwnProperty('organizations');
+	const collectionRef = collection(docRef, collectionName);
+	const snapshot = await getDocs(collectionRef);
+
+	return !snapshot.empty;
 }
 
 
@@ -73,20 +77,36 @@ export async function userHasOrg(){
 
 	@author Miles
  */
-export const addOrgToUser = async (orgName, role) => {
+export const addOrgToUser = async (orgName, role, location) => {
+
+	if( location === undefined ){
+		location = await getUserOrgs().location
+
+	}
 
 	const userInfo = await getCurrentUserInfo()
 	const userID = userInfo.userID
+	const orgID = 'Org.' + orgName
 
-	const userRef = doc(fireDb, `users`, userID)
+	const userRef = doc(fireDb, `users/${userID}/organizations`, orgName)
 
-	const update = {
-		organizations: {
-			['Org.' + orgName]: {
-				role: role
-			}
-		}
+	const orgInfo = {
+		name: orgName,
+		role: role,
+		location: location,
 	}
 
-	await updateDoc( userRef, update )
+	await setDoc( userRef, orgInfo )
+}
+
+
+export const getUserOrgs = async () => {
+
+	const docRef = doc(fireDb, 'users', fireAuth.currentUser.uid)
+	const collectionName = 'organizations'
+
+	const collectionRef = collection(docRef, collectionName);
+	const snapshot = await getDocs(collectionRef);
+
+	return snapshot.docs.map(doc => doc.data());
 }

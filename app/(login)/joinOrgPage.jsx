@@ -10,6 +10,7 @@ import {useEffect, useState} from "react";
 import {addOrgToUser, createUser, userHasOrg} from "../firebase/user/userFunctions.js";
 import {creationPageStyles} from "../styles/pageType/creationPageStyles.jsx";
 import {addCurrentUserToOrg, checkOrgExists} from "../firebase/user/organizationFunctions.js";
+import {globalVariable} from "../_layout.jsx";
 
 
 
@@ -39,9 +40,10 @@ export default function JoinOrgPage() {
         }
         else{
             await addCurrentUserToOrg(orgName, 'editor')
-            await addOrgToUser(orgName, 'editor')
+            await addOrgToUser(orgName, 'editor' )
 
-            router.navigate('/dashboardTab')
+            globalVariable.currentOrg = orgName
+            router.navigate('/selectOrgPage')
         }
     }
 

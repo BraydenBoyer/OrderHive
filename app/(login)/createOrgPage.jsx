@@ -10,9 +10,10 @@ import {useEffect, useState} from "react";
 import {createUser} from "../firebase/user/userFunctions.js";
 import {creationPageStyles} from "../styles/pageType/creationPageStyles.jsx";
 import {checkOrgExists, createOrganization} from "../firebase/user/organizationFunctions.js";
+import {globalVariable, setCurrentOrg} from "../_layout.jsx";
 
 
-export default function JoinOrgPage() {
+export default function CreateOrgPage() {
 
     const styles = creationPageStyles()
 
@@ -37,7 +38,9 @@ export default function JoinOrgPage() {
             if( !orgExists ){
                 // only create if no org exists
                 await createOrganization(name, location)
-                router.navigate('/dashboardTab')
+
+                globalVariable.currentOrg = name
+                router.navigate('/selectOrgPage')
             }
             else{
                 setSnackText('This organization name is taken.')

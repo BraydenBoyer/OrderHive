@@ -1,30 +1,29 @@
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
 import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB, Dialog, useTheme } from "react-native-paper";
-import { useCallback, useContext, useState } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
-import { useFocusEffect } from "expo-router";
-import { addCustomer } from '../../firebase/addCustomer';
+import { collection, doc, setDoc, deleteDoc, getDocs, addDoc } from "firebase/firestore";
+import { fireDb } from '../../firebase/initializeFirebase';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-
-const initialCustomers = {
-  "Location 1": [
-    { id: 1, name: "Joey", price: "$50", notes: "Customer notes", totalOrders: 1, completedOrders: 0 },
-    { id: 2, name: "Nelly", price: "$50", notes: "", totalOrders: 1, completedOrders: 0 },
-  ],
-  "Location 2": [
-    { id: 3, name: "Pat", price: "$50", notes: "", totalOrders: 1, completedOrders: 0 },
-  ],
-};
+import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
+import { Tabs, useFocusEffect } from "expo-router";
+import {globalVariable} from '../../_layout.jsx'
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
   const [isDeleteMode, setDeleteMode] = useState(false);
   const [selectedCustomers, setSelectedCustomers] = useState([]);
-  const [customers, setCustomers] = useState(initialCustomers);
+  const [groupedCustomerData, setGroupedCustomerData] = useState({});
   const [addCustomerModalVisible, setAddCustomerModalVisible] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerDetailVisible, setCustomerDetailVisible] = useState(false);
+  const [currentOrg, setCurrentOrg] = useState('')
+  //for local fab
+    const [visible, setVisible] = useState(false)
+    const orgName = "Org." + globalVariable.currentOrg
+
+
   const [newCustomer, setNewCustomer] = useState({
     name: '',
     email: '',
@@ -38,12 +37,48 @@ export default function CustomerPage() {
   const theme = useTheme();
   const colors = theme.colors;
 
-  useFocusEffect(
-    useCallback(() => {
-      setFabVisible(false);
-      return () => setFabVisible(false);
-    }, [])
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const customerRef = collection(fireDb, 'organizations/'+orgName+'/customers');
+        const querySnapshot = await getDocs(customerRef);
+        const customerData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const currOrg = globalVariable.currentOrg
+        setCurrentOrg(currOrg)
+
+        const groupedData = customerData.reduce((acc, customer) => {
+          const location = customer.location || 'Uncategorized';
+          if (!acc[location]) {
+            acc[location] = [];
+          }
+          acc[location].push(customer);
+          return acc;
+        }, {});
+
+        setGroupedCustomerData(groupedData);
+      } catch (error) {
+        console.error('Error fetching customer data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const deleteCustomer = async (customerId) => {
+    try {
+        const orgName = "Org." + globalVariable.currentOrg
+      await deleteDoc(doc(fireDb, 'organizations/'+orgName+'/customers', customerId));
+
+      return true;
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      return false;
+    }
+  };
 
   const handleSelectCustomer = (customerId) => {
     setSelectedCustomers((prevSelected) =>
@@ -53,49 +88,54 @@ export default function CustomerPage() {
     );
   };
 
-  const handleDeleteCustomers = () => {
-    const updatedCustomers = {};
-    for (const location in customers) {
-      updatedCustomers[location] = customers[location].filter(
+  const handleDeleteCustomers = async () => {
+    for (const customerId of selectedCustomers) {
+      const success = await deleteCustomer(customerId);
+      if (!success) {
+        console.error(`Failed to delete customer with ID: ${customerId}`);
+      }
+    }
+
+    const updatedGroupedData = { ...groupedCustomerData };
+    Object.keys(updatedGroupedData).forEach((location) => {
+      updatedGroupedData[location] = updatedGroupedData[location].filter(
         (customer) => !selectedCustomers.includes(customer.id)
       );
-    }
-    setCustomers(updatedCustomers);
+    });
+
+    setGroupedCustomerData(updatedGroupedData);
     setSelectedCustomers([]);
     setDeleteMode(false);
   };
 
   const handleAddCustomer = async () => {
-      const location = newCustomer.location || 'Uncategorized';
-      const newCustomerData = {
-        id: Date.now(),
-        ...newCustomer,
-        price: "$50",
-        totalOrders: parseInt(newCustomer.totalOrders) || 0,
-        completedOrders: parseInt(newCustomer.completedOrders) || 0,
-      };
-
-      const result = await addCustomer(
-        newCustomer.name,
-        newCustomer.email,
-        newCustomer.phone,
-        newCustomer.location,
-        newCustomer.notes,
-        newCustomer.totalOrders,
-        newCustomer.completedOrders
-      );
-
-      if (result === true) {
-        setCustomers((prevCustomers) => ({
-          ...prevCustomers,
-          [location]: [...(prevCustomers[location] || []), newCustomerData],
-        }));
-        setAddCustomerModalVisible(false);
-        setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
-      } else {
-        console.error("Failed to add customer:", result);
-      }
+    const location = newCustomer.location || 'Uncategorized';
+    const newCustomerData = {
+      name: newCustomer.name,
+      email: newCustomer.email,
+      phone: newCustomer.phone,
+      location: location,
+      notes: newCustomer.notes,
+      totalOrders: parseInt(newCustomer.totalOrders) || 0,
+      completedOrders: parseInt(newCustomer.completedOrders) || 0,
     };
+
+    try {
+        const orgName = "Org." + globalVariable.currentOrg
+      const docRef = await addDoc(collection(fireDb, 'organizations/'+orgName+'/customers'), newCustomerData);
+      const addedCustomer = { id: docRef.id, ...newCustomerData };
+
+      setGroupedCustomerData((prevData) => ({
+        ...prevData,
+        [location]: [...(prevData[location] || []), addedCustomer],
+      }));
+
+      setAddCustomerModalVisible(false);
+      setNewCustomer({ name: '', email: '', phone: '', location: '', notes: '', totalOrders: '', completedOrders: '' });
+    } catch (error) {
+      console.error("Failed to add customer:", error);
+    }
+  };
 
   const handleFabStateChange = ({ open }) => setFabOpen(open);
 
@@ -109,126 +149,136 @@ export default function CustomerPage() {
     setSelectedCustomer(null);
   };
 
+  //for local fab
+      useFocusEffect(
+          useCallback(() => {
+
+              setVisible(true)
+
+              return () => {
+                  setVisible(false)
+              }
+          }, [setVisible])
+      )
+
   return (
-      <BackDrop title={"CustomerTab"}>
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView>
-        {Object.keys(customers).map((location) => (
-          <View key={location} style={styles.locationContainer}>
-            <Title style={[styles.locationTitle, { color: colors.primary }]}>{location}</Title>
-            <Divider style={[styles.divider, { backgroundColor: colors.onSurface }]} />
-            {customers[location].map((customer) => (
-              <Card key={customer.id} style={[styles.customerCard, { backgroundColor: colors.surface }]} onPress={() => openCustomerDetails(customer)}>
-                <Card.Content style={styles.cardContent}>
-                  {isDeleteMode && (
-                    <Checkbox
-                      status={selectedCustomers.includes(customer.id) ? "checked" : "unchecked"}
-                      onPress={() => handleSelectCustomer(customer.id)}
-                    />
-                  )}
-                  <View style={styles.cardText}>
-                    <Title style={[styles.customerName, { color: colors.onSurface }]}>{customer.name}</Title>
-                    <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Price: {customer.price}</Paragraph>
-                    <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Orders: {customer.totalOrders}</Paragraph>
-                    <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Completed: {customer.completedOrders}</Paragraph>
-                    <Paragraph style={[styles.customerNotes, { color: colors.secondary }]}>{customer.notes}</Paragraph>
-                  </View>
-                </Card.Content>
-              </Card>
-            ))}
+    <BackDrop title={"CustomerTab"}>
+        <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <ScrollView>
+          {Object.keys(groupedCustomerData).map((location) => (
+            <View key={location} style={styles.locationContainer}>
+              <Title style={[styles.locationTitle, { color: colors.primary }]}>{location}</Title>
+              <Divider style={[styles.divider, { backgroundColor: colors.onSurface }]} />
+
+              {groupedCustomerData[location].map((customer) => (
+                <Card
+                  key={customer.id}
+                  style={[styles.customerCard, { backgroundColor: colors.tertiary }]}
+                  onPress={() => openCustomerDetails(customer)} // Open details on card press
+                >
+                  <Card.Content style={styles.cardContent}>
+                    {isDeleteMode && (
+                      <Checkbox
+                        status={selectedCustomers.includes(customer.id) ? "checked" : "unchecked"}
+                        onPress={() => handleSelectCustomer(customer.id)}
+                      />
+                    )}
+                    <View style={styles.cardText}>
+                      <Title style={[styles.customerName, { color: colors.onSurface }]}>{customer.name}</Title>
+                      <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Price: {customer.price}</Paragraph>
+                      <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Orders: {customer.totalOrders}</Paragraph>
+                      <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Completed: {customer.completedOrders}</Paragraph>
+                      <Paragraph style={[styles.customerNotes, { color: colors.onPrimary }]}>{customer.notes}</Paragraph>
+                    </View>
+                  </Card.Content>
+                </Card>
+              ))}
+            </View>
+          ))}
+        </ScrollView>
+
+        <Portal>
+          <Dialog visible={customerDetailVisible} onDismiss={closeCustomerDetails}>
+            <Dialog.Title>Customer Details</Dialog.Title>
+            <Dialog.Content>
+              {selectedCustomer && (
+                <>
+                  <Text>Name: {selectedCustomer.name}</Text>
+                  <Text>Email: {selectedCustomer.email}</Text>
+                  <Text>Phone: {selectedCustomer.phone}</Text>
+                  <Text>Location: {selectedCustomer.location}</Text>
+                  <Text>Notes: {selectedCustomer.notes}</Text>
+                  <Text>Total Orders: {selectedCustomer.totalOrders}</Text>
+                  <Text>Completed Orders: {selectedCustomer.completedOrders}</Text>
+                </>
+              )}
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={closeCustomerDetails}>Close</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+
+        {isDeleteMode && (
+          <View style={[styles.deleteFooter, { backgroundColor: colors.errorContainer }]}>
+            <IconButton
+              icon="delete"
+              size={30}
+              color={colors.onError}
+              onPress={handleDeleteCustomers}
+              style={styles.trashIcon}
+            />
+            <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton} color={colors.onError}>
+              Cancel
+            </Button>
           </View>
-        ))}
-      </ScrollView>
+        )}
+        <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
+            { icon: "plus", label: "Add Customer", onPress: () => setAddCustomerModalVisible(true) },
+            { icon: "delete", label: "Delete Selected", onPress: () => setDeleteMode(true) },
 
-      <Portal>
-        <Dialog visible={customerDetailVisible} onDismiss={closeCustomerDetails}>
-          <Dialog.Title>Customer Details</Dialog.Title>
-          <Dialog.Content>
-            {selectedCustomer && (
-              <>
-                <Text>Name: {selectedCustomer.name}</Text>
-                <Text>Email: {selectedCustomer.email}</Text>
-                <Text>Phone: {selectedCustomer.phone}</Text>
-                <Text>Location: {selectedCustomer.location}</Text>
-                <Text>Notes: {selectedCustomer.notes}</Text>
-                <Text>Total Orders: {selectedCustomer.totalOrders}</Text>
-                <Text>Completed Orders: {selectedCustomer.completedOrders}</Text>
-              </>
-            )}
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={closeCustomerDetails}>Close</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+                    ]} />
 
-      {isDeleteMode && (
-        <View style={[styles.deleteFooter, { backgroundColor: colors.errorContainer }]}>
-          <IconButton
-            icon="delete"
-            size={30}
-            color={colors.onError}
-            onPress={handleDeleteCustomers}
-            style={styles.trashIcon}
-          />
-          <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton} color={colors.onError}>
-            Cancel
-          </Button>
-        </View>
-      )}
-
-      <FAB.Group
-        open={fabOpen}
-        icon={fabOpen ? "close" : "plus"}
-        actions={[
-          {
-            icon: "plus",
-            label: "Add Customer",
-            onPress: () => setAddCustomerModalVisible(true),
-          },
-          {
-            icon: "delete",
-            label: "Delete Selected",
-            onPress: () => setDeleteMode(true),
-          },
-        ]}
-        onStateChange={handleFabStateChange}
-        style={styles.fabGroup}
-      />
-
-      <Modal
-        visible={addCustomerModalVisible}
-        onRequestClose={() => setAddCustomerModalVisible(false)}
-        animationType="slide"
-        transparent={true}
-      >
-        <View style={styles.modalContainer}>
-          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Add Customer</Text>
-            <TextInput placeholder="Name" style={styles.input} value={newCustomer.name} onChangeText={(text) => setNewCustomer({ ...newCustomer, name: text })} />
-            <TextInput placeholder="Email" style={styles.input} value={newCustomer.email} onChangeText={(text) => setNewCustomer({ ...newCustomer, email: text })} />
-            <TextInput placeholder="Phone" style={styles.input} value={newCustomer.phone} onChangeText={(text) => setNewCustomer({ ...newCustomer, phone: text })} />
-            <TextInput placeholder="Location" style={styles.input} value={newCustomer.location} onChangeText={(text) => setNewCustomer({ ...newCustomer, location: text })} />
-            <TextInput placeholder="Notes" style={styles.input} value={newCustomer.notes} onChangeText={(text) => setNewCustomer({ ...newCustomer, notes: text })} />
-            <TextInput placeholder="Total Orders" style={styles.input} keyboardType="numeric" value={newCustomer.totalOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, totalOrders: text })} />
-            <TextInput placeholder="Completed Orders" style={styles.input} keyboardType="numeric" value={newCustomer.completedOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, completedOrders: text })} />
-            <View style={styles.buttonContainer}>
-              <Button mode="text" onPress={() => setAddCustomerModalVisible(false)} color={colors.onSurface}>
-                Cancel
-              </Button>
-              <Button mode="contained" onPress={handleAddCustomer} color={colors.primary}>
-                Add
-              </Button>
+        <Modal
+          visible={addCustomerModalVisible}
+          onRequestClose={() => setAddCustomerModalVisible(false)}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Add Customer</Text>
+              <TextInput placeholder="Name" style={styles.input} value={newCustomer.name} onChangeText={(text) => setNewCustomer({ ...newCustomer, name: text })} />
+              <TextInput placeholder="Email" style={styles.input} value={newCustomer.email} onChangeText={(text) => setNewCustomer({ ...newCustomer, email: text })} />
+              <TextInput placeholder="Phone" style={styles.input} value={newCustomer.phone} onChangeText={(text) => setNewCustomer({ ...newCustomer, phone: text })} />
+              <TextInput placeholder="Location" style={styles.input} value={newCustomer.location} onChangeText={(text) => setNewCustomer({ ...newCustomer, location: text })} />
+              <TextInput placeholder="Notes" style={styles.input} value={newCustomer.notes} onChangeText={(text) => setNewCustomer({ ...newCustomer, notes: text })} />
+              <TextInput placeholder="Total Orders" style={styles.input} keyboardType="numeric" value={newCustomer.totalOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, totalOrders: text })} />
+              <TextInput placeholder="Completed Orders" style={styles.input} keyboardType="numeric" value={newCustomer.completedOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, completedOrders: text })} />
+              <View style={styles.buttonContainer}>
+                <Button mode="text" onPress={() => setAddCustomerModalVisible(false)} color={colors.onSurface}>
+                  Cancel
+                </Button>
+                <Button mode="contained" onPress={handleAddCustomer} color={colors.primary}>
+                  Add
+                </Button>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
     </BackDrop>
   );
 }
 
 const styles = StyleSheet.create({
+    orgTitle:{
+        fontSize: 16,
+        color: 'black',
+        fontWeight: 'bold',
+
+        },
   container: {
     flex: 1,
     padding: 16,

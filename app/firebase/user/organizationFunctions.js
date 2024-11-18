@@ -5,7 +5,7 @@
 
 
 import {collection, doc, setDoc, query, where, getDoc, getDocs} from "firebase/firestore";
-import {fireDb} from "../initializeFirebase.js";
+import {fireAuth, fireDb} from "../initializeFirebase.js";
 import { v4 } from 'uuid';
 import {addOrgToUser, getCurrentUserInfo} from "./userFunctions.js";
 
@@ -37,7 +37,7 @@ export const createOrganization = async (name, location) => {
     await addCurrentUserToOrg(name, 'owner')
 
     // Add the org to the user
-    await addOrgToUser(name, 'owner')
+    await addOrgToUser(name, 'owner', location)
 
     console.log("Organization created: ", orgID)
 }
@@ -94,4 +94,37 @@ export const checkOrgExists = async (name) => {
      */
 
     return !querySnap.empty
+}
+
+
+export const getOrg = async (orgName) => {
+
+    const docRef = doc(fireDb, "organizations", 'Org.' + orgName);
+    const docSnap = await getDoc(docRef);
+
+    return docSnap.data()
+}
+
+//function just to get all organizations for inventory
+export async function getAllOrganizations() {
+    try {
+        const organizationsRef = collection(fireDb, "organizations"); // Replace with your collection name
+        const snapshot = await getDocs(organizationsRef);
+
+        if (snapshot.empty) {
+            console.log("No organizations found.");
+            return [];
+        }
+
+        const organizationsArray = [];
+        snapshot.forEach(doc => {
+            organizationsArray.push({ id: doc.id, ...doc.data() });
+        });
+
+        console.log("Organizations fetched successfully:", organizationsArray);
+        return organizationsArray;
+    } catch (error) {
+        console.error("Error fetching organizations:", error);
+        throw new Error("Failed to fetch organizations.");
+    }
 }

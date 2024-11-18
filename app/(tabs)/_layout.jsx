@@ -67,7 +67,7 @@ export default function TabLayout() {
 
 				</Tabs>
 
-				<MyFAB actions={actions} icon={icon} visible={fabVisibility} />
+
 			</AppContext.Provider>
 		</PaperProvider>
 	);
