@@ -1,4 +1,3 @@
-// tabs/dashboardTab/Pickup.jsx
 import React, { useState } from 'react';
 import { Text, StyleSheet, TextInput, FlatList, TouchableOpacity, View } from 'react-native';
 import { IconButton, Card } from 'react-native-paper';
@@ -13,18 +12,40 @@ const pickups = [
   { id: '3', name: 'Aarry Ballen', date: '10/7/24', items: 18, price: '$70' },
 ];
 
-// Synthetic grocery list data
+// Enhanced grocery list data with price only
 const groceryItems = [
-  { category: 'Fruits & Vegetables', items: ['Apples - 1 kg'] },
-  { category: 'Dairy', items: ['Milk - 1 liter'] },
-  { category: 'Grains & Cereals', items: ['Rice - 1 kg'] },
-  { category: 'Meat & Seafood', items: ['Chicken Breast - 500 g'] },
-  { category: 'Snacks & Beverages', items: ['Coffee - 200 g'] },
-  { category: 'Condiments & Spices', items: ['Olive Oil - 500 ml'] },
-  { category: 'Canned & Packaged Goods', items: ['Baked Beans - 1 can'] },
-  { category: 'Bakery & Bread', items: ['Whole Wheat Bread - 1 loaf'] },
-  { category: 'Frozen Items', items: ['Frozen Peas - 500 g'] },
-  { category: 'Household Essentials', items: ['Dish Soap - 500 ml'] },
+  {
+    category: 'Fruits & Vegetables',
+    items: [
+      { name: 'Apples - 1 kg', price: '$5' },
+      { name: 'Bananas - 1 kg', price: '$4' }
+    ],
+  },
+  {
+    category: 'Dairy',
+    items: [
+      { name: 'Milk - 1 liter', price: '$2' },
+      { name: 'Cheese - 200 g', price: '$4' }
+    ],
+  },
+  {
+    category: 'Grains & Cereals',
+    items: [
+      { name: 'Rice - 1 kg', price: '$3' }
+    ],
+  },
+  {
+    category: 'Meat & Seafood',
+    items: [
+      { name: 'Chicken Breast - 500 g', price: '$6' }
+    ],
+  },
+  {
+    category: 'Snacks & Beverages',
+    items: [
+      { name: 'Coffee - 200 g', price: '$8' }
+    ],
+  },
 ];
 
 export default function Pickup() {
@@ -81,9 +102,14 @@ export default function Pickup() {
                         {category.category}
                       </Text>
                       {category.items.map((groceryItem, idx) => (
-                        <Text key={idx} style={[styles.groceryItem, { color: colors.onSurfaceVariant }]}>
-                          {groceryItem}
-                        </Text>
+                        <View key={idx} style={styles.itemDetailContainer}>
+                          <Text style={[styles.groceryItem, { color: colors.onSurfaceVariant }]}>
+                            {groceryItem.name}
+                          </Text>
+                          <Text style={[styles.groceryItemDetail, { color: colors.primary }]}>
+                            Price: {groceryItem.price}
+                          </Text>
+                        </View>
                       ))}
                     </View>
                   ))}
@@ -158,8 +184,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 5,
   },
+  itemDetailContainer: {
+    marginLeft: 10,
+    marginTop: 5,
+  },
   groceryItem: {
     fontSize: 14,
-    marginLeft: 10,
+  },
+  groceryItemDetail: {
+    fontSize: 12,
   },
 });
