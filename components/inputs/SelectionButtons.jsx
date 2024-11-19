@@ -4,7 +4,15 @@ import {globalVariable} from "../../app/_layout.jsx";
 import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
 import {buttonStyle} from "../../app/styles/components/inputs/buttons.jsx";
 
-export const SelectionButtons = (orgName, index = 0, count = 1, onClick, theme) => {
+
+/*
+	Versatile button that can act as a standalone or preferably in a group. See selectOrgPage.jsx for an example.
+
+	It will generate a group of buttons that appear to be in a group when properly used.
+
+	@author Miles
+ */
+export const SelectionButtons = ({orgName, index = 0, count = 1, onClick, theme}) => {
 	const topRadius = index === 0 ? roundness.largeRadius : 0;
 	const bottomRadius = index === count - 1 ? roundness.largeRadius : 0;
 

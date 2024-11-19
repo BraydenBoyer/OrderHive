@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
-import { PaperProvider, useTheme, Text } from 'react-native-paper';
+import {PaperProvider, useTheme, Text, Divider} from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { basicBackdropStyle } from '../../app/styles/basicScreenStyling.jsx';
-import {MyFAB} from "./FAB.jsx";
 import {BackHeader} from "./BackHeader.jsx";
 import {MainHeader} from "./MainHeader.jsx";
 import {StatusBar} from "expo-status-bar";
+import {globalVariable} from "../../app/_layout.jsx";
+import {useCallback, useEffect, useState} from "react";
+import {useFocusEffect} from "expo-router";
+import {logoutCurrentUser} from "../../app/firebase/user/authentication.js";
 
 
 /*
@@ -33,7 +36,13 @@ import {StatusBar} from "expo-status-bar";
 	@author Miles Hoffman
  */
 export const BackDrop = ({ children, style, mainHeader = true, title = 'App.OrderHive', header = true }) => {
-	const colors = useTheme().colors;
+
+	const colors = useTheme().colors
+	const [orgName, setOrgName] = useState('')
+
+	useEffect(() => {
+		setOrgName(globalVariable.currentOrg)
+	}, [globalVariable.currentOrg]);
 
 
 	return (
@@ -43,8 +52,25 @@ export const BackDrop = ({ children, style, mainHeader = true, title = 'App.Orde
 				:
 				<BackHeader title={title}/>
 			}
-			<ScrollView style={{width: '100%'}} contentContainerStyle={{flexGrow: 1}} showsVerticalScrollIndicator={false} horizontal={false}>
+			<ScrollView
+				style={{width: '100%'}}
+				contentContainerStyle={{flexGrow: 1, paddingBottom: 35}}
+				showsVerticalScrollIndicator={false}
+				horizontal={false}
+			>
 				<View style={[{padding: 10, flex: 1 }, style]}>
+
+					{
+						orgName.length < 1 || !header ?
+							<></>
+							:
+							<View style={{marginTop: 10, marginBottom: 30, rowGap: 10}}>
+								<Text variant={'displayMedium'} style={{textAlign: 'center'}}>
+									{orgName}
+								</Text>
+								<Divider bold={true} style={{height: 2}} horizontalInset={true} />
+							</View>
+					}
 
 					{children}
 

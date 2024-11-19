@@ -11,20 +11,10 @@ import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjus
 const colors = lightTheme.colors;
 
 export default function DashboardPage() {
-  const { setFabVisible, setIcon, setActions } = useContext(AppContext);
 
   useFocusEffect(
     useCallback(() => {
-      setFabVisible(true);
-      setIcon(['cloud', 'minus']);
-      setActions([
-        {
-          icon: 'menu',
-          label: 'testing action',
-          onPress: () => console.log('Clicked FAB plus'),
-          size: 'large',
-        },
-      ]);
+
 
       return () => {
         // Cleanup when screen is unfocused

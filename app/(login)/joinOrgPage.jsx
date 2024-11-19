@@ -11,6 +11,7 @@ import {addOrgToUser, createUser, userHasOrg} from "../firebase/user/userFunctio
 import {creationPageStyles} from "../styles/pageType/creationPageStyles.jsx";
 import {addCurrentUserToOrg, checkOrgExists} from "../firebase/user/organizationFunctions.js";
 import {globalVariable} from "../_layout.jsx";
+import {setGlobalOrgs} from "../index.jsx";
 
 
 
@@ -43,6 +44,7 @@ export default function JoinOrgPage() {
             await addOrgToUser(orgName, 'editor' )
 
             globalVariable.currentOrg = orgName
+            await setGlobalOrgs()
             router.navigate('/selectOrgPage')
         }
     }

@@ -9,6 +9,7 @@ import {createContext, useState} from "react";
 // Globally accessible variable
 export const globalVariable = {
 	currentOrg: '',
+	allOrgs: [],
 	colors: lightTheme.colors
 }
 
@@ -27,7 +28,10 @@ export const ThemeContext = createContext();
 
 export default function RootLayout() {
 
-	const [hiveTheme, setHiveTheme] = useState(createTheme(lightTheme.colors))
+	const materialColors = MD3LightTheme.colors
+	const myTheme = lightTheme
+
+	const [hiveTheme, setHiveTheme] = useState(createTheme(myTheme.colors))
 
 	//Work on status bar here?
 

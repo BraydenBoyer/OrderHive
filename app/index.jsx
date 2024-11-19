@@ -7,10 +7,11 @@ import {MyButton} from "../components/inputs/MyButton.jsx";
 import {roundness} from "./styles/themes/roundness/roundness.jsx";
 import {useCallback, useEffect, useState} from "react";
 import {emailLogin, logoutCurrentUser} from "./firebase/user/authentication.js";
-import {userHasOrg} from "./firebase/user/userFunctions.js";
+import {getUserOrgs, userHasOrg} from "./firebase/user/userFunctions.js";
 import {fireAuth} from "./firebase/initializeFirebase.js";
 import {creationPageStyles} from "./styles/pageType/creationPageStyles.jsx";
 import {globalVariable} from "./_layout.jsx";
+import {BottomButtons} from "../components/overlays/BottomButtons.jsx";
 
 
 const interpretLoginError = (error) => {
@@ -38,8 +39,16 @@ const toCreateUser = () => {
 	router.navigate('/createUser')
 }
 
+export const setGlobalOrgs = async () => {
+	globalVariable.allOrgs = []
+	const orgs = await getUserOrgs()
+	orgs.map((org) => globalVariable.allOrgs.push(org.name))
+	console.log('Set global allOrgs: ', globalVariable.allOrgs)
+}
+
 export default function LoginPage() {
 
+	const theme = useTheme()
 	const colors = useTheme().colors
 	const styles = creationPageStyles()
 
@@ -77,6 +86,8 @@ export default function LoginPage() {
 						console.log("User has org: ", hasOrg)
 						router.navigate('/joinOrgPage')
 					}
+
+					setGlobalOrgs()
 				}
 			)()
 		}
@@ -168,6 +179,7 @@ export default function LoginPage() {
 					{loginErrorString}
 				</Snackbar>
 			</Portal>
+
 
 		</BackDrop>
 

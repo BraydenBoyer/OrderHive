@@ -11,6 +11,7 @@ import {createUser} from "../firebase/user/userFunctions.js";
 import {creationPageStyles} from "../styles/pageType/creationPageStyles.jsx";
 import {checkOrgExists, createOrganization} from "../firebase/user/organizationFunctions.js";
 import {globalVariable, setCurrentOrg} from "../_layout.jsx";
+import {setGlobalOrgs} from "../index.jsx";
 
 
 export default function CreateOrgPage() {
@@ -40,6 +41,7 @@ export default function CreateOrgPage() {
                 await createOrganization(name, location)
 
                 globalVariable.currentOrg = name
+                await setGlobalOrgs()
                 router.navigate('/selectOrgPage')
             }
             else{

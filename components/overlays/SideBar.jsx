@@ -2,33 +2,54 @@ import * as React from 'react';
 import {Portal, Surface, Text, useTheme, Drawer} from 'react-native-paper';
 import { Modal, TouchableOpacity, Animated, StyleSheet, View } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
+import {getUserOrgs} from "../../app/firebase/user/userFunctions.js";
+import {globalVariable} from "../../app/_layout.jsx";
+import {router, useNavigation} from "expo-router";
+
+const setGlobalOrg = (orgName, setOpen) => {
+
+	setOpen(false)
+	globalVariable.currentOrg = orgName
+	console.log('Changed current org to: ', globalVariable.currentOrg)
+	router.dismissAll()
+	router.navigate('/dashboardTab')
+}
 
 
 export default function SideBar({ open, setOpen }) {
 
 	const colors = useTheme().colors
-	const [active, setActive] = React.useState('');
+
+	const HandleGetOrgs = () => {
+
+		const orgs = globalVariable.allOrgs
+
+		return orgs.map((org) => (
+			<Drawer.Item
+				key={org} // Add a unique key for better list performance
+				label={org}
+				onPress={() => {
+					setGlobalOrg(org, setOpen);
+				}}
+				icon={'note'}
+			/>
+		));
+	};
 
 	return (
 		<Portal>
-			{open && ( // Conditionally render the overlay and sidebar
+			{
+				open
+				&& ( // Conditionally render the overlay and sidebar
 				<View>
 					<TouchableOpacity style={styles.overlay} onPress={() => setOpen(false)} activeOpacity={.5} />
 					<View style={styles.sidebar}>
 						<Surface mode={"elevated"} style={[styles.sidebarSurface, {backgroundColor: colors.secondaryContainer} ]} >
 
-							<Drawer.Section style={styles.section} title="OrderHive" showDivider={true} >
-								<Drawer.Item
-									label="First Item"
-									onPress={() => setActive('first')}
-									icon={'note'}
-								/>
-								<Drawer.Item
-									label="Second Item"
-									active={active === 'second'}
-									onPress={() => setActive('second')}
-									icon={'note'}
-								/>
+							<Drawer.Section style={styles.section}  title="Organizations" showDivider={true} >
+
+								<HandleGetOrgs/>
+
 							</Drawer.Section>
 
 						</Surface>

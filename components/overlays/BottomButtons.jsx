@@ -1,13 +1,80 @@
-import {View} from "react-native";
+import { Portal } from "react-native-paper";
+import { MyButton } from "../inputs/MyButton.jsx";
+import {Modal, StyleSheet, View} from "react-native";
+import { roundness } from "../../app/styles/themes/roundness/roundness.jsx";
+import {globalVariable} from "../../app/_layout.jsx";
 
 
-export const BottomButtons = () => {
+
+/*
+	Creates two buttons on the bottom of the screen.
+
+	@author Miles
+ */
+
+const colors = globalVariable.colors
+
+export const BottomButtons = ({
+		visible = true,
+		firstTitle = 'FirstTitle',
+		secondTitle = 'SecondTitle',
+		firstOnClick = () => {},
+		secondOnClick = () => {},
+	}) => {
 
 
-	return(
+	return (!visible) ?
 
-		<View>
+		<></>
+		:
+		<Portal>
+			<View
+				style={{
+					flex: 1,
+					justifyContent: "flex-end", // Push content to the bottom
+				}}
+			>
+				<View
+					style={styles.container}
+				>
+					<MyButton
+						title={firstTitle}
+						variant={'titleLarge'}
+						onClick={firstOnClick}
+						elevation={1}
+						style={styles.button}
+					/>
 
-		</View>
-	)
-}
+					<MyButton
+						title={secondTitle}
+						variant={'titleLarge'}
+						onClick={secondOnClick}
+						elevation={1}
+						style={styles.button}
+					/>
+
+				</View>
+			</View>
+		</Portal>
+};
+
+
+const styles = StyleSheet.create({
+
+	button: {
+		flex: 1,
+		backgroundColor: colors.inversePrimary
+	},
+
+	container: {
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: globalVariable.colors.primaryContainer,
+		height: 160,
+		padding: 10,
+		columnGap: 15,
+		borderTopRightRadius: roundness.largeRadius,
+		borderTopLeftRadius: roundness.largeRadius,
+	}
+})

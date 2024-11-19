@@ -82,5 +82,5 @@ export const LocalFAB = ({actions, icon = ['plus', 'close'], visible}) => {
 
 
 const styleFab = {
-	marginBottom: 75
+	marginBottom: 80
 }

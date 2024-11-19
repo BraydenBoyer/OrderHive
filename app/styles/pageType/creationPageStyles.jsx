@@ -1,10 +1,11 @@
 import {useTheme} from "react-native-paper";
 import {StyleSheet} from "react-native";
 import {roundness} from "../themes/roundness/roundness.jsx";
+import {globalVariable} from "../../_layout.jsx";
 
 export const creationPageStyles = () => {
 
-    const colors = useTheme().colors
+    const colors = globalVariable.colors
 
     return StyleSheet.create({
 

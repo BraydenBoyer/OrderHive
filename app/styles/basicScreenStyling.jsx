@@ -1,25 +1,26 @@
-import {lightTheme} from "./themes/colors/lightTheme.jsx";
+import {globalVariable} from "../_layout.jsx";
 
+const colors = globalVariable.colors
 
 export const basicScreenOption = {
 	headerShown: false,
 	navigationBarHidden: false,
-	navigationBarColor: lightTheme.colors.primaryContainer,
+	navigationBarColor: '#000000',
 	//statusBarColor: lightTheme.colors.primaryContainer,
 	//statusBarStyle: 'dark',
 }
 
 export const basicTabOptions = {
 	headerShown: false,
-	tabBarActiveTintColor: lightTheme.colors.primary,
-	tabBarInactiveTintColor: lightTheme.colors.onPrimaryContainer,
+	tabBarActiveTintColor: colors.primary,
+	tabBarInactiveTintColor: colors.onPrimaryContainer,
 	tabBarStyle: {
-		backgroundColor: lightTheme.colors.primaryContainer,
+		backgroundColor: colors.primaryContainer,
 		height: 80,
 	},
 
 	tabBarItemStyle: {
-		backgroundColor: lightTheme.colors.primaryContainer,
+		backgroundColor: colors.primaryContainer,
 		paddingBottom: 10,
 		paddingTop: 5,
 	},
@@ -40,7 +41,7 @@ export const basicBackdropStyle = {
 
 	paddingVertical: 0,
 	paddingHorizontal: 0,
-	backgroundColor: lightTheme.colors.surface,
+	backgroundColor: colors.surface,
 	flex: 1,
 	flexGrow: 1
 }

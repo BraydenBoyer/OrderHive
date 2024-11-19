@@ -3,6 +3,7 @@ import {StyleSheet, View} from "react-native";
 import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
 import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 import {buttonStyle} from "../../app/styles/components/inputs/buttons.jsx";
+import {globalVariable} from "../../app/_layout.jsx";
 
 
 export const MyButton = ({
@@ -16,7 +17,7 @@ export const MyButton = ({
 }) => {
 
 	const styles = inputStyles()
-	const colors = useTheme().colors
+	const colors = globalVariable.colors
 	const fonts = useTheme().fonts
 
 	const iconSize = fonts[variant].fontSize * 1.5

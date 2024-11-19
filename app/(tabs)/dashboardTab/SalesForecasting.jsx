@@ -2,8 +2,8 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
-import { MyFAB } from "../../../components/overlays/FAB.jsx"; 
-import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
+import {LocalFAB} from "../../../components/overlays/LocalFAB.jsx"; // Adjust path as necessary
 
 const colors = lightTheme.colors;
 const actions = [
@@ -33,7 +33,7 @@ export default function SalesForecasting() {
       <Text style={[styles.text, { color: colors.onBackground }]}>
         This is the Sales Forecasting screen.
       </Text>
-      <MyFAB actions={actions} visible={true} />
+      <LocalFAB actions={actions} visible={true} />
     </BackDrop>
   );
 }

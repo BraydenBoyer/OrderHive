@@ -10,10 +10,15 @@ const colors = globalVariable.colors
 export const buttonStyle = StyleSheet.create({
 
 	basicButtonTemplate: {
-		borderRadius: roundness.largeRadius,
+		borderRadius: roundness.mediumRadius,
 		minWidth: 75,
 		minHeight: 50,
 		backgroundColor: colors.primaryContainer
+	},
+
+	clearButtonTemplate: {
+		backgroundColor: 'transparent',
+		shadowColor: 'transparent'
 	},
 
 	clearButton: {
@@ -22,6 +27,6 @@ export const buttonStyle = StyleSheet.create({
 		width: '100%',
 		flex: 0,
 		backgroundColor: 'transparent',
-		borderRadius: roundness.largeRadius,
+		borderRadius: roundness.mediumRadius,
 	},
 })

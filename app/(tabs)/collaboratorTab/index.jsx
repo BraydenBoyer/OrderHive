@@ -8,12 +8,13 @@ import {useFocusEffect} from "expo-router";
 
 export default function CollaboratorPage() {
 
-	const {setFabVisible} = useContext(AppContext)
+
 
 	useFocusEffect(
 		useCallback(() => {
 			// If you want to do something when screen is focused
-			setFabVisible(false)
+
+
 
 			return () => {
 				// If you want to do something when screen is unfocused

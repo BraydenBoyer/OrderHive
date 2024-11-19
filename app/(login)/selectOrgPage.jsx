@@ -46,7 +46,14 @@ export default function SelectOrgPage() {
 
 			<View style={styles.middleView}>
 				{orgNames.map((orgName, index) =>
-					SelectionButtons(orgName, index, orgNames.length, () => handleSelectionClick(orgName), hiveTheme)
+					<SelectionButtons
+						key={orgName}
+						orgName={orgName}
+						index={index}
+						count={orgNames.length}
+						onClick={() => handleSelectionClick(orgName)}
+						theme={hiveTheme}
+					/>
 				)}
 			</View>
 
