@@ -324,7 +324,7 @@ const getItemNameById = (inventoryID) => {
                   {groupedInventoryData[category].map((item) => {
                     console.log("Rendering item:", item); // Log the item being rendered
                     return (
-                        <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.secondary }]}>
+                        <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.primaryContainer }]}>
                           <Card.Content style={styles.cardContent}>
                             {isDeleteMode && (
                                 <Checkbox

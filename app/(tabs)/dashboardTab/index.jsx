@@ -31,32 +31,32 @@ export default function DashboardPage() {
           <WidgetButton
             title="Collection Info"
             route="dashboardTab/CollectionInfo"
-            style={[styles.widget, { backgroundColor: colors.surface }]}
+            style={[styles.widget, ]}
           />
           <WidgetButton
             title="Collaborator"
             route="dashboardTab/Collaborator"
-            style={[styles.widget, { backgroundColor: colors.surface }]}
+            style={[styles.widget,]}
           />
           <WidgetButton
             title="Pickup"
             route="dashboardTab/Pickup"
-            style={[styles.widget, { backgroundColor: colors.surface }]}
+            style={[styles.widget, ]}
           />
           <WidgetButton
             title="Sales Forecasting"
             route="dashboardTab/SalesForecasting"
-            style={[styles.widget, { backgroundColor: colors.surface }]}
+            style={[styles.widget, ]}
           />
           <WidgetButton
             title="Order Assembly"
             route="dashboardTab/OrderAssembly"
-            style={[styles.widget, { backgroundColor: colors.surface }]}
+            style={[styles.widget, ]}
           />
           <WidgetButton
             title="Product Analysis"
             route="dashboardTab/ProductAnalysis"
-            style={[styles.widget, { backgroundColor: colors.surface }]}
+            style={[styles.widget,]}
           />
         </View>
       </View>
@@ -80,11 +80,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
+
   },
   widget: {
     width: '45%', // Set to approximately half the width to allow two widgets per row
     aspectRatio: 1.2, // Adjust for a balanced height-to-width ratio
-    backgroundColor: '#f8c8c8', // Light pink background
+    backgroundColor: lightTheme.colors.primaryContainer, // Light pink background
     borderRadius: 10,
     marginBottom: 15,
     justifyContent: 'center',
