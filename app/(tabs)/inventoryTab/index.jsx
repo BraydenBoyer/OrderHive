@@ -50,7 +50,7 @@ const [selectedItem, setSelectedItem] = useState([])
 
     //how items are shown when inventory component is mounted
 
-useEffect(() => {
+
     const fetchData = async () => {
         try {
             const orgName = "Org." + globalVariable.currentOrg;
@@ -95,10 +95,27 @@ useEffect(() => {
         }
     };
 
-    fetchData();
-}, []);
 
 
+useFocusEffect(
+    useCallback(() => {
+      // Fetch data when the screen is focused
+      fetchData();
+
+      return () => {
+        // Clear state when the screen is unfocused
+        setGroupedInventoryData({});
+        setDropdownItems([]);
+        setNewItemName('');
+        setNewItemPrice('');
+        setNewItemCategory('');
+        setNewItemTotal('');
+        setNewItemHold('');
+        setSelectedItems([]);
+        setDeleteMode(false);
+      };
+    }, [])
+  );
 
 
   const handleSelectItem = (inventoryID) => {
