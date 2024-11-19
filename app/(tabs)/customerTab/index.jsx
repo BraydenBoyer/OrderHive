@@ -209,7 +209,7 @@ export default function CustomerPage() {
               {groupedCustomerData[location].map((customer) => (
                 <Card
                   key={customer.id}
-                  style={[styles.customerCard, { backgroundColor: colors.tertiary }]}
+                  style={[styles.customerCard, { backgroundColor: colors.primaryContainer }]}
                   onPress={() => openCustomerDetails(customer)} // Open details on card press
                 >
                   <Card.Content style={styles.cardContent}>
@@ -224,7 +224,7 @@ export default function CustomerPage() {
                       <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Price: {customer.price}</Paragraph>
                       <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Orders: {customer.totalOrders}</Paragraph>
                       <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Completed: {customer.completedOrders}</Paragraph>
-                      <Paragraph style={[styles.customerNotes, { color: colors.onPrimary }]}>{customer.notes}</Paragraph>
+                      <Paragraph style={[styles.customerNotes, { color: colors.onSurfaceVariant }]}>{customer.notes}</Paragraph>
                     </View>
                   </Card.Content>
                 </Card>
