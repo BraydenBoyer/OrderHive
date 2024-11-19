@@ -8,6 +8,9 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import {LocalFAB} from '../../../components/overlays/LocalFAB.jsx'
 import { Tabs, useFocusEffect } from "expo-router";
 import {globalVariable} from '../../_layout.jsx'
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
@@ -19,6 +22,9 @@ export default function CustomerPage() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerDetailVisible, setCustomerDetailVisible] = useState(false);
   const [currentOrg, setCurrentOrg] = useState('')
+  const [dropdownCustomers, setDropDownCustomers] = useState([])
+  const [isFocus, setIsFocus] = useState(false)
+   const [value, setValue] = useState(null)
   //for local fab
     const [visible, setVisible] = useState(false)
     const orgName = "Org." + globalVariable.currentOrg
@@ -43,6 +49,7 @@ export default function CustomerPage() {
         const currOrg = 'Org.' + globalVariable.currentOrg
                 setCurrentOrg(currOrg)
       try {
+          const dropArray = [];
         const customerRef = collection(fireDb, 'organizations/'+currOrg+'/customers');
         const querySnapshot = await getDocs(customerRef);
         const customerData = querySnapshot.docs.map((doc) => ({
@@ -57,11 +64,15 @@ export default function CustomerPage() {
           if (!acc[location]) {
             acc[location] = [];
           }
+            dropArray.push({ label: location, value: location });
           acc[location].push(customer);
           return acc;
         }, {});
 
         setGroupedCustomerData(groupedData);
+        setDropDownCustomers(dropArray);
+        console.log('Dropdown locations:', dropArray);
+
       } catch (error) {
         console.error('Error fetching customer data:', error);
       }
@@ -74,6 +85,7 @@ export default function CustomerPage() {
        return () => {
          setGroupedCustomerData({});
          setSelectedCustomers([]);
+         setDropDownCustomers([]);
          setAddCustomerModalVisible(false);
          setFabOpen(false);
          setSelectedCustomer(null);
@@ -279,6 +291,36 @@ export default function CustomerPage() {
               <TextInput placeholder="Notes" style={styles.input} value={newCustomer.notes} onChangeText={(text) => setNewCustomer({ ...newCustomer, notes: text })} />
               <TextInput placeholder="Total Orders" style={styles.input} keyboardType="numeric" value={newCustomer.totalOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, totalOrders: text })} />
               <TextInput placeholder="Completed Orders" style={styles.input} keyboardType="numeric" value={newCustomer.completedOrders} onChangeText={(text) => setNewCustomer({ ...newCustomer, completedOrders: text })} />
+                <Dropdown
+                  style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  iconStyle={styles.iconStyle}
+                  data={dropdownCustomers}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocus ? 'Select Category' : '...'}
+                  searchPlaceholder="Search..."
+                  value={value}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={(item) => {
+                    setNewCustomer({ ...newCustomer, location: item.value }); // Update location field
+                    setValue(item.value); // Update dropdown's selected value
+                    setIsFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <AntDesign
+                      style={styles.icon}
+                      color={isFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
               <View style={styles.buttonContainer}>
                 <Button mode="text" onPress={() => setAddCustomerModalVisible(false)} color={colors.onSurface}>
                   Cancel
