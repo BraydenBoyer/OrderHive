@@ -37,18 +37,20 @@ export default function CustomerPage() {
   const theme = useTheme();
   const colors = theme.colors;
 
-  useEffect(() => {
+
     const fetchData = async () => {
+
+        const currOrg = 'Org.' + globalVariable.currentOrg
+                setCurrentOrg(currOrg)
       try {
-        const customerRef = collection(fireDb, 'organizations/'+orgName+'/customers');
+        const customerRef = collection(fireDb, 'organizations/'+currOrg+'/customers');
         const querySnapshot = await getDocs(customerRef);
         const customerData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        const currOrg = globalVariable.currentOrg
-        setCurrentOrg(currOrg)
+
 
         const groupedData = customerData.reduce((acc, customer) => {
           const location = customer.location || 'Uncategorized';
@@ -65,8 +67,30 @@ export default function CustomerPage() {
       }
     };
 
-    fetchData();
-  }, []);
+   useFocusEffect(
+     useCallback(() => {
+       fetchData();
+
+       return () => {
+         setGroupedCustomerData({});
+         setSelectedCustomers([]);
+         setAddCustomerModalVisible(false);
+         setFabOpen(false);
+         setSelectedCustomer(null);
+         setCustomerDetailVisible(false);
+         setNewCustomer({
+           name: '',
+           email: '',
+           phone: '',
+           location: '',
+           notes: '',
+           totalOrders: '',
+           completedOrders: '',
+         });
+         setDeleteMode(false);
+       };
+     }, [])
+   );
 
   const deleteCustomer = async (customerId) => {
     try {
@@ -163,7 +187,6 @@ export default function CustomerPage() {
 
   return (
     <BackDrop title={"CustomerTab"}>
-        <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView>
           {Object.keys(groupedCustomerData).map((location) => (

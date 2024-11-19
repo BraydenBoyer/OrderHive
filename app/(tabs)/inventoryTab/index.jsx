@@ -315,7 +315,6 @@ const getItemNameById = (inventoryID) => {
 
       <BackDrop title={"InventoryTab"} >
 
-          <Text style={styles.orgTitle}>{'Current Organization: ' + currentOrg || 'No Organization Selected'}</Text>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.inventoryList}>
