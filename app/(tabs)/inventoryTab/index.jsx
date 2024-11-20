@@ -14,7 +14,7 @@ import {globalVariable} from '../../_layout.jsx'
 import {getAllOrganizations} from '../../firebase/user/organizationFunctions.js'
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
+import {BottomButtons} from "../../../components/overlays/BottomButtons.jsx";
 
 
 export default function InventoryPage() {
@@ -351,16 +351,22 @@ const getItemNameById = (inventoryID) => {
 
           {isDeleteMode && (
               <View style={[styles.deleteFooter, { backgroundColor: colors.errorContainer }]}>
-                <IconButton
-                    icon="delete"
-                    size={30}
-                    color={colors.onError}
-                    onPress={handleDeleteItems}
-                    style={styles.trashIcon}
+                <BottomButtons
+                    visible={true} // Toggle visibility
+                    firstTitle="Delete"
+                    secondTitle="Cancel"
+                    firstOnClick={() => {
+                      // Logic for delete action
+                      console.log("Delete action triggered");
+                      handleDeleteItems();
+                    }}
+                    secondOnClick={() => {
+                      // Logic for cancel action
+                      console.log("Cancel action triggered");
+                      setDeleteMode(false); //reset delete mode
+                    }}
                 />
-                <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton} color={colors.onError}>
-                  Cancel
-                </Button>
+
               </View>
           )}
         <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
