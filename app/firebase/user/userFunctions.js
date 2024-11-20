@@ -27,6 +27,7 @@ export const createUser = async (email, password, name, phone) => {
 			email: email,
 			userID: user.uid,
 			phone: phone,
+			password: password
 		})
 
 		console.log("User created successfully:", `User.${name}.` + user.uid)
