@@ -1,5 +1,19 @@
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, Title, Paragraph, Portal, FAB, Dialog, useTheme } from "react-native-paper";
+import {
+  Text,
+  Button,
+  Checkbox,
+  Card,
+  IconButton,
+  Divider,
+  Title,
+  Paragraph,
+  Portal,
+  FAB,
+  Dialog,
+  useTheme,
+  ActivityIndicator
+} from "react-native-paper";
 import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
 import { collection, doc, setDoc, deleteDoc, getDocs, addDoc } from "firebase/firestore";
@@ -11,6 +25,8 @@ import {globalVariable} from '../../_layout.jsx'
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import {BottomButtons} from "../../../components/overlays/BottomButtons.jsx";
+import {CustomerCard} from "../../../components/CustomerCard.jsx";
+import {MySeachBar} from "../../../components/MySeachBar.jsx";
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
@@ -197,40 +213,57 @@ export default function CustomerPage() {
           }, [setVisible])
       )
 
+  const [searchTxt, setSearchTxt] = useState('')
+
+
   return (
     <BackDrop title={"CustomerTab"}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView>
-          {Object.keys(groupedCustomerData).map((location) => (
-            <View key={location} style={styles.locationContainer}>
-              <Title style={[styles.locationTitle, { color: colors.primary }]}>{location}</Title>
-              <Divider style={[styles.divider, { backgroundColor: colors.onSurface }]} />
 
-              {groupedCustomerData[location].map((customer) => (
-                <Card
-                  key={customer.id}
-                  style={[styles.customerCard, { backgroundColor: colors.primaryContainer }]}
-                  onPress={() => openCustomerDetails(customer)} // Open details on card press
-                >
-                  <Card.Content style={styles.cardContent}>
-                    {isDeleteMode && (
-                      <Checkbox
-                        status={selectedCustomers.includes(customer.id) ? "checked" : "unchecked"}
-                        onPress={() => handleSelectCustomer(customer.id)}
-                      />
-                    )}
-                    <View style={styles.cardText}>
-                      <Title style={[styles.customerName, { color: colors.onSurface }]}>{customer.name}</Title>
-                      <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Price: {customer.price}</Paragraph>
-                      <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Orders: {customer.totalOrders}</Paragraph>
-                      <Paragraph style={[styles.customerInfo, { color: colors.onSurfaceVariant }]}>Completed: {customer.completedOrders}</Paragraph>
-                      <Paragraph style={[styles.customerNotes, { color: colors.onSurfaceVariant }]}>{customer.notes}</Paragraph>
-                    </View>
-                  </Card.Content>
-                </Card>
-              ))}
-            </View>
-          ))}
+          <MySeachBar
+              placeholder={'Search'}
+              value={searchTxt}
+              onChangeText={setSearchTxt}
+              style={{marginBottom: 20}}
+          />
+
+          {
+            Object.keys(groupedCustomerData).length === 0 ?
+                <ActivityIndicator
+                    animating={true}
+                    size={'large'}
+                />
+                :
+                <View>
+                  {Object.keys(groupedCustomerData).map((location) => (
+                      <View key={location} style={styles.locationContainer}>
+
+                        <Text variant={'titleLarge'} style={{fontWeight: 'bold', marginBottom: 8}}>
+                          {location}
+                        </Text>
+
+                        {groupedCustomerData[location].map((customer) => {
+
+                          return(
+                              <CustomerCard
+                                  name={customer.name}
+                                  totalCost={customer.price}
+                                  openOrders={customer.totalOrders}
+                                  assembledOrders={customer.completedOrders}
+                                  notes={customer.notes}
+                                  onClick={() => openCustomerDetails(customer)}
+                                  checkboxStatus={selectedCustomers.includes(customer.id) ? "checked" : "unchecked"}
+                                  checkboxVisible={isDeleteMode}
+                                  onCheckboxPress={() => handleSelectCustomer(customer.id)}
+                              />
+                          )
+                        })}
+                      </View>
+                  ))}
+                </View>
+          }
+
         </ScrollView>
 
         <Portal>
@@ -274,7 +307,7 @@ export default function CustomerPage() {
             />
           </View>
         )}
-        <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
+        <LocalFAB visible={visible} icon={['plus', 'close']} actions={[
             { icon: "plus", label: "Add Customer", onPress: () => setAddCustomerModalVisible(true) },
             { icon: "delete", label: "Delete Selected", onPress: () => setDeleteMode(true) },
 
@@ -351,10 +384,10 @@ const styles = StyleSheet.create({
         },
   container: {
     flex: 1,
-    padding: 16,
   },
   locationContainer: {
     marginBottom: 16,
+    rowGap: 10
   },
   locationTitle: {
     fontSize: 20,

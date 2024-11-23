@@ -401,7 +401,7 @@ const getItemNameById = (inventoryID) => {
 
               </View>
           )}
-        <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
+        <LocalFAB visible={visible} icon={['plus', 'close']} actions={[
             { icon: 'plus', label: 'Add Item', onPress: () => setAddModalVisible(true) },
             { icon: 'delete', label: 'Delete Selected', onPress: () => setDeleteMode(true) },
             ]} />

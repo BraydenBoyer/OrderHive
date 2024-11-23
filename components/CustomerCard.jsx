@@ -1,31 +1,31 @@
-import {MySurface} from "./MySurface.jsx";
 import {StyleSheet, View} from "react-native";
-import {globalVariable} from "../app/_layout.jsx";
 import {Checkbox, Chip, Text, TouchableRipple} from "react-native-paper";
-import {fonts} from '../app/styles/themes/fonts/fonts.jsx'
+import {MySurface} from "./MySurface.jsx";
+import {globalVariable} from "../app/_layout.jsx";
 import {roundness} from "../app/styles/themes/roundness/roundness.jsx";
 
 
-export const InventoryCard = ({
-	title,
-	inventory,
-	claimed,
-	retail,
-	wholesale = 0,
+export const CustomerCard = ({
+
+	name,
+	totalCost,
+	openOrders,
+	assembledOrders,
+	notes,
 	metadata,
 	checkboxVisible,
 	checkboxStatus,
 	onCheckboxPress,
 	onClick = () => {},
-}) => {
+ }) => {
 
 
 	const styles = fileStyle()
-	const colors = globalVariable.colors
 
 	return(
+
 		<MySurface>
-			<TouchableRipple borderless={true} style={styles.card} onPress={onClick}>
+			<TouchableRipple style={styles.card} borderless={true} onPress={onClick} >
 				<View>
 					<View style={styles.topContainer}>
 
@@ -41,45 +41,50 @@ export const InventoryCard = ({
 							}
 
 							<Text variant={'headlineMedium'}>
-								{title}
+								{name}
 							</Text>
 						</View>
 
 						<View style={styles.topRightContainer}>
 							<Text variant={'labelLarge'}>
-								Inventory: {inventory}
+								Open Orders: {openOrders}
 							</Text>
 							<Text variant={'labelLarge'}>
-								Claimed: {claimed}
+								Assembled: {assembledOrders}
 							</Text>
 						</View>
 					</View>
 
 					<View style={styles.middleContainer}>
+
+						<Chip
+							compact={true}
+							textStyle={{fontSize: 14}}
+						>
+							Total: ${totalCost}
+						</Chip>
+
 						{
-							wholesale === 0 ?
+							notes.length < 1 ?
 								<></>
 								:
 								<Chip
 									compact={true}
 									textStyle={{fontSize: 14}}
+									style={{
+										flexShrink: 1
+									}}
 								>
-									Wholesale: ${wholesale}
+									Notes: {notes}
 								</Chip>
 						}
-						<Chip
-							compact={true}
-							textStyle={{fontSize: 14}}
-						>
-							Retail: ${retail}
-						</Chip>
+
 					</View>
 				</View>
 			</TouchableRipple>
 		</MySurface>
 	)
 }
-
 
 const fileStyle = () => {
 
@@ -110,7 +115,10 @@ const fileStyle = () => {
 
 		middleContainer: {
 			flexDirection: 'row',
-			columnGap: 5
+			columnGap: 5,
+			overflow: 'hidden',
+			borderRadius: roundness.smallRadius,
+			marginTop: 5,
 		},
 
 		bottomContainer: {
