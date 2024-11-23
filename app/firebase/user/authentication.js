@@ -28,7 +28,18 @@ export const logoutCurrentUser = async () => {
 	console.log("Current user was signed out.")
 }
 
-
+export const updateUserPassword = async (password) => {
+	const user = fireAuth.currentUser
+	await updatePassword(user, password)
+	console.log('2')
+	const userRef = doc(fireDb, "users", fireAuth.currentUser.uid)
+	console.log('3')
+	const update = {
+		password: password
+	}
+	await updateDoc(userRef,update)
+	console.log('Done')
+}
 
 
 export const updateUserEmail = async (email) => {
