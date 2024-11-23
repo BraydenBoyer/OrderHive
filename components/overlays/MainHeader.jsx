@@ -21,10 +21,10 @@ export const MainHeader = ({children,  title = 'App.OrderHive' }) => {
 	return (
 		<>
 			<Appbar.Header style={{backgroundColor: colors.primaryContainer}} elevated={true}>
-				<Appbar.Action icon={'menu'} color={colors.onPrimaryContainer}  onPress={() => setOpen(!open)} />
-				<Appbar.Content color={colors.onPrimaryContainer} title={title} />
-				<Appbar.Action color={colors.onPrimaryContainer} icon={'login'} onPress={handleLoginPress} />
-				<Appbar.Action color={colors.onPrimaryContainer} icon={'cog'} onPress={handleSettingsPress} />
+				<Appbar.Action icon={'menu'} color={colors.onPrimary}  onPress={() => setOpen(!open)} />
+				<Appbar.Content color={colors.onPrimary} title={title} />
+				<Appbar.Action color={colors.onPrimary} icon={'login'} onPress={handleLoginPress} />
+				<Appbar.Action color={colors.onPrimary} icon={'cog'} onPress={handleSettingsPress} />
 
 				<SideBar open={open} setOpen={setOpen} />
 			</Appbar.Header>

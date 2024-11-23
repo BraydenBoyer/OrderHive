@@ -1,9 +1,14 @@
-import { Button, StyleSheet, Text, SafeAreaView, View, TouchableOpacity, Modal } from "react-native";
+import { Button, StyleSheet, SafeAreaView, View, TouchableOpacity, Modal } from "react-native";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import React, { useState } from "react";
-import { Switch } from "react-native-paper";
+import {Divider, Switch} from "react-native-paper";
 import ColorPicker from 'react-native-wheel-color-picker';
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
+import {MySurface} from "../../../components/MySurface.jsx";
+import {roundness} from "../../styles/themes/roundness/roundness.jsx";
+import {Text} from 'react-native-paper'
+import {globalVariable} from "../../_layout.jsx";
+import {MyButton} from "../../../components/inputs/MyButton.jsx";
 
 export default function MenuPage() {
 
@@ -14,6 +19,8 @@ export default function MenuPage() {
     const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
     const [currentColor, setCurrentColor] = useState(primaryColor);
     const [targetButton, setTargetButton] = useState('primary');
+
+    const colors = globalVariable.colors
 
     const toggleDarkSwitch = () => {
         setIsDarkSwitchOn(true);
@@ -51,33 +58,47 @@ export default function MenuPage() {
 
 
             <View style={styles.container}>
-                <View style={styles.backgroundContainerTop}>
-                    <Text style={[styles.text, { marginRight: 180 }]}>Dark Mode</Text>
+
+                <MySurface style={styles.backgroundContainer}>
+                    <Text variant={'headlineMedium'} >
+                        Dark Mode
+                    </Text>
                     <Switch value={isDarkSwitchOn} onValueChange={toggleDarkSwitch} />
-                </View>
+                </MySurface>
 
-                <View style={styles.backgroundContainerBottom}>
-                    <Text style={[styles.text, { marginRight: 180 }]}>Light Mode</Text>
+                <MySurface style={styles.backgroundContainer}>
+                    <Text variant={'headlineMedium'} >
+                        Light Mode
+                    </Text>
                     <Switch value={isLightSwitchOn} onValueChange={toggleLightSwitch} />
-                </View>
+                </MySurface>
 
-                <View style={[styles.container, { paddingVertical: 20 }]}>
-                    <View style={styles.backgroundContainerTop}>
-                        <Text style={[styles.text, { marginRight: 175 }]}>Primary Color</Text>
-                        <TouchableOpacity
-                            style={[styles.colorButton, { backgroundColor: primaryColor }]}
-                            onPress={() => openColorPicker('primary')}
+                <MySurface style={[styles.surroundContainer]} >
+
+                    <View style={styles.insideContainer}>
+                        <Text variant={'headlineMedium'} >
+                            Primary Color
+                        </Text>
+                        <MyButton
+                            title={''}
+                            onClick={() => openColorPicker('primary')}
+                            style={{backgroundColor: primaryColor}}
+                        />
+                    </View>
+                    <Divider bold={true} />
+                    <View style={styles.insideContainer}>
+                        <Text variant={'headlineMedium'} >
+                            Secondary Color
+                        </Text>
+                        <MyButton
+                            title={''}
+                            onClick={() => openColorPicker('secondary')}
+                            style={{ backgroundColor: secondaryColor }}
                         />
                     </View>
 
-                    <View style={styles.backgroundContainerBottom}>
-                        <Text style={[styles.text, { marginRight: 150 }]}>Secondary Color</Text>
-                        <TouchableOpacity
-                            style={[styles.colorButton, { backgroundColor: secondaryColor }]}
-                            onPress={() => openColorPicker('secondary')}
-                        />
-                    </View>
-                </View>
+                </MySurface>
+
             </View>
  
 
@@ -109,52 +130,33 @@ export default function MenuPage() {
 }
 
 const styles = StyleSheet.create({
-    text: {
-        fontSize: 20,
-        lineHeight: 21,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color:lightTheme.colors.black,
-    },
     title: {
         fontSize: 45,
         fontWeight: 'bold',
         textAlign: 'left',
     },
     container: {
-        alignItems: 'center',
-        paddingHorizontal: 10,
         flexDirection: 'column',
+        rowGap: 20,
     },
-    backgroundContainerTop: {
+    backgroundContainer: {
         flexDirection: 'row',
-        backgroundColor: lightTheme.colors.primaryContainer,
-        padding: 10,
-        borderRadius: 10,
-        marginRight: 10,
+        borderRadius: roundness.mediumRadius,
         height: 100,
-        width: 388,
         alignItems: "center",
         justifyContent: "space-between",
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        borderBottomWidth: 0.5,
-        borderBottomColor: 'white',
-        paddingHorizontal: 30,
+        paddingHorizontal: 20
     },
-    backgroundContainerBottom: {
+    surroundContainer: {
+        flexDirection: 'column',
+        borderRadius: roundness.mediumRadius,
+        padding: 20,
+        rowGap: 20
+    },
+    insideContainer: {
         flexDirection: 'row',
-        backgroundColor: lightTheme.colors.primaryContainer,
-        padding: 10,
-        borderRadius: 10,
-        marginRight: 10,
-        height: 100,
-        width: 388,
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
-        paddingHorizontal: 30,
+        justifyContent: 'space-between',
+        width: '100%'
     },
     colorButton: {
         width: 50,

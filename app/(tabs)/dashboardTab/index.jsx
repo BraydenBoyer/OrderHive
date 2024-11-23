@@ -6,7 +6,9 @@ import WidgetButton from '../../../components/WidgetButton';
 import { AppContext } from "../_layout.jsx";
 import { useFocusEffect } from "expo-router";
 import {StatusBar} from "expo-status-bar";
-import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; // Adjust path as necessary
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
+import {MySurface} from "../../../components/MySurface.jsx";
+import {MyButton} from "../../../components/inputs/MyButton.jsx"; // Adjust path as necessary
 
 const colors = lightTheme.colors;
 
@@ -58,6 +60,12 @@ export default function DashboardPage() {
             route="dashboardTab/ProductAnalysis"
             style={[styles.widget,]}
           />
+
+          <MyButton style={{width: 100, height: 100}} onClick={() => {}} >
+            <Text>
+              Hi
+            </Text>
+          </MyButton>
         </View>
       </View>
     </BackDrop>

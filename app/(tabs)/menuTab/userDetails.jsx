@@ -2,7 +2,7 @@
 import {Button, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
 import React, {useState, useEffect, useCallback} from "react";
-import {TextInput, useTheme} from "react-native-paper";
+import {Snackbar, TextInput, useTheme} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
 import { auth, db } from "../../firebase/initializeFirebase.js";
@@ -11,22 +11,30 @@ import {collection, doc, getDoc, getDocs, query, updateDoc, where} from "firebas
 import { fireDb } from "../../firebase/initializeFirebase.js";
 import {getCurrentUserInfo,updateUserPhone,updateUserUsername} from "../../firebase/user/userFunctions.js";
 import {useFocusEffect} from "expo-router";
-import {updateUserEmail, updateUserPassword} from "../../firebase/user/authentication.js";
+import {updateUserEmail, updateUserPassword, verifyUserEmail} from "../../firebase/user/authentication.js";
 import {getOrg} from "../../firebase/user/organizationFunctions.js";
 import {globalVariable} from "../../_layout.jsx";
+import {MyTextInput} from "../../../components/inputs/MyTextInput.jsx";
+import {roundness} from "../../styles/themes/roundness/roundness.jsx";
+import {editablePageStyle} from "../../styles/pageType/editablePageStyle.jsx";
 
 
 export default function MenuPage() {
 
+    const styles = editablePageStyle
+
     const [textUN, setTextUN] = React.useState("");
     const [textPass, setTextPass] = React.useState("");
     const [textEm, setTextEm] = React.useState("");
-    const [textPM, setTextPM] = React.useState("");
+    const [textPn, setTextPn] = React.useState("");
 
     const [isEditableUN, setIsEditableUN] = useState(false);
     const [isEditablePass, setIsEditablePass] = useState(false);
     const [isEditableEm, setIsEditableEm] = useState(false);
-    const [isEditablePN, setIsEditablePN] = useState(false);
+    const [isEditablePn, setIsEditablePn] = useState(false);
+
+    const [isSnack, setSnack] = useState(false)
+    const [snackText, setSnackText] = useState('')
 
     useEffect(() => {
         (
@@ -34,13 +42,21 @@ export default function MenuPage() {
                 let userDetails = await getCurrentUserInfo()
                 setTextUN(userDetails.name);
                 setTextPass(userDetails.password);
-                setTextPM(userDetails.phone);
+                setTextPn(userDetails.phone);
                 setTextEm(userDetails.email);
             }
         )()
     }, []);
 
 
+    const handleEmailVerification = () => {
+
+        console.log('Starting email verification')
+        verifyUserEmail()
+
+        setSnackText('Email verification sent. Please check your email.')
+        setSnack(true)
+    }
     
     const handleEditToggleUn = () => {
         setIsEditableUN(!isEditableUN);
@@ -50,7 +66,6 @@ export default function MenuPage() {
                     await updateUserUsername(textUN)
                 }
             )()
-
         }
     };
 
@@ -75,168 +90,135 @@ export default function MenuPage() {
             (
                 async () => {
                     console.log('EnteredEmailFunction')
-                    await updateUserEmail(textEm)
-                    console.log('emailUpdated')
+                    let res = await updateUserEmail(textEm)
+
+                    if( res === '0' ){ // means that there were no errors
+                        setSnack(false)
+                    }
+                    else if( res === 'auth/operation-not-allowed'){
+                        setSnackText('Please verify your email before changing email.')
+                        setSnack(true)
+                    }
+
+                    console.log(`updateUserEmail response: ${res}`)
                 }
             )()
         }
     };
 
     const handleEditTogglePn = () => {
-        setIsEditablePN(!isEditablePN);
-        if(isEditablePN){
+        setIsEditablePn(!isEditablePn);
+        if(isEditablePn){
             (
                 async ()=>{
-                    await updateUserPhone(textPM)
+                    await updateUserPhone(textPn)
                 })()
         }
     };
     return (
-        <BackDrop title='User Details' mainHeader={false}>
+        <View style={{flex: 1}}>
+            <BackDrop title='User Details' mainHeader={false}>
 
-            <View style={styles.container}>
+                <View style={styles.container}>
 
-                <View style={[styles.backgroundContainer,
-                    {borderBottomLeftRadius: 0,borderBottomRightRadius: 0,borderBottomWidth:.5,borderBottomColor:'white'}]}>
-                    <Text style={styles.text}>UserName</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{width:'80%',height: 30}}
-                            mode="outlined"
-                            value={textUN}
-                            onChangeText={setTextUN}
-                            editable={isEditableUN}
+                    <View style={[styles.backgroundContainer]}>
+                        <View style={styles.inputContainer}>
 
+                            <MyTextInput
+                                value={textUN}
+                                onChangeText={setTextUN}
+                                placeholder={'Username'}
+                                editable={isEditableUN}
+                                style={styles.textInput}
+                            />
+                            <MyButton
+                                title={isEditableUN ? "Save" : "Edit"}
+                                onClick={handleEditToggleUn}
+                                style={styles.button}
+                            />
 
-                        />
-                        <MyButton  title={isEditableUN ? "Save" : "Edit"} onClick={handleEditToggleUn}/>
-
+                        </View>
                     </View>
-                </View>
 
-                <View style={[styles.backgroundContainer,
-                    {borderRadius: 0,borderBottomWidth:.5,borderBottomColor:'white'}]}>
-                    <Text style={styles.text}>Password</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{width:'80%',height: 30}}
-                            mode="outlined"
-                            value={textPass}
-                            onChangeText={setTextPass}
-                            editable={isEditablePass}
-                            //secureTextEntry
-                            //right={<TextInput.Icon icon="eye" />}
+                    <View style={[styles.backgroundContainer]}>
+                        <View style={styles.inputContainer}>
 
-                        />
-                        <MyButton title={isEditablePass ? "Save" : "Edit"} onClick={handleEditTogglePass}/>
+                            <MyTextInput
+                                value={textPass}
+                                onChangeText={setTextPass}
+                                editable={isEditablePass}
+                                placeholder={'Password'}
+                                style={styles.textInput}
+                            />
+                            <MyButton
+                                title={isEditablePass ? "Save" : "Edit"}
+                                onClick={handleEditTogglePass}
+                                style={styles.button}
+                            />
 
+                        </View>
                     </View>
-                </View>
 
-                <View style={[styles.backgroundContainer,
-                    {borderRadius: 0,borderBottomWidth:.5,borderBottomColor:'white'}]}>
-                    <Text style={styles.text}>Email</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{width:'80%',height: 30}}
-                            mode="outlined"
-                            value={textEm}
-                            onChangeText={setTextEm}
-                            editable={isEditableEm}
+                    <View style={[styles.backgroundContainer]}>
+                        <View style={styles.inputContainer}>
 
-                        />
-                        <MyButton title={isEditableEm ? "Save" : "Edit"} onClick={handleEditToggleEm} />
+                            <MyTextInput
+                                value={textEm}
+                                onChangeText={setTextEm}
+                                editable={isEditableEm}
+                                placeholder={'Email'}
+                                style={styles.textInput}
+                            />
+                            <MyButton
+                                title={isEditablePass ? "Save" : "Edit"}
+                                onClick={handleEditToggleEm}
+                                style={styles.button}
+                            />
+
+                        </View>
                     </View>
-                </View>
 
-                <View style={[styles.backgroundContainer, {borderTopLeftRadius: 0,borderTopRightRadius: 0}]}>
-                    <Text style={styles.text}>Phone</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={{width:'80%',height: 30}}
-                            mode="outlined"
-                            value={textPM}
-                            onChangeText={setTextPM}
-                            editable={isEditablePN}
+                    <View style={[styles.backgroundContainer]}>
+                        <View style={styles.inputContainer}>
 
-                        />
-                        <MyButton title={isEditablePN ? "Save" : "Edit"} onClick={handleEditTogglePn} />
+                            <MyTextInput
+                                value={textPn}
+                                onChangeText={setTextPn}
+                                editable={isEditablePn}
+                                placeholder={'Phone Number'}
+                                style={styles.textInput}
+                            />
+                            <MyButton
+                                title={isEditablePass ? "Save" : "Edit"}
+                                onClick={handleEditTogglePn}
+                                style={styles.button}
+                            />
+
+                        </View>
                     </View>
+
+                    <MyButton
+                        title={'Verify Email'}
+                        onClick={handleEmailVerification}
+                        style={[
+                            styles.button
+                        ]}
+                        variant={'titleLarge'}
+                    />
+
+                    <MyButton
+                        title={'2-Step Verification'}
+                        onClick={() => handleEditToggleEm}
+                        variant={'titleLarge'}
+                    />
+
                 </View>
 
+            </BackDrop>
 
-
-
-                <View style={[styles.backgroundContainer,{marginVertical: 20,alignItems: "center",justifyContent:"center",paddingHorizontal:10}]}>
-                    <TouchableOpacity style={styles.button} onPress={handleEditToggleEm}>
-                        <Text style={styles.text}>Enable 2-Step Verification</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-
-        </BackDrop>
+            <Snackbar visible={isSnack} onDismiss={() => setSnack(false)} duration={4000} >
+                {snackText}
+            </Snackbar>
+        </View>
     )
 }
-
-
-const styles = StyleSheet.create({
-
-    text: {
-        fontSize: 20,
-        lineHeight: 21,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: lightTheme.colors.black,
-    },
-    title: {
-        fontSize: 45,
-        fontWeight: 'bold',
-        textAlign: 'left',
-    },
-
-
-    container: {
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        flexDirection: 'column',
-    },
-
-    backgroundContainer: {
-        flexDirection: 'column',
-        backgroundColor: lightTheme.colors.primaryContainer,
-        padding: 10,
-        borderRadius: 10,
-        marginRight: 10,
-        height: 100, // Set desired container height
-        width:388,
-        alignItems:"left",
-
-
-    },
-    inputContainer: {
-        flexDirection: 'row',
-
-        height: 100, // Set desired container height
-        width:388,
-        alignItems:"center",
-        paddingTop: 10,
-        paddingBottom: 40,
-
-    },
-    textInput: {
-        maxWidth:'85%',
-        height: 10,
-        flex: 1, // Take up available space
-
-        paddingHorizontal: 50,
-        paddingRight: 20,
-    },
-
-    button: {
-        alignItems:'center',
-        justifyContent:'center',
-        height: 100,
-        width: '100%',
-    }
-});

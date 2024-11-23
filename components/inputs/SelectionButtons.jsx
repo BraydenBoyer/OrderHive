@@ -12,7 +12,7 @@ import {buttonStyle} from "../../app/styles/components/inputs/buttons.jsx";
 
 	@author Miles
  */
-export const SelectionButtons = ({orgName, index = 0, count = 1, onClick, theme}) => {
+export const SelectionButtons = ({title, index = 0, count = 1, onClick, theme}) => {
 	const topRadius = index === 0 ? roundness.largeRadius : 0;
 	const bottomRadius = index === count - 1 ? roundness.largeRadius : 0;
 
@@ -25,8 +25,8 @@ export const SelectionButtons = ({orgName, index = 0, count = 1, onClick, theme}
 					<></>
 			}
 			<MyButton
-				key={orgName} // Adding key to each button
-				title={orgName}
+				key={title} // Adding key to each button
+				title={title}
 				style={{
 					height: 75,
 					width: "100%",

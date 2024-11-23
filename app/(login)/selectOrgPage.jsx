@@ -48,7 +48,7 @@ export default function SelectOrgPage() {
 				{orgNames.map((orgName, index) =>
 					<SelectionButtons
 						key={orgName}
-						orgName={orgName}
+						title={orgName}
 						index={index}
 						count={orgNames.length}
 						onClick={() => handleSelectionClick(orgName)}

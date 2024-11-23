@@ -12,10 +12,10 @@ export const basicScreenOption = {
 
 export const basicTabOptions = {
 	headerShown: false,
-	tabBarActiveTintColor: colors.primary,
-	tabBarInactiveTintColor: colors.onPrimaryContainer,
+	tabBarActiveTintColor: colors.onSecondaryContainer,
+	tabBarInactiveTintColor: colors.primary,
 	tabBarStyle: {
-		backgroundColor: colors.primaryContainer,
+		backgroundColor: colors.surface,
 		height: 80,
 	},
 
@@ -41,7 +41,7 @@ export const basicBackdropStyle = {
 
 	paddingVertical: 0,
 	paddingHorizontal: 0,
-	backgroundColor: colors.surface,
+	backgroundColor: colors.background,
 	flex: 1,
 	flexGrow: 1
 }

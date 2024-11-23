@@ -8,12 +8,13 @@ import {globalVariable} from "../../app/_layout.jsx";
 
 export const MyButton = ({
 	elevation,
-	style = {height: 50, width: 50},
+	style = {minHeight: 50, minWidth: 50},
 	title = 'Button',
 	onClick,
 	variant = 'bodyMedium',
 	iconLeft,
 	iconRight,
+	textColor = globalVariable.colors.onPrimary
 }) => {
 
 	const styles = inputStyles()
@@ -27,11 +28,11 @@ export const MyButton = ({
 		<Surface
 			style={[buttonStyle.basicButtonTemplate, style]}
 			elevation={elevation}
-			mode={'elevated'}
+			mode={'flat'}
 		>
 			<TouchableRipple
 				onPress={onClick}
-				style={[buttonStyle.basicButtonTemplate, style]}
+				style={[{flex: 1, borderRadius: roundness.mediumRadius}, style]}
 				underlayColor={'red'}
 				borderless={true}
 				rippleColor={colors.backdrop}
@@ -39,7 +40,7 @@ export const MyButton = ({
 				<View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
 
 					<Icon size={iconSize} source={iconLeft} />
-					<Text variant={variant} style={{marginHorizontal: iconSize*.5}} >
+					<Text variant={variant} style={{marginHorizontal: iconSize*.5, color: textColor}} >
 						{title}
 					</Text>
 					<Icon size={iconSize} source={iconRight} />

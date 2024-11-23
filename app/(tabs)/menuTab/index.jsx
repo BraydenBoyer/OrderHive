@@ -6,6 +6,7 @@ import {AppContext} from "../_layout.jsx";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
 import {Button} from 'react-native-paper'
+import {SelectionButtons} from "../../../components/inputs/SelectionButtons.jsx";
 
 export default function MenuPage() {
 
@@ -16,34 +17,51 @@ export default function MenuPage() {
 
 	return (
 
-		<BackDrop>
-			<View>
-				<Text style={styles.title}>Menu</Text>
-			</View>
+		<BackDrop title={'Menu'} >
 
-			<View style={{alignItems: "center",flexDirection: 'column', justifyContent: 'center',rowGap:10}}>
+			<View style={{flexDirection: 'column', rowGap:10}}>
 
-				<View style={{alignContent: 'center',paddingTop: 5, rowGap: 1}}>
+				<View style={{paddingTop: 5}}>
 
-					<MyButton title={'User Details'} onClick={ () => router.navigate('menuTab/userDetails')} style={styles.button} />
-					<MyButton title={"Company Details"} onClick={ () => router.navigate('menuTab/CompanyDetails')} style={styles.button} ></MyButton>
+					<SelectionButtons
+						onClick={() => router.navigate('menuTab/userDetails')}
+						title={'User Details'}
+						index={0}
+						count={2}
+					/>
+					<SelectionButtons
+						onClick={() => router.navigate('menuTab/CompanyDetails')}
+						title={'Company Details'}
+						index={1}
+						count={2}
+					/>
 
 				</View>
 
 
-				<View style={{alignContent: 'center'}}>
-					<MyButton title={'Collaborators'} onClick={ () => router.navigate('menuTab/Collaborators')} style={styles.button}>
-						<Text style={styles.text}>Collaborators</Text> </MyButton>
+				<View>
+					<SelectionButtons
+						title={'Collaborators'}
+						onClick={() => router.navigate('menuTab/Collaborators')}
+						index={0}
+						count={1}
+					/>
 				</View>
 
 
 				<View style={{alignContent: 'center'}}>
+					<SelectionButtons
+						title={'Subscriptions'}
+						onClick={() => router.navigate('menuTab/SubscriptionPlan')}
 
-					<MyButton title={'SubscriptionPlan'} onClick={ () => router.navigate('menuTab/SubscriptionPlan')} style={styles.button }><Text style={styles.text}>Subscription Plan</Text></MyButton>
+					/>
 				</View>
 
 				<View style={{alignContent: 'center'}}>
-					<MyButton title={'Appearance'} onClick={ () => router.navigate('menuTab/Appearance')} style={styles.button }><Text style={styles.text}>Appearance</Text></MyButton>
+					<SelectionButtons
+						title={'Appearance'}
+						onClick={() => router.navigate('menuTab/Appearance')}
+					/>
 				</View>
 
 			</View>

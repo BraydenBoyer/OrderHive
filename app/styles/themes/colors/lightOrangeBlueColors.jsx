@@ -1,14 +1,14 @@
 const colors = {
 
-	primary: '#FEFEFE', // Main color for interactive elements and branding.
-	onPrimary: '#1C1C1C', // Color for text and icons displayed on top of the primary color.
-	primaryContainer: '#FEFEFE', // Background color for elements containing primary color elements.
-	onPrimaryContainer: '#7F7F7F', // Color for text and icons on top of primaryContainer.
+	primary: '#82A2D9', // Main color for interactive elements and branding.
+	onPrimary: '#001323', // Color for text and icons displayed on top of the primary color.
+	primaryContainer: '#D0E4FF', // Background color for elements containing primary color elements.
+	onPrimaryContainer: '#001323', // Color for text and icons on top of primaryContainer.
 
-	secondary: '#1C1C1C', // Supporting color for interactive elements.
-	onSecondary: '#FEFEFE', // Color for text and icons on top of the secondary color.
-	secondaryContainer: '#1C1C1C', // Background color for elements containing secondary color elements.
-	onSecondaryContainer: '#FEFEFE', // Color for text and icons on top of secondaryContainer.
+	secondary: '#D9B982', // Supporting color for interactive elements.
+	onSecondary: '#231000', // Color for text and icons on top of the secondary color.
+	secondaryContainer: '#FFEBD0', // Background color for elements containing secondary color elements.
+	onSecondaryContainer: '#231000', // Color for text and icons on top of secondaryContainer.
 
 	tertiary: '#006D5B', // Accent color for less prominent elements.
 	onTertiary: '#FFFFFF', // Color for text and icons on top of the tertiary color.
@@ -20,10 +20,10 @@ const colors = {
 	errorContainer: '#F9DEDC', // Background color for elements containing error color elements.
 	onErrorContainer: '#410E0B', // Color for text and icons on top of errorContainer.
 
-	background: '#E5E5E5', // Default background color for the application.
-	onBackground: '#1C1B1F', // Color for text and icons on top of the background color.
+	background: '#F8F8F8', // A very light gray, almost white. Provides a neutral backdrop for the blue and orange.
+	onBackground: '#1C1B1F',  // Remains a dark color for good contrast against the light background.
 
-	surface: '#FEFEFE', // Background color for surfaces like cards and sheets.
+	surface: '#FFFFFF', // Pure white for surfaces. This helps cards and sheets stand out against the background and complements both blue and orange.
 	onSurface: '#3A3A3A', // Color for text and icons on top of surface color elements.
 	surfaceVariant: '#E7E0EC', // Alternative background color for surfaces.
 	onSurfaceVariant: '#49454F', // Color for text and icons on top of surfaceVariant color elements.
@@ -55,6 +55,4 @@ const colors = {
 	white: '#ffffff' // White color.
 };
 
-export const lightTheme = {
-	colors
-}
+export const lightOrangeBlueColors = colors

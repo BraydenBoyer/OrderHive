@@ -27,8 +27,8 @@ export const BackHeader = ({title = 'App.OrderHive'}) => {
 
 		<Appbar.Header style={{backgroundColor: colors.primaryContainer}} elevated={true}>
 			<Appbar.BackAction onPress={goBack} />
-			<Appbar.Content color={colors.onPrimaryContainer} title={title} />
-			<Appbar.Action color={colors.onPrimaryContainer} icon={'cog'} onPress={handleSettingsPress} />
+			<Appbar.Content color={colors.onPrimary} title={title} />
+			<Appbar.Action color={colors.onPrimary} icon={'cog'} onPress={handleSettingsPress} />
 		</Appbar.Header>
 	)
 }

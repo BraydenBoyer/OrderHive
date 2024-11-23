@@ -1,4 +1,4 @@
-import {FAB, Portal} from "react-native-paper";
+import {FAB, Portal, useTheme} from "react-native-paper";
 import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 import {useEffect, useState} from "react";
 
@@ -53,12 +53,20 @@ export const LocalFAB = ({actions, icon = ['plus', 'close'], visible}) => {
 	const [state, setState] = useState({ open: false });
 	const onStateChange = ({ open }) => setState({ open });
 	const { open } = state;
+	const colors = useTheme().colors
 
 	useEffect(() => {
 		if( !visible ){
 			setState({open: false})
 		}
 	}, [visible]);
+
+	actions.map((action) => {
+		action.style = {
+			backgroundColor: colors.secondaryContainer,
+		}
+		action.color = colors.onSecondary
+	})
 
 
 	return (!visible) ?
@@ -74,7 +82,8 @@ export const LocalFAB = ({actions, icon = ['plus', 'close'], visible}) => {
 					onStateChange={onStateChange}
 
 					style={styleFab}
-					variant={'primary'}
+					variant={'secondary'}
+
 				/>
 			</Portal>
 		</>

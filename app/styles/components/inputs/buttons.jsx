@@ -13,7 +13,7 @@ export const buttonStyle = StyleSheet.create({
 		borderRadius: roundness.mediumRadius,
 		minWidth: 75,
 		minHeight: 50,
-		backgroundColor: colors.primaryContainer
+		backgroundColor: colors.primary,
 	},
 
 	clearButtonTemplate: {

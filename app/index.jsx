@@ -164,8 +164,9 @@ export default function LoginPage() {
 			</View>
 
 			<Button
-				buttonColor={colors.secondaryContainer}
-				onPress={() => emailLogin('admin@gmail.com', '1234abcd', setErrorCode)}
+				buttonColor={colors.primaryContainer}
+				textColor={colors.onPrimaryContainer}
+				onPress={() => emailLogin('kotan6114@gmail.com', '123456', setErrorCode)}
 			>
 				Dev Door
 			</Button>

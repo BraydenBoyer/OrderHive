@@ -44,7 +44,7 @@ export default function SideBar({ open, setOpen }) {
 				<View>
 					<TouchableOpacity style={styles.overlay} onPress={() => setOpen(false)} activeOpacity={.5} />
 					<View style={styles.sidebar}>
-						<Surface mode={"elevated"} style={[styles.sidebarSurface, {backgroundColor: colors.secondaryContainer} ]} >
+						<Surface mode={"elevated"} style={[styles.sidebarSurface, {backgroundColor: colors.primaryContainer} ]} >
 
 							<Drawer.Section style={styles.section}  title="Organizations" showDivider={true} >
 

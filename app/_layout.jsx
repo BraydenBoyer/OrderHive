@@ -4,17 +4,20 @@ import {basicScreenOption} from "./styles/basicScreenStyling.jsx";
 import {lightTheme} from "./styles/themes/colors/lightTheme.jsx";
 import initializeFirebase from "./firebase/initializeFirebase.js";
 import {StatusBar} from "expo-status-bar";
-import {createContext, useState} from "react";
+import {createContext, useEffect, useState} from "react";
+import {lightOrangeBlueColors} from "./styles/themes/colors/lightOrangeBlueColors.jsx";
 
 // Globally accessible variable
 export const globalVariable = {
 	currentOrg: '',
 	allOrgs: [],
-	colors: lightTheme.colors
+	colors: lightOrangeBlueColors
 }
 
 // Returns a theme object with custom colors.
 export const createTheme = (colors) => {
+
+	globalVariable.colors = colors
 
 	return({
 		...MD3LightTheme,
@@ -23,15 +26,20 @@ export const createTheme = (colors) => {
 	});
 }
 
+const setGlobalColor = (colors) => {
+	globalVariable.colors = colors
+}
+
 // Propagates throughout the app
 export const ThemeContext = createContext();
 
 export default function RootLayout() {
 
 	const materialColors = MD3LightTheme.colors
-	const myTheme = lightTheme
+	let myTheme = lightOrangeBlueColors
 
-	const [hiveTheme, setHiveTheme] = useState(createTheme(myTheme.colors))
+	const [hiveTheme, setHiveTheme] = useState(createTheme(myTheme))
+
 
 	//Work on status bar here?
 

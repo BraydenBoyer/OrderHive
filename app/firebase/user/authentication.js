@@ -1,4 +1,4 @@
-import {getAuth, signInWithEmailAndPassword, signOut,updatePassword,updateEmail,verifyBeforeUpdateEmail} from 'firebase/auth'
+import {getAuth, sendEmailVerification, signInWithEmailAndPassword, signOut,updatePassword,updateEmail,verifyBeforeUpdateEmail} from 'firebase/auth'
 import {fireApp, fireAuth, fireDb} from "../initializeFirebase.js";
 import {doc, updateDoc} from "firebase/firestore";
 import {getCurrentUserInfo} from "./userFunctions.js";
@@ -43,18 +43,29 @@ export const updateUserPassword = async (password) => {
 
 
 export const updateUserEmail = async (email) => {
+	let res = '0'
+
 	try {
 		const user = fireAuth.currentUser;
 
 		// Initiate email update and verification
-		await verifyBeforeUpdateEmail(user, email);
+		await updateEmail(user, email);
 
-		// const userRef = doc(fireDb, "users", user.uid);
-		// await updateDoc(userRef, { email: email });
+		const userRef = doc(fireDb, "users", user.uid);
+		await updateDoc(userRef, { email: email });
 
-		console.log("Verification email sent. Please verify to update your email.");
+		console.log(`New email ${email} has been applied.`);
 
 	} catch (error) {
-		console.error("Error initiating email update:", error);
+		console.warn("Error initiating email update:", error);
+		res = error.code
 	}
+
+	return res
+}
+
+
+export const verifyUserEmail = async () => {
+
+	await sendEmailVerification(fireAuth.currentUser)
 }
