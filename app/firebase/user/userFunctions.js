@@ -124,3 +124,13 @@ export const updateUserUsername = async (name) => {
 	}
 	await updateDoc(userRef,update)
 }
+
+export const updateUserPhone = async (phone) => {
+	const userInfo = await getCurrentUserInfo()
+	const userID = userInfo.userID
+	const userRef = doc(fireDb, "users", fireAuth.currentUser.uid)
+	const update = {
+		phone: phone
+	}
+	await updateDoc(userRef,update)
+}
