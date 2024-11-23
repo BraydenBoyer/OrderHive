@@ -6,11 +6,14 @@ import {TextInput, useTheme} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
 import { auth, db } from "../../firebase/initializeFirebase.js";
-import { doc, getDoc, updateDoc} from "firebase/firestore";
+import {collection, doc, getDoc, getDocs, query, updateDoc, where} from "firebase/firestore";
 
 import { fireDb } from "../../firebase/initializeFirebase.js";
-import {getCurrentUserInfo,updateUserPhoneNumber,updateUserPassword,updateUserUsername,updateUserEmail} from "../../firebase/user/userFunctions.js";
+import {getCurrentUserInfo,updateUserPhoneNumber,updateUserUsername} from "../../firebase/user/userFunctions.js";
 import {useFocusEffect} from "expo-router";
+import {updateUserEmail, updateUserPassword} from "../../firebase/user/authentication.js";
+import {getOrg} from "../../firebase/user/organizationFunctions.js";
+import {globalVariable} from "../../_layout.jsx";
 
 
 export default function MenuPage() {
@@ -38,12 +41,29 @@ export default function MenuPage() {
     }, []);
 
 
-
+    
     const handleEditToggleUn = () => {
         setIsEditableUN(!isEditableUN);
         if (isEditableUN) {
             (
                 async () => {
+
+                    const currOrg = "Org." + globalVariable.currentOrg;
+                    const collaboratorRef = collection(
+                        fireDb,
+                        `organizations/${currOrg}/collaborators`
+                    );
+                    const querySnapshot = await getDocs(collaboratorRef);
+
+                    const collaboratorData = querySnapshot.docs.map((doc) => ({
+                        name: doc.data().name,
+                        role: doc.data().role,
+                    }));
+
+                    console.log("Collaborator Data:", collaboratorData);
+
+
+
                     await updateUserUsername(textUN)
                 }
             )()
@@ -53,6 +73,17 @@ export default function MenuPage() {
 
     const handleEditTogglePass = () => {
         setIsEditablePass(!isEditablePass);
+        if(isEditablePass){
+            (
+
+                async () =>{
+                    console.log('test')
+                    await updateUserPassword(textPass)
+                    console.log('test')
+                }
+
+            )()
+        }
     };
 
     const handleEditToggleEm = () => {
@@ -60,7 +91,9 @@ export default function MenuPage() {
         if(isEditableEm){
             (
                 async () => {
-                    await updateUserEmail(setIsEditableEm)
+                    console.log('test')
+                    await updateUserEmail(textEm)
+                    console.log('test')
                 }
             )()
         }

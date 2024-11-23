@@ -1,38 +1,35 @@
-import {
-    StyleSheet,
-    Text,
-    View,
-    FlatList,
-    TouchableOpacity,
-    Alert,
-    Modal,
-    TextInput,
-} from "react-native";
+import {StyleSheet, Text, View, FlatList, TouchableOpacity, Alert, Modal, TextInput,} from "react-native";
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
 import { MyButton } from "../../../components/inputs/MyButton.jsx";
 import {getCurrentUserInfo} from "../../firebase/user/userFunctions.js";
+import {useFocusEffect} from "expo-router";
+import {getOrg} from "../../firebase/user/organizationFunctions.js";
+import {globalVariable} from "../../_layout.jsx";
+import {addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where} from "firebase/firestore";
+import {fireDb} from "../../firebase/initializeFirebase.js";
+import CollaboratorsList from "./CollaboratorList.jsx";
+
 
 export default function MenuPage() {
-
-
-
+    useFocusEffect(
+        useCallback(async () => {
+            await fetchCollaborators();
+        }, [])
+    );
 
     const [visibleSections, setVisibleSections] = useState({
         admins: false,
         editors: false,
-        collaborators: false,
     });
     const [editMode, setEditMode] = useState({
         admins: false,
         editors: false,
-        collaborators: false,
     });
     const [currentPage, setCurrentPage] = useState({
         admins: 1,
         editors: 1,
-        collaborators: 1,
     });
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -41,35 +38,25 @@ export default function MenuPage() {
 
     const itemsPerPage = 5;
 
-    const [admins, setAdmins] = useState([
-        { id: 1, name: "Alice" },
-        { id: 2, name: "Bob" },
-        { id: 3, name: "Charlie" },
-        { id: 4, name: "David" },
-        { id: 5, name: "Eve" },
-        { id: 6, name: "Frank" },
-        { id: 7, name: "Grace" },
-    ]);
+    const [admins, setAdmins] = useState([]);
+    const [editors, setEditors] = useState([]);
+    const fetchCollaborators = async () => {
+        const currOrg = "Org." + globalVariable.currentOrg;
+        const collaboratorRef = collection(
+            fireDb,
+            `organizations/${currOrg}/collaborators`
+        );
+        const querySnapshot = await getDocs(collaboratorRef);
 
-    const [editors, setEditors] = useState([
-        { id: 8, name: "Hannah" },
-        { id: 9, name: "Ian" },
-        { id: 10, name: "Jack" },
-        { id: 11, name: "Karen" },
-        { id: 12, name: "Leo" },
-        { id: 13, name: "Mia" },
-        { id: 14, name: "Nathan" },
-    ]);
+        const collaboratorData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            name: doc.data().name,
+            role: doc.data().role,
+        }));
 
-    const [collaborators, setCollaborators] = useState([
-        { id: 15, name: "Olivia" },
-        { id: 16, name: "Paul" },
-        { id: 17, name: "Quinn" },
-        { id: 18, name: "Rachel" },
-        { id: 19, name: "Sam" },
-        { id: 20, name: "Tina" },
-        { id: 21, name: "Uma" },
-    ]);
+        setAdmins(collaboratorData.filter((user) => user.role === "admin"));
+        setEditors(collaboratorData.filter((user) => user.role === "editor"));
+    };
 
     const toggleSection = (section) => {
         setVisibleSections((prevState) => ({
@@ -90,29 +77,66 @@ export default function MenuPage() {
         setModalVisible(true);
     };
 
-    const confirmAddItem = () => {
+    const confirmAddItem = async () => {
         if (newItemName.trim() === "") {
             Alert.alert("Error", "Name cannot be empty.");
             return;
         }
 
-        const newItem = { id: Date.now(), name: newItemName.trim() };
+        const currOrg = "Org." + globalVariable.currentOrg;
+        const collaboratorRef = collection(
+            fireDb,
+            `organizations/${currOrg}/collaborators`
+        );
 
-        if (targetSection === "admins") setAdmins((prev) => [...prev, newItem]);
-        if (targetSection === "editors") setEditors((prev) => [...prev, newItem]);
-        if (targetSection === "collaborators")
-            setCollaborators((prev) => [...prev, newItem]);
+        try {
+            const docRef = await addDoc(collaboratorRef, {
+                name: newItemName.trim(),
+                role: targetSection === "admins" ? "admin" : "editor",
+            });
+            console.log("Document written with ID: ", docRef.id);
+            fetchCollaborators();
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
 
         setNewItemName("");
         setTargetSection("");
         setModalVisible(false);
     };
 
-    const handleRemoveItem = (section, id) => {
-        if (section === "admins") setAdmins((prev) => prev.filter((item) => item.id !== id));
-        if (section === "editors") setEditors((prev) => prev.filter((item) => item.id !== id));
-        if (section === "collaborators")
-            setCollaborators((prev) => prev.filter((item) => item.id !== id));
+    const handleRemoveItem = async (section, id) => {
+        const currOrg = "Org." + globalVariable.currentOrg;
+        const collaboratorRef = doc(
+            fireDb,
+            `organizations/${currOrg}/collaborators`,
+            id
+        );
+
+        try {
+            await deleteDoc(collaboratorRef);
+            await fetchCollaborators();
+        } catch (e) {
+            console.error("Error removing document: ", e);
+        }
+    };
+
+    const handleChangeRole = async (section, id) => {
+        const currOrg = "Org." + globalVariable.currentOrg;
+        const collaboratorRef = doc(
+            fireDb,
+            `organizations/${currOrg}/collaborators`,
+            id
+        );
+
+        try {
+            await updateDoc(collaboratorRef, {
+                role: section === "admins" ? "editor" : "admin",
+            });
+            await fetchCollaborators();
+        } catch (e) {
+            console.error("Error updating document: ", e);
+        }
     };
 
     const handleNextPage = (section) => {
@@ -131,11 +155,14 @@ export default function MenuPage() {
 
     const renderSection = (section, data) => {
         const startIndex = (currentPage[section] - 1) * itemsPerPage;
-        const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedData = data.slice(startIndex, endIndex);
 
         return (
             <View style={styles.sectionContainer}>
-                <Text style={styles.text}>{section.charAt(0).toUpperCase() + section.slice(1)}</Text>
+                <Text style={styles.text}>
+                    {section.charAt(0).toUpperCase() + section.slice(1)}
+                </Text>
                 <View style={styles.inputContainer}>
                     <Text style={styles.subText}>Count: {data.length} |</Text>
                     <MyButton
@@ -150,33 +177,16 @@ export default function MenuPage() {
                 </View>
                 {visibleSections[section] && (
                     <>
-                        <FlatList
+                        <CollaboratorsList
                             data={paginatedData}
-                            keyExtractor={(item) => item.id.toString()}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    style={styles.listItem}
-                                    onPress={() =>
-                                        Alert.alert(
-                                            "Modify Person",
-                                            `What do you want to do with ${item.name}?`,
-                                            [
-                                                {
-                                                    text: "Remove",
-                                                    onPress: () => handleRemoveItem(section, item.id),
-                                                },
-                                                { text: "Cancel", style: "cancel" },
-                                            ]
-                                        )
-                                    }
-                                >
-                                    <Text>{item.name}</Text>
-                                </TouchableOpacity>
-                            )}
-                            scrollEnabled={false}
+                            onRemove={(id) => handleRemoveItem(section, id)}
+                            onChangeRole={(id) => handleChangeRole(section, id)}
                         />
                         {editMode[section] && (
-                            <MyButton title="Add Person" onClick={() => handleAddItem(section)} />
+                            <MyButton
+                                title="Add Person"
+                                onClick={() => handleAddItem(section)}
+                            />
                         )}
                         <View style={styles.paginationContainer}>
                             <MyButton
@@ -185,12 +195,13 @@ export default function MenuPage() {
                                 disabled={currentPage[section] === 1}
                             />
                             <Text style={styles.pageIndicator}>
-                                Page {currentPage[section]} of {Math.ceil(data.length / itemsPerPage)}
+                                Page {currentPage[section]} of{" "}
+                                {Math.ceil(data.length / itemsPerPage)}
                             </Text>
                             <MyButton
                                 title="Next"
                                 onClick={() => handleNextPage(section)}
-                                disabled={startIndex + itemsPerPage >= data.length}
+                                disabled={endIndex >= data.length}
                             />
                         </View>
                     </>
@@ -204,13 +215,12 @@ export default function MenuPage() {
             <View style={styles.container}>
                 {renderSection("admins", admins)}
                 {renderSection("editors", editors)}
-                {renderSection("collaborators", collaborators)}
 
-                {/* Modal for adding new item */}
                 <Modal visible={modalVisible} transparent animationType="slide">
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
-                            <Text style={styles.modalText}>Enter a name:</Text>
+                            <Text style={styles.modalText}>Enter
+                                a name:</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="Name"
@@ -282,13 +292,15 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
-    modalContent: {
-        width: "80%",
-        padding: 20,
-        backgroundColor: lightTheme.colors.white,
-        borderRadius: 10,
-        alignItems: "center",
-    },
+    modalContent:
+        {
+            width: "80%",
+            padding: 20,
+            backgroundColor:
+            lightTheme.colors.white,
+            borderRadius: 10,
+            alignItems: "center",
+        },
     modalText: {
         fontSize: 18,
         marginBottom: 10,
@@ -309,3 +321,5 @@ const styles = StyleSheet.create({
         width: "100%",
     },
 });
+
+

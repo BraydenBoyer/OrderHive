@@ -1,15 +1,21 @@
 import {StyleSheet, Text,View} from "react-native";
 import {BackDrop} from "../../../components/overlays/Backdrop.jsx";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState,useCallback} from "react";
 import {TextInput, useTheme} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
+import {globalVariable} from "../../_layout.jsx";
+import {getOrg} from "../../firebase/user/organizationFunctions.js";
+import {useFocusEffect} from "expo-router";
 import {auth, db, fireDb} from "../../firebase/initializeFirebase.js";
 import {collection, doc, getDoc, getDocs, updateDoc} from "firebase/firestore";
 import {getCurrentUserInfo} from "../../firebase/user/userFunctions.js";
 
 
 export default function MenuPage() {
+
+
+
     const [textON, setTextON] = React.useState("");
     const [textAdd, setTextAdd] = React.useState("");
     const [textEm, setTextEm] = React.useState("");
@@ -21,28 +27,27 @@ export default function MenuPage() {
     const [isEditableEm, setIsEditableEm] = useState(false);
     const [isEditablePN, setIsEditablePN] = useState(false);
 
+    useFocusEffect(
+        useCallback( ()=>{
+            (async () =>{
+                const orgInfo = await getOrg(globalVariable.currentOrg);
+                setTextON(orgInfo.name);
+                setTextAdd(orgInfo.location);
+                //setTextEm(orgInfo.email);
+                //setTextPM(orgInfo.phone);
 
-    useEffect(() => {
-        (
-            async () =>{
-                let userDetails = await getCurrentUserInfo()
-                let userID = userDetails.id;
+            })()
+            //return () =>{}
+        },[])
+    )
 
-                /*
-                const orgRef = collection(fireDb,`users/'+userId+'/organizations`);
-                const userRef = await getDocs(orgRef);
-                console.log(userRef)
-                */
-
-
-
-            }
-        )()
-    }, []);
+        //when screen comes into focus, getOrg gets called
+        //if put a return statement, gets called when leave scereen
 
 
     const handleEditToggleON = () => {
         setIsEditableON(!isEditableON);
+
     };
 
     const handleEditToggleAdd = () => {

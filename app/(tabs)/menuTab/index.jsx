@@ -9,19 +9,8 @@ import {Button} from 'react-native-paper'
 
 export default function MenuPage() {
 
-	const {setFabVisible} = useContext(AppContext)
 
-	useFocusEffect(
-		useCallback(() => {
-			// If you want to do something when screen is focused
-			setFabVisible(true)
 
-			return () => {
-				// If you want to do something when screen is unfocused
-
-			}
-		}, [])
-	)
 
 
 

@@ -111,3 +111,16 @@ export const getUserOrgs = async () => {
 
 	return snapshot.docs.map(doc => doc.data());
 }
+
+
+
+
+export const updateUserUsername = async (name) => {
+	const userInfo = await getCurrentUserInfo()
+	const userID = userInfo.userID
+	const userRef = doc(fireDb, "users", fireAuth.currentUser.uid)
+	const update = {
+		name: name
+	}
+	await updateDoc(userRef,update)
+}
