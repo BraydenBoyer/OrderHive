@@ -9,7 +9,7 @@ import {roundness} from "../../app/styles/themes/roundness/roundness.jsx";
  *      - value: Current value of the TextInput.
  *      - onChangeText: Set function to handle text input changes.
  */
-export const MyTextInput = ({placeholder, value, onChangeText, editable, style}) => {
+export const MyTextInput = ({placeholder, value, onChangeText, editable, style, keyboardType}) => {
 
 	const styles = textInputStyles()
 	const colors = useTheme().colors
@@ -27,6 +27,7 @@ export const MyTextInput = ({placeholder, value, onChangeText, editable, style})
 			onChangeText={onChangeText}
 			activeUnderlineColor={colors.onPrimaryContainer}
 			editable={editable}
+			keyboardType={keyboardType}
 		/>
 	)
 }

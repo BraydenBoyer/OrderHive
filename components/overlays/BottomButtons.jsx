@@ -63,7 +63,9 @@ const styles = StyleSheet.create({
 
 	button: {
 		flex: 1,
-		backgroundColor: colors.inversePrimary
+		height: '100%',
+		width: '100%',
+		backgroundColor: colors.primary
 	},
 
 	container: {
@@ -76,5 +78,9 @@ const styles = StyleSheet.create({
 		columnGap: 15,
 		borderTopRightRadius: roundness.largeRadius,
 		borderTopLeftRadius: roundness.largeRadius,
+		borderColor: colors.onPrimary,
+		borderTopWidth: 1,
+		borderRightWidth: 1,
+		borderLeftWidth: 1
 	}
 })

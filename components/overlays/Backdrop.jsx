@@ -54,7 +54,7 @@ export const BackDrop = ({ children, style, mainHeader = true, title = 'App.Orde
 			}
 			<ScrollView
 				style={{width: '100%'}}
-				contentContainerStyle={{flexGrow: 1, paddingBottom: 35}}
+				contentContainerStyle={{flexGrow: 1, paddingBottom: 65}}
 				showsVerticalScrollIndicator={false}
 				horizontal={false}
 			>

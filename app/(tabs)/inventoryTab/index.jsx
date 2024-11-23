@@ -1,6 +1,6 @@
 import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB, Menu } from "react-native-paper";
+import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB, Menu, Searchbar } from "react-native-paper";
 import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
 import { addInventoryItem } from '../../firebase/addItem.js';
@@ -15,6 +15,9 @@ import {getAllOrganizations} from '../../firebase/user/organizationFunctions.js'
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import {BottomButtons} from "../../../components/overlays/BottomButtons.jsx";
+import {InventoryCard} from "../../../components/InventoryCard.jsx";
+import {MySeachBar} from "../../../components/MySeachBar.jsx";
+import {MyTextInput} from "../../../components/inputs/MyTextInput.jsx";
 
 
 export default function InventoryPage() {
@@ -245,14 +248,14 @@ const getItemNameById = (inventoryID) => {
   return null; // Return null if not found
 };
 
-    const clearInputFields = () => {
-      setNewItemName('');
-      setNewItemPrice('');
-      setNewItemCategory('');
-      setNewItemTotal('');
-      setNewItemHold('');
+  const clearInputFields = () => {
+    setNewItemName('');
+    setNewItemPrice('');
+    setNewItemCategory('');
+    setNewItemTotal('');
+    setNewItemHold('');
 
-    };
+  };
 
   const handleAddItems = async () => {
     if (!newItemCategory || !newItemName || !newItemPrice || !newItemTotal || !newItemHold) {
@@ -298,18 +301,21 @@ const getItemNameById = (inventoryID) => {
       console.error("Error adding item or creating category:", error);
     }
   };
-    //for local fab
-    useFocusEffect(
-        useCallback(() => {
 
-            setVisible(true)
 
-            return () => {
-                setVisible(false)
-            }
-        }, [setVisible])
-    )
+  //for local fab
+  useFocusEffect(
+      useCallback(() => {
 
+          setVisible(true)
+
+          return () => {
+              setVisible(false)
+          }
+      }, [setVisible])
+  )
+
+  const [searchTxt, setSearchTxt] = useState('')
 
   return (
 
@@ -317,31 +323,37 @@ const getItemNameById = (inventoryID) => {
 
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
+
+            <MySeachBar
+                placeholder={'Search'}
+                value={searchTxt}
+                onChangeText={setSearchTxt}
+                style={{marginBottom: 20}}
+            >
+
+            </MySeachBar>
+
             <View style={styles.inventoryList}>
               {Object.keys(groupedInventoryData).map((category) => (
                 <View key={category} style={styles.categorySection}>
-                  <Text style={[styles.categoryTitle, { color: colors.onBackground }]}>{category}</Text>
+
+                  <Text variant={'titleLarge'} style={[styles.categoryTitle]}>
+                    {category}
+                  </Text>
                   {groupedInventoryData[category].map((item) => {
                     console.log("Rendering item:", item); // Log the item being rendered
                     return (
-                        <Card key={item.id || `${category}-${item.name}`} style={[styles.card, { backgroundColor: colors.primaryContainer }]}>
-                          <Card.Content style={styles.cardContent}>
-                            {isDeleteMode && (
-                                <Checkbox
-                                  status={selectedItems.includes(item.id) ? "checked" : "unchecked"} // Use ID for selection
-                                  onPress={() => handleSelectItem(item.id)} // Pass ID directly
-                                />
-                            )}
-                            <View style={styles.cardText}>
-                              <Text style={[styles.itemName, { color: colors.onSurface }]}>{item.name}</Text>
-                              <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>{item.price}</Text>
-                              <Text style={[styles.details, { color: colors.onSurfaceVariant }]}>
-                                Total: {item.total}   Hold: {item.hold}
-                              </Text>
-
-                            </View>
-                          </Card.Content>
-                        </Card>
+                        <InventoryCard
+                            title={item.name}
+                            inventory={item.total}
+                            claimed={item.hold}
+                            metadata={['Lettuce', 'Greens', 'Hydroponic']}
+                            retail={item.price}
+                            wholesale={item.wholesale}
+                            checkboxVisible={isDeleteMode}
+                            checkboxStatus={selectedItems.includes(item.id) ? "checked" : "unchecked"}
+                            onCheckboxPress={() => handleSelectItem(item.id)}
+                        />
                     );
                   })}
                 </View>
@@ -384,11 +396,11 @@ const getItemNameById = (inventoryID) => {
             <View style={styles.modalContainer}>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Add Item</Text>
-                <TextInput placeholder="Product Name" style={styles.input} value={newItemName} onChangeText={setNewItemName} />
-                <TextInput placeholder="Sales Cost" style={styles.input} keyboardType="numeric" value={newItemPrice} onChangeText={setNewItemPrice} />
-                <TextInput placeholder="New Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
-                <TextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
-                <TextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
+                <MyTextInput placeholder="Product Name" style={styles.input} value={newItemName} onChangeText={setNewItemName} />
+                <MyTextInput placeholder="Sales Cost" style={styles.input} keyboardType="numeric" value={newItemPrice} onChangeText={setNewItemPrice} />
+                <MyTextInput placeholder="New Category (e.g., Lettuce, Bread)" style={styles.input} value={newItemCategory} onChangeText={setNewItemCategory} />
+                <MyTextInput placeholder="Total Quantity" style={styles.input} keyboardType="numeric" value={newItemTotal} onChangeText={setNewItemTotal} />
+                <MyTextInput placeholder="Hold Quantity" style={styles.input} keyboardType="numeric" value={newItemHold} onChangeText={setNewItemHold} />
                 <Dropdown
                   style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                   placeholderStyle={styles.placeholderStyle}
@@ -420,26 +432,28 @@ const getItemNameById = (inventoryID) => {
                   )}
                 />
                 <Menu
-                                        visible={menuVisible}
-                                        onDismiss={() => setMenuVisible(false)}
-                                        anchor={
-                                          <Button
-                                            mode="outlined"
-                                            onPress={() => setMenuVisible(true)}
-                                            style={styles.dropdownButton}
-                                          >
-                                            {currentOrg || "Select an Organization"}
-                                          </Button>
-                                        }
-                                      >
-                                        {allOrgs.map((org) => (
-                                          <Menu.Item
-                                            key={org.id}
-                                            onPress={() => handleSelectOrganization(org)}
-                                            title={org.name}
-                                          />
-                                        ))}
-                                      </Menu>
+                    visible={menuVisible}
+                    onDismiss={() => setMenuVisible(false)}
+                    anchor={
+                  <Button
+                      mode="outlined"
+                      onPress={() => setMenuVisible(true)}
+                      style={styles.dropdownButton}
+                  >
+                    {currentOrg || "Select an Organization"}
+                  </Button>
+
+                }
+
+                >
+                  {allOrgs.map((org) => (
+                      <Menu.Item
+                          key={org.id}
+                          onPress={() => handleSelectOrganization(org)}
+                          title={org.name}
+                      />
+                  ))}
+                </Menu>
 
                 <View style={styles.buttonContainer}>
                   <Button mode="outlined" onPress={() => setAddModalVisible(false)} style={styles.cancelButton} color={colors.onSurface}>
@@ -460,7 +474,6 @@ const getItemNameById = (inventoryID) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   orgTitle: {
       fontSize: 16,
@@ -478,11 +491,11 @@ const styles = StyleSheet.create({
   categorySection: {
     width: "100%",
     marginBottom: 16,
+    rowGap: 10
   },
   categoryTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
     marginBottom: 8,
+    fontWeight: 'bold'
   },
   card: {
     width: "100%",
