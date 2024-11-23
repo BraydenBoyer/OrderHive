@@ -10,7 +10,7 @@ import { Tabs, useFocusEffect } from "expo-router";
 import {globalVariable} from '../../_layout.jsx'
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
+import {BottomButtons} from "../../../components/overlays/BottomButtons.jsx";
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
@@ -257,16 +257,21 @@ export default function CustomerPage() {
 
         {isDeleteMode && (
           <View style={[styles.deleteFooter, { backgroundColor: colors.errorContainer }]}>
-            <IconButton
-              icon="delete"
-              size={30}
-              color={colors.onError}
-              onPress={handleDeleteCustomers}
-              style={styles.trashIcon}
+            <BottomButtons
+                visible={true} // Toggle visibility
+                firstTitle="Delete"
+                secondTitle="Cancel"
+                firstOnClick={() => {
+                  // Logic for delete action
+                  console.log("Delete action triggered");
+                  handleDeleteCustomers();
+                }}
+                secondOnClick={() => {
+                  // Logic for cancel action
+                  console.log("Cancel action triggered");
+                  setDeleteMode(false); //reset delete mode
+                }}
             />
-            <Button mode="text" onPress={() => setDeleteMode(false)} style={styles.cancelButton} color={colors.onError}>
-              Cancel
-            </Button>
           </View>
         )}
         <LocalFAB visible={visible} icon={['plus', 'trashIcon']} actions={[
