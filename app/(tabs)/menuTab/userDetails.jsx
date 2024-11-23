@@ -170,7 +170,7 @@ export default function MenuPage() {
                                 style={styles.textInput}
                             />
                             <MyButton
-                                title={isEditablePass ? "Save" : "Edit"}
+                                title={isEditableEm ? "Save" : "Edit"}
                                 onClick={handleEditToggleEm}
                                 style={styles.button}
                             />
@@ -189,7 +189,7 @@ export default function MenuPage() {
                                 style={styles.textInput}
                             />
                             <MyButton
-                                title={isEditablePass ? "Save" : "Edit"}
+                                title={isEditablePn ? "Save" : "Edit"}
                                 onClick={handleEditTogglePn}
                                 style={styles.button}
                             />

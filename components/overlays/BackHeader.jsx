@@ -3,12 +3,13 @@ import {Link, router} from "expo-router";
 import SideBar from "./SideBar.jsx";
 import * as React from "react";
 import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
+import {globalVariable} from "../../app/_layout.jsx";
 
 
 export const BackHeader = ({title = 'App.OrderHive'}) => {
 
 
-	const colors = lightTheme.colors
+	const colors = globalVariable.colors
 
 	const handleSettingsPress = () => {
 

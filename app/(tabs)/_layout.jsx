@@ -22,11 +22,11 @@ export default function TabLayout() {
 			>
 
 				<Tabs.Screen
-					name="collaboratorTab"
+					name="dashboardTab"
 					options={{
-						title: 'collab',
+						title: 'Dashboard',
 						tabBarIcon: ({ color }) => (
-							<TabBarIcon name="cloud" color={color} />
+							<TabBarIcon name="dashboard" color={color} />
 						),
 					}}
 				/>
@@ -34,9 +34,9 @@ export default function TabLayout() {
 				<Tabs.Screen
 					name="customerTab"
 					options={{
-						title: 'customer',
+						title: 'Customer',
 						tabBarIcon: ({ color }) => (
-							<TabBarIcon name="cloud" color={color} />
+							<TabBarIcon name="handshake" color={color} />
 						),
 					}}
 				/>
@@ -44,19 +44,19 @@ export default function TabLayout() {
 				<Tabs.Screen
 					name="inventoryTab"
 					options={{
-						title: 'inventory',
+						title: 'Inventory',
 						tabBarIcon: ({ color }) => (
-							<TabBarIcon name="settings" color={color} />
+							<TabBarIcon name="inventory" color={color} />
 						),
 					}}
 				/>
 
 				<Tabs.Screen
-					name="dashboardTab"
+					name="collaboratorTab"
 					options={{
-						title: 'Dashboard',
+						title: 'Collaborator',
 						tabBarIcon: ({ color }) => (
-							<TabBarIcon name="stop" color={color} />
+							<TabBarIcon name="groups" color={color} />
 						),
 					}}
 				/>
