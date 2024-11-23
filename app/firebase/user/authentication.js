@@ -37,7 +37,7 @@ export const updateUserEmail = async (email) => {
 
 		// Initiate email update and verification
 		await verifyBeforeUpdateEmail(user, email);
-		// Update Firestore document (optional, you might want to wait for verification)
+
 		// const userRef = doc(fireDb, "users", user.uid);
 		// await updateDoc(userRef, { email: email });
 
