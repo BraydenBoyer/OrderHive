@@ -1,6 +1,18 @@
 import { Tabs, useFocusEffect } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
-import { Text, Button, Checkbox, Card, IconButton, Divider, useTheme, FAB, Menu, Searchbar } from "react-native-paper";
+import {
+  Text,
+  Button,
+  Checkbox,
+  Card,
+  IconButton,
+  Divider,
+  useTheme,
+  FAB,
+  Menu,
+  Searchbar,
+  ActivityIndicator
+} from "react-native-paper";
 import { useContext, useState, useEffect, useCallback } from "react";
 import { AppContext } from "../_layout.jsx";
 import { addInventoryItem } from '../../firebase/addItem.js';
@@ -329,36 +341,44 @@ const getItemNameById = (inventoryID) => {
                 value={searchTxt}
                 onChangeText={setSearchTxt}
                 style={{marginBottom: 20}}
-            >
+            />
 
-            </MySeachBar>
+            {
+              Object.keys(groupedInventoryData).length === 0 ?
+                  <ActivityIndicator
+                      animating={true}
+                      size={'large'}
+                  />
+                  :
+                  <View style={styles.inventoryList}>
+                    {Object.keys(groupedInventoryData).map((category) => (
+                        <View key={category} style={styles.categorySection}>
 
-            <View style={styles.inventoryList}>
-              {Object.keys(groupedInventoryData).map((category) => (
-                <View key={category} style={styles.categorySection}>
+                          <Text variant={'titleLarge'} style={[styles.categoryTitle]}>
+                            {category}
+                          </Text>
+                          {groupedInventoryData[category].map((item) => {
+                            console.log("Rendering item:", item); // Log the item being rendered
+                            return (
+                                <InventoryCard
+                                    title={item.name}
+                                    inventory={item.total}
+                                    claimed={item.hold}
+                                    metadata={['Lettuce', 'Greens', 'Hydroponic']}
+                                    retail={item.price}
+                                    wholesale={item.wholesale}
+                                    checkboxVisible={isDeleteMode}
+                                    checkboxStatus={selectedItems.includes(item.id) ? "checked" : "unchecked"}
+                                    onCheckboxPress={() => handleSelectItem(item.id)}
+                                />
+                            );
+                          })}
+                        </View>
+                    ))}
+                  </View>
+            }
 
-                  <Text variant={'titleLarge'} style={[styles.categoryTitle]}>
-                    {category}
-                  </Text>
-                  {groupedInventoryData[category].map((item) => {
-                    console.log("Rendering item:", item); // Log the item being rendered
-                    return (
-                        <InventoryCard
-                            title={item.name}
-                            inventory={item.total}
-                            claimed={item.hold}
-                            metadata={['Lettuce', 'Greens', 'Hydroponic']}
-                            retail={item.price}
-                            wholesale={item.wholesale}
-                            checkboxVisible={isDeleteMode}
-                            checkboxStatus={selectedItems.includes(item.id) ? "checked" : "unchecked"}
-                            onCheckboxPress={() => handleSelectItem(item.id)}
-                        />
-                    );
-                  })}
-                </View>
-              ))}
-            </View>
+
           </ScrollView>
 
           {isDeleteMode && (
