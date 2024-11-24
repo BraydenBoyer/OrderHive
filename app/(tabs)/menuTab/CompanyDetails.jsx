@@ -70,6 +70,7 @@ export default function MenuPage() {
             (
                 async () => {
                     await updateCompanyAddress(textAdd)
+
                 }
             )()
         }

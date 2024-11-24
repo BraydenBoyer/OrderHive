@@ -167,6 +167,7 @@ export const updateCompanyEmail = async (email) => {
 
     const currOrg = "Org." + globalVariable.currentOrg;
 
+
     const companyRef = doc(fireDb, "organizations", currOrg)
     const update = {
         email: email
