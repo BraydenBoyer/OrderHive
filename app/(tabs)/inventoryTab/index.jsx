@@ -133,6 +133,7 @@ useFocusEffect(
   );
 
 
+
   const handleSelectItem = (inventoryID) => {
     setSelectedItems((prevSelected) => {
       //check if item has been selected already
@@ -329,6 +330,16 @@ const getItemNameById = (inventoryID) => {
 
   const [searchTxt, setSearchTxt] = useState('')
 
+   const filteredData = Object.fromEntries(
+     Object.entries(groupedInventoryData).map(([category, items]) => [
+       category,
+       items.filter((item) =>
+         item.name.toLowerCase().includes(searchTxt.toLowerCase())
+       ),
+     ])
+   );
+
+
   return (
 
       <BackDrop title={"InventoryTab"} >
@@ -344,20 +355,20 @@ const getItemNameById = (inventoryID) => {
             />
 
             {
-              Object.keys(groupedInventoryData).length === 0 ?
+              Object.keys(filteredData).length === 0 ?
                   <ActivityIndicator
                       animating={true}
                       size={'large'}
                   />
                   :
                   <View style={styles.inventoryList}>
-                    {Object.keys(groupedInventoryData).map((category) => (
+                    {Object.keys(filteredData).map((category) => (
                         <View key={category} style={styles.categorySection}>
 
                           <Text variant={'titleLarge'} style={[styles.categoryTitle]}>
                             {category}
                           </Text>
-                          {groupedInventoryData[category].map((item) => {
+                          {filteredData[category].map((item) => {
                             console.log("Rendering item:", item); // Log the item being rendered
                             return (
                                 <InventoryCard
