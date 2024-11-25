@@ -5,11 +5,16 @@ import {TextInput, useTheme} from "react-native-paper";
 import {lightTheme} from "../../styles/themes/colors/lightTheme.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
 import {globalVariable} from "../../_layout.jsx";
-import {getOrg} from "../../firebase/user/organizationFunctions.js";
+import {
+    getOrg, updateCompanyAddress,
+    updateCompanyEmail,
+    updateCompanyName,
+    updateCompanyPhone
+} from "../../firebase/user/organizationFunctions.js";
 import {useFocusEffect} from "expo-router";
 import {auth, db, fireDb} from "../../firebase/initializeFirebase.js";
 import {collection, doc, getDoc, getDocs, updateDoc} from "firebase/firestore";
-import {getCurrentUserInfo} from "../../firebase/user/userFunctions.js";
+import {getCurrentUserInfo, updateUserUsername} from "../../firebase/user/userFunctions.js";
 import {editablePageStyle} from "../../styles/pageType/editablePageStyle.jsx";
 import {MyTextInput} from "../../../components/inputs/MyTextInput.jsx";
 
@@ -35,8 +40,8 @@ export default function MenuPage() {
                 const orgInfo = await getOrg(globalVariable.currentOrg);
                 setTextON(orgInfo.name);
                 setTextAdd(orgInfo.location);
-                //setTextEm(orgInfo.email);
-                //setTextPM(orgInfo.phone);
+                setTextEm(orgInfo.email);
+                setTextPN(orgInfo.phone);
 
             })()
             //return () =>{}
@@ -49,19 +54,49 @@ export default function MenuPage() {
 
     const handleEditToggleON = () => {
         setIsEditableON(!isEditableON);
+        if (isEditableON) {
+            (
+                async () => {
+                    await updateCompanyName(textON)
+                }
+            )()
+        }
 
     };
 
     const handleEditToggleAdd = () => {
         setIsEditableAdd(!isEditableAdd);
+        if (isEditableAdd) {
+            (
+                async () => {
+                    await updateCompanyAddress(textAdd)
+
+                }
+            )()
+        }
     };
 
     const handleEditToggleEm = () => {
         setIsEditableEm(!isEditableEm);
+        if (isEditableEm) {
+            (
+                async () => {
+                    await updateCompanyEmail(textEm)
+                }
+            )()
+        }
     };
 
     const handleEditTogglePn = () => {
         setIsEditablePN(!isEditablePN);
+        if (isEditablePN) {
+            (
+                async () => {
+                    await updateCompanyPhone(textPN)
+                }
+            )()
+        }
+
     };
     return (
         <BackDrop title='Company Details' mainHeader={false}>
@@ -113,7 +148,7 @@ export default function MenuPage() {
                             value={textEm}
                             onChangeText={setTextEm}
                             editable={isEditableEm}
-                            placeholder={'Password'}
+                            placeholder={'Email'}
                             style={styles.textInput}
                         />
                         <MyButton

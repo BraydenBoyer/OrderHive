@@ -215,6 +215,15 @@ export default function CustomerPage() {
 
   const [searchTxt, setSearchTxt] = useState('')
 
+ const filteredData = Object.fromEntries(
+   Object.entries(groupedCustomerData).map(([category, items]) => [
+     category,
+     items.filter((item) =>
+       item.name.toLowerCase().includes(searchTxt.toLowerCase())
+     ),
+   ])
+ );
+
 
   return (
     <BackDrop title={"CustomerTab"}>
@@ -229,21 +238,21 @@ export default function CustomerPage() {
           />
 
           {
-            Object.keys(groupedCustomerData).length === 0 ?
+            Object.keys(filteredData).length === 0 ?
                 <ActivityIndicator
                     animating={true}
                     size={'large'}
                 />
                 :
                 <View>
-                  {Object.keys(groupedCustomerData).map((location) => (
+                  {Object.keys(filteredData).map((location) => (
                       <View key={location} style={styles.locationContainer}>
 
                         <Text variant={'titleLarge'} style={{fontWeight: 'bold', marginBottom: 8}}>
                           {location}
                         </Text>
 
-                        {groupedCustomerData[location].map((customer) => {
+                        {filteredData[location].map((customer) => {
 
                           return(
                               <CustomerCard

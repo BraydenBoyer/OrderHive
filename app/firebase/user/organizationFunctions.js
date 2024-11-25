@@ -4,10 +4,11 @@
 
 
 
-import {collection, doc, setDoc, query, where, getDoc, getDocs} from "firebase/firestore";
+import {collection, doc, setDoc, query, where, getDoc, getDocs, updateDoc} from "firebase/firestore";
 import {fireAuth, fireDb} from "../initializeFirebase.js";
 import { v4 } from 'uuid';
 import {addOrgToUser, getCurrentUserInfo} from "./userFunctions.js";
+import {globalVariable} from "../../_layout.jsx";
 
 
 /*
@@ -127,4 +128,49 @@ export async function getAllOrganizations() {
         console.error("Error fetching organizations:", error);
         throw new Error("Failed to fetch organizations.");
     }
+}
+
+export const updateCompanyPhone = async (phone) => {
+
+    const currOrg = "Org." + globalVariable.currentOrg;
+
+    const companyRef = doc(fireDb, "organizations", currOrg)
+    const update = {
+        phone: phone
+    }
+    await updateDoc(companyRef,update)
+}
+
+export const updateCompanyName = async (name) => {
+
+    const currOrg = "Org." + globalVariable.currentOrg;
+
+    const companyRef = doc(fireDb, "organizations", currOrg)
+    const update = {
+        name: name
+    }
+    await updateDoc(companyRef,update)
+}
+
+export const updateCompanyAddress = async (address) => {
+
+    const currOrg = "Org." + globalVariable.currentOrg;
+
+    const companyRef = doc(fireDb, "organizations", currOrg)
+    const update = {
+        location: address
+    }
+    await updateDoc(companyRef,update)
+}
+
+export const updateCompanyEmail = async (email) => {
+
+    const currOrg = "Org." + globalVariable.currentOrg;
+
+
+    const companyRef = doc(fireDb, "organizations", currOrg)
+    const update = {
+        email: email
+    }
+    await updateDoc(companyRef,update)
 }
