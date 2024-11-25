@@ -27,6 +27,11 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import {BottomButtons} from "../../../components/overlays/BottomButtons.jsx";
 import {CustomerCard} from "../../../components/CustomerCard.jsx";
 import {MySeachBar} from "../../../components/MySeachBar.jsx";
+import {
+  createStaticNavigation,
+  useNavigation,
+} from '@react-navigation/native';
+
 
 export default function CustomerPage() {
   const { setFabVisible } = useContext(AppContext);
@@ -45,6 +50,7 @@ export default function CustomerPage() {
     const [visible, setVisible] = useState(false)
     const orgName = "Org." + globalVariable.currentOrg
 
+    const navigation = useNavigation();
 
   const [newCustomer, setNewCustomer] = useState({
     name: '',
@@ -224,7 +230,9 @@ export default function CustomerPage() {
    ])
  );
 
-
+const navigateModifyCustomer = (customer) => {
+  navigation.navigate('ModifyCustomer', { customerData: JSON.stringify(customer) });
+};
 
   return (
     <BackDrop title={"CustomerTab"}>
@@ -266,6 +274,7 @@ export default function CustomerPage() {
                                   checkboxStatus={selectedCustomers.includes(customer.id) ? "checked" : "unchecked"}
                                   checkboxVisible={isDeleteMode}
                                   onCheckboxPress={() => handleSelectCustomer(customer.id)}
+                                  onClick={() => navigateModifyCustomer(customer)}
                               />
                           )
                         })}
