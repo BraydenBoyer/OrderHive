@@ -16,6 +16,7 @@ export const InventoryCard = ({
 	checkboxVisible,
 	checkboxStatus,
 	onCheckboxPress,
+	onPress,
 	onClick = () => {},
 }) => {
 

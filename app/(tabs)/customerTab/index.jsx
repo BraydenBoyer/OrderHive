@@ -225,6 +225,7 @@ export default function CustomerPage() {
  );
 
 
+
   return (
     <BackDrop title={"CustomerTab"}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>

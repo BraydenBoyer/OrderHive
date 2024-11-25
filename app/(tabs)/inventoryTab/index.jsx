@@ -1,8 +1,8 @@
-import { Tabs, useFocusEffect } from "expo-router";
+import { Tabs, useFocusEffect, useRouter } from "expo-router";
 import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
 import {
   Text,
-  Button,
+
   Checkbox,
   Card,
   IconButton,
@@ -30,6 +30,13 @@ import {BottomButtons} from "../../../components/overlays/BottomButtons.jsx";
 import {InventoryCard} from "../../../components/InventoryCard.jsx";
 import {MySeachBar} from "../../../components/MySeachBar.jsx";
 import {MyTextInput} from "../../../components/inputs/MyTextInput.jsx";
+import {
+  createStaticNavigation,
+  useNavigation,
+} from '@react-navigation/native';
+import { Button } from '@react-navigation/elements';
+
+
 
 
 export default function InventoryPage() {
@@ -58,10 +65,13 @@ const [selectedItem, setSelectedItem] = useState([])
 
   const [groupedInventoryData, setGroupedInventoryData] = useState({});
 
+    const router = useRouter()
+
 
     const theme = useTheme()
     const colors = theme.colors;
 
+    const navigation = useNavigation();
 
     //how items are shown when inventory component is mounted
 
@@ -339,7 +349,9 @@ const getItemNameById = (inventoryID) => {
      ])
    );
 
-
+const navigateToModifyItem = (item) => {
+  navigation.navigate('ModifyItemPage', { itemData: JSON.stringify(item) });
+};
   return (
 
       <BackDrop title={"InventoryTab"} >
@@ -371,19 +383,20 @@ const getItemNameById = (inventoryID) => {
                           {filteredData[category].map((item) => {
                             console.log("Rendering item:", item); // Log the item being rendered
                             return (
-                                <InventoryCard
-                                    title={item.name}
-                                    inventory={item.total}
-                                    claimed={item.hold}
-                                    metadata={['Lettuce', 'Greens', 'Hydroponic']}
-                                    retail={item.price}
-                                    wholesale={item.wholesale}
-                                    checkboxVisible={isDeleteMode}
-                                    checkboxStatus={selectedItems.includes(item.id) ? "checked" : "unchecked"}
-                                    onCheckboxPress={() => handleSelectItem(item.id)}
-                                />
-                            );
-                          })}
+                                 <InventoryCard
+                                   title={item.name}
+                                   inventory={item.total}
+                                   claimed={item.hold}
+                                   metadata={['Lettuce', 'Greens', 'Hydroponic']}
+                                   retail={item.price}
+                                   wholesale={item.wholesale}
+                                   checkboxVisible={isDeleteMode}
+                                   checkboxStatus={selectedItems.includes(item.id) ? "checked" : "unchecked"}
+                                   onCheckboxPress={() => handleSelectItem(item.id)}
+                                   onClick={() => navigateToModifyItem(item)}
+                                 />
+                                                             );
+                                                           })}
                         </View>
                     ))}
                   </View>
