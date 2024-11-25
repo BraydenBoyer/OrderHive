@@ -1,58 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, Button, TextInput, Alert } from 'react-native';
 import { Card, Checkbox } from 'react-native-paper';
 import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
-import { LocalFAB } from "../../../components/overlays/LocalFAB.jsx"; // Import the LocalFAB component
-import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx"; 
+import { LocalFAB } from "../../../components/overlays/LocalFAB.jsx";
+import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { addOrder, fetchOrders, deleteOrder, updateOrder } from "../../firebase/orderFunctions.js";
 
 const colors = lightTheme.colors;
 
-let initialOrders = [
-  { 
-    id: '1', 
-    name: 'Barry Allen', 
-    date: '10/3/24', 
-    items: [
-      { name: 'Item 1', sellingPrice: 15, costToMake: 7 },
-      { name: 'Item 2', sellingPrice: 18, costToMake: 9 },
-      { name: 'Item 3', sellingPrice: 12, costToMake: 6 },
-    ] 
-  },
-  { 
-    id: '2', 
-    name: 'Allen Barry', 
-    date: '10/9/24', 
-    items: [
-      { name: 'Item 4', sellingPrice: 20, costToMake: 10 },
-      { name: 'Item 5', sellingPrice: 25, costToMake: 12 },
-      { name: 'Item 6', sellingPrice: 30, costToMake: 15 },
-    ] 
-  },
-  { 
-    id: '3', 
-    name: 'Aarry Ballen', 
-    date: '10/7/24', 
-    items: [
-      { name: 'Item 7', sellingPrice: 13, costToMake: 5 },
-      { name: 'Item 8', sellingPrice: 17, costToMake: 8 },
-      { name: 'Item 9', sellingPrice: 19, costToMake: 10 },
-    ] 
-  },
-];
-
 const OrderAssembly = () => {
-  const [orders, setOrders] = useState(initialOrders);
+  const [orders, setOrders] = useState([]); // Initially empty, fetched from Firebase
   const [viewedOrder, setViewedOrder] = useState(null);
   const [completedItems, setCompletedItems] = useState({});
   const [completedCount, setCompletedCount] = useState(0);
-  const [fabVisible, setFabVisible] = useState(true); // State to manage FAB visibility
+  const [fabVisible, setFabVisible] = useState(true);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [newOrderName, setNewOrderName] = useState('');
-  const [newOrderItems, setNewOrderItems] = useState('');
+  const [newOrderItems, setNewOrderItems] = useState([]);
   const [showDeleteButtons, setShowDeleteButtons] = useState(false);
   const [showEditButtons, setShowEditButtons] = useState(false);
+
+  // Fetch orders from Firebase when component mounts
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        const fetchedOrders = await fetchOrders(); // Fetch orders from Firebase
+        setOrders(fetchedOrders); // Update state with fetched data
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        Alert.alert("Error", "Failed to fetch orders from the server.");
+      }
+    };
+
+    loadOrders();
+  }, []);
 
   const handleViewItems = (order) => {
     setSelectedOrder(order);
@@ -63,42 +47,75 @@ const OrderAssembly = () => {
     setAddModalVisible(true);
   };
 
-  const handleSaveNewOrder = () => {
-    if (newOrderName.trim() === '' || newOrderItems.trim() === '') {
-      Alert.alert('Error', 'Please fill out all fields');
+  const handleSaveNewOrder = async () => {
+    if (newOrderName.trim() === '') {
+      Alert.alert('Error', 'Client name is required');
       return;
     }
 
-    const items = newOrderItems.split(',').map((item, index) => ({
-      name: item.trim(),
-      sellingPrice: Math.floor(Math.random() * 20) + 10, // Random selling price for simplicity
-      costToMake: Math.floor(Math.random() * 10) + 5, // Random cost to make for simplicity
+    if (newOrderItems.length === 0) {
+      Alert.alert('Error', 'At least one item must be added');
+      return;
+    }
+
+    const validItems = newOrderItems.map((item) => ({
+      name: item.name.trim(),
+      sellingPrice: parseFloat(item.sellingPrice),
+      costToMake: parseFloat(item.costToMake),
     }));
 
+    if (validItems.some(item => !item.name || isNaN(item.sellingPrice) || isNaN(item.costToMake))) {
+      Alert.alert('Error', 'All item fields must be filled out correctly');
+      return;
+    }
+
     const newOrder = {
-      id: (orders.length + 1).toString(),
       name: newOrderName,
       date: new Date().toLocaleDateString(),
-      items,
+      items: validItems,
+      numberOfItems: validItems.length,
     };
 
-    setOrders([...orders, newOrder]);
-    setAddModalVisible(false);
-    setNewOrderName('');
-    setNewOrderItems('');
+    try {
+      const savedOrder = await addOrder(newOrder); // Save the order to Firebase
+      Alert.alert('Success', 'Order added successfully');
+      setOrders([...orders, savedOrder]); // Update local state
+      setAddModalVisible(false);
+      setNewOrderName('');
+      setNewOrderItems([]);
+    } catch (error) {
+      console.error('Error saving order:', error);
+      Alert.alert('Error', 'Failed to add order');
+    }
+  };
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...newOrderItems];
+    updatedItems[index] = { ...updatedItems[index], [field]: value };
+    setNewOrderItems(updatedItems);
+  };
+  
+  const addNewItemRow = () => {
+    setNewOrderItems([
+      ...newOrderItems,
+      { name: "", sellingPrice: "", costToMake: "" },
+    ]);
+  };
+  
+  const removeItem = (index) => {
+    const updatedItems = newOrderItems.filter((_, i) => i !== index);
+    setNewOrderItems(updatedItems);
+  };
+  const handleDeleteOrder = async (id) => {
+    try {
+      await deleteOrder(id); // Delete the order from Firebase
+      setOrders(orders.filter(order => order.id !== id)); // Update local state
+      Alert.alert("Success", "Order deleted successfully");
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      Alert.alert("Error", "Failed to delete order");
+    }
   };
 
-  const handleDeleteOrder = (id) => {
-    setOrders(orders.filter(order => order.id !== id));
-  };
-
-  const handleEditOrder = (order) => {
-    // For simplicity, just setting this order as the selected one to "edit"
-    setSelectedOrder(order);
-    setModalVisible(true);
-  };
-
-  // Toggle the visibility of the delete and edit buttons
   const toggleDeleteButtons = () => {
     setShowDeleteButtons(!showDeleteButtons);
     setShowEditButtons(false);
@@ -109,7 +126,6 @@ const OrderAssembly = () => {
     setShowDeleteButtons(false);
   };
 
-  // Custom actions for the LocalFAB
   const fabActions = [
     {
       icon: 'plus',
@@ -132,47 +148,47 @@ const OrderAssembly = () => {
     <BackDrop title="Order Assembly" mainHeader={false}>
       {/* Order List */}
       {orders.map((order) => (
-        <Card key={order.id} style={[styles.card, { backgroundColor: colors.surface }]}>
-          <View style={styles.cardContent}>
-            <View style={styles.leftSection}>
-              <Checkbox
-                status={
-                  completedItems[order.id]?.length === order.items.length ? 'checked' : 'unchecked'
-                }
-                onPress={() => order.items.forEach((item) => handleToggleCheckbox(order.id, item))}
-              />
-              <View>
-                <Text style={[styles.orderName, { color: colors.onSurface }]}>{order.name}</Text>
-                <Text style={[styles.orderDetails, { color: colors.onSurfaceVariant }]}>
-                  {order.date} • {order.items.length} items
-                </Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={[styles.viewButton, { backgroundColor: colors.primary }]}
-              onPress={() => handleViewItems(order)}
-            >
-              <Text style={[styles.viewButtonText, { color: colors.onPrimary }]}>View Items</Text>
-            </TouchableOpacity>
-            {showDeleteButtons && (
-              <TouchableOpacity
-                style={[styles.deleteButton]}
-                onPress={() => handleDeleteOrder(order.id)}
-              >
-                <Text style={styles.deleteButtonText}>X</Text>
-              </TouchableOpacity>
-            )}
-            {showEditButtons && (
-              <TouchableOpacity
-                style={[styles.editButton]}
-                onPress={() => handleEditOrder(order)}
-              >
-                <Text style={styles.editButtonText}>Edit</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </Card>
-      ))}
+  <Card key={order.id} style={[styles.card, { backgroundColor: colors.surface }]}>
+    <View style={styles.cardContent}>
+      <View style={styles.leftSection}>
+        <Checkbox
+          status={
+            completedItems[order.id]?.length === order.items.length ? 'checked' : 'unchecked'
+          }
+        />
+        <View>
+          <Text style={[styles.orderName, { color: colors.onSurface }]}>{order.name}</Text>
+          <Text style={[styles.orderDetails, { color: colors.onSurfaceVariant }]}>
+            {order.date} • {order.items.length} items
+          </Text>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={[styles.viewButton, { backgroundColor: colors.primary }]}
+        onPress={() => handleViewItems(order)}
+      >
+        <Text style={[styles.viewButtonText, { color: colors.onPrimary }]}>View Items</Text>
+      </TouchableOpacity>
+      {showDeleteButtons && (
+        <TouchableOpacity
+          style={[styles.deleteButton]}
+          onPress={() =>
+            Alert.alert(
+              "Confirm Delete",
+              "Are you sure you want to delete this order?",
+              [
+                { text: "Cancel", style: "cancel" },
+                { text: "Delete", onPress: () => handleDeleteOrder(order.id) }
+              ]
+            )
+          }
+        >
+          <Icon name="trash-can" size={20} color="red" />
+        </TouchableOpacity>
+      )}
+    </View>
+  </Card>
+))}
 
       {/* Modal for viewing order details */}
       <Modal
@@ -188,14 +204,13 @@ const OrderAssembly = () => {
                 <Text style={styles.modalTitle}>Order Details</Text>
                 <Text style={styles.modalText}>Customer Name: {selectedOrder.name}</Text>
                 <Text style={styles.modalText}>Date: {selectedOrder.date}</Text>
-                <Text style={styles.modalText}>Number of Items: {selectedOrder.items.length}</Text>
                 <FlatList
                   data={selectedOrder.items}
                   keyExtractor={(item) => item.name}
                   renderItem={({ item }) => (
                     <View style={styles.itemDetailRow}>
                       <Text style={styles.itemDetailText}>
-                        {item.name} - Selling Price: ${item.sellingPrice}, Cost to Make: ${item.costToMake}
+                        {item.name} - SP: ${item.sellingPrice}, COGS: ${item.costToMake}
                       </Text>
                     </View>
                   )}
@@ -213,42 +228,82 @@ const OrderAssembly = () => {
         </View>
       </Modal>
 
-      {/* Modal for adding new order */}
       <Modal
-        visible={isAddModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setAddModalVisible(false)}
+  visible={isAddModalVisible}
+  animationType="slide"
+  transparent={true}
+  onRequestClose={() => setAddModalVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.addOrderModalContent}>
+      <Text style={styles.addOrderModalTitle}>Add New Order</Text>
+      <TextInput
+        placeholder="Client Name"
+        placeholderTextColor="#888"
+        style={styles.addOrderInput}
+        value={newOrderName}
+        onChangeText={setNewOrderName}
+      />
+
+      {/* Render multiple items */}
+      <FlatList
+  data={newOrderItems}
+  keyExtractor={(item, index) => `item-${index}`}
+  renderItem={({ item, index }) => (
+    <View style={styles.itemRow}>
+      <TextInput
+        placeholder="Item Name"
+        placeholderTextColor="#888"
+        style={[styles.itemInput, { flex: 2 }]}
+        value={item.name}
+        onChangeText={(text) => handleItemChange(index, "name", text)}
+      />
+      <TextInput
+        placeholder="Selling Price"
+        placeholderTextColor="#888"
+        style={[styles.itemInput, { flex: 1 }]}
+        value={item.sellingPrice}
+        keyboardType="numeric"
+        onChangeText={(text) => handleItemChange(index, "sellingPrice", text)}
+      />
+      <TextInput
+        placeholder="Cost to Make"
+        placeholderTextColor="#888"
+        style={[styles.itemInput, { flex: 1 }]}
+        value={item.costToMake}
+        keyboardType="numeric"
+        onChangeText={(text) => handleItemChange(index, "costToMake", text)}
+      />
+      <TouchableOpacity
+        onPress={() => removeItem(index)}
+        style={styles.deleteItemButton}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add New Order</Text>
-            <TextInput
-              placeholder="Order Name"
-              value={newOrderName}
-              onChangeText={setNewOrderName}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Items (comma separated)"
-              value={newOrderItems}
-              onChangeText={setNewOrderItems}
-              style={styles.input}
-            />
-            <Button title="Save Order" onPress={handleSaveNewOrder} />
-            <Button title="Cancel" onPress={() => setAddModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+        <Icon name="trash-can" size={20} color="red" />
+      </TouchableOpacity>
+    </View>
+  )}
+/>
 
-      <View style={[styles.completedBox, { backgroundColor: colors.primaryContainer }]}>
-        <Text style={[styles.completedText, { color: colors.onPrimaryContainer }]}>Completed</Text>
-        <Text style={[styles.completedCounter, { color: colors.onPrimaryContainer }]}>
-          {completedCount}/{orders.reduce((acc, order) => acc + order.items.length, 0)}
-        </Text>
+      <TouchableOpacity
+        style={styles.addItemButton}
+        onPress={addNewItemRow}
+      >
+        <Text style={styles.addItemButtonText}>+ Add Item</Text>
+      </TouchableOpacity>
+
+      <View style={styles.addOrderButtonContainer}>
+        <Button title="Save Order" onPress={handleSaveNewOrder} />
+        <Button
+          title="Cancel"
+          onPress={() => setAddModalVisible(false)}
+          color="red"
+        />
       </View>
+    </View>
+  </View>
+</Modal>
 
-      {/* LocalFAB for add, delete, and edit actions */}
+
       <LocalFAB actions={fabActions} visible={fabVisible} />
     </BackDrop>
   );
@@ -288,23 +343,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   deleteButton: {
-    backgroundColor: 'red',
-    padding: 5,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
+  justifyContent: "center",
+  alignItems: "center",
+  padding: 5,
+  marginLeft: 10,
+},
   deleteButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  editButton: {
-    backgroundColor: 'blue',
-    padding: 5,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  editButtonText: {
     color: 'white',
     fontSize: 14,
     fontWeight: 'bold',
@@ -322,45 +366,94 @@ const styles = StyleSheet.create({
     width: '90%',
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  modalText: {
+    fontSize: 16,
     marginBottom: 10,
   },
   itemDetailRow: {
-    marginBottom: 5,
+    marginBottom: 10,
   },
   itemDetailText: {
     fontSize: 14,
   },
   modalTotalText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    width: '100%',
+  addOrderModalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  completedBox: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  completedText: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  completedCounter: {
+  addOrderModalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
     textAlign: 'center',
+  },
+  addOrderInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 20,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#f9f9f9',
+  },
+  itemRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  itemInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 16,
+    color: "#333",
+    backgroundColor: "#f9f9f9",
+    marginRight: 10,
+  },
+  deleteItemButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 5,
+  },
+  deleteItemButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  addItemButton: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+    marginBottom: 20,
+  },
+  addItemButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
