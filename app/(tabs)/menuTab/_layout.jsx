@@ -13,7 +13,6 @@ export default function StackLayout() {
 			<Stack.Screen name={'Appearance'} />
 			<Stack.Screen name={'CompanyDetails'} />
 			<Stack.Screen name={'SubscriptionPlan'} />
-			<Stack.Screen name={'Collaborators'} />
 		</Stack>
 
 	)
