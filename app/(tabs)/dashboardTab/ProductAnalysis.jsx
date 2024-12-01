@@ -6,6 +6,8 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
 import { fetchCountryOrders } from "../../firebase/fetchCountryOrders.js";
 import { fetchInventoryData } from "../../firebase/fetchInventoryData.js";
+import { fetchUsers } from "../../firebase/fetchUsers.js";
+
 
 const colors = lightTheme.colors;
 
@@ -13,7 +15,21 @@ const ProductAnalysis = () => {
   const [viewedChart, setViewedChart] = useState(null);
   const [countryOrders, setCountryOrders] = useState({});
   const [inventoryData, setInventoryData] = useState({});
+  const [userCount, setUserCount] = useState(0);
 
+  useEffect(() => {
+    const loadUserCount = async () => {
+      try {
+        const count = await fetchUsers();
+        setUserCount(count);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        Alert.alert('Error', 'Failed to load user data.');
+      }
+    };
+
+    loadUserCount();
+  }, []);
   // Fetch total orders by country
   useEffect(() => {
     const fetchOrders = async () => {
@@ -174,6 +190,17 @@ const ProductAnalysis = () => {
           </TouchableOpacity>
         </View>
         {viewedChart === "inventory" && renderInventoryChart()}
+      </Card>
+            {/* Card for User Count */}
+            <Card style={[styles.card, { backgroundColor: colors.surface }]}>
+        <View style={styles.cardContent}>
+          <View style={styles.leftSection}>
+            <Text style={[styles.cardTitle, { color: colors.onSurface }]}>User Count</Text>
+            <Text style={[styles.cardSubtitle, { color: colors.onSurfaceVariant }]}>
+              Total Users: {userCount}
+            </Text>
+          </View>
+        </View>
       </Card>
     </BackDrop>
   );
