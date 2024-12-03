@@ -39,15 +39,6 @@ export default function MenuPage() {
 				</View>
 
 
-				<View>
-					<SelectionButtons
-						title={'Collaborators'}
-						onClick={() => router.navigate('menuTab/Collaborators')}
-						index={0}
-						count={1}
-					/>
-				</View>
-
 
 				<View style={{alignContent: 'center'}}>
 					<SelectionButtons
