@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   widgetContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     rowGap: 10,
   },
   widget: {

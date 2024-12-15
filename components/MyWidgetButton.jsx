@@ -20,7 +20,7 @@ export const MyWidgetButton = ({ title, route }) => {
 
 const styles = StyleSheet.create({
 	button: {
-		width: 200,
+		width: 190,
 		height: 150
 	},
 });
