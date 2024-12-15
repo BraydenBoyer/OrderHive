@@ -174,3 +174,21 @@ export const updateCompanyEmail = async (email) => {
     }
     await updateDoc(companyRef,update)
 }
+
+export const changeUserRoleInOrg = async (uid, role) => {
+
+    const currOrg = "Org." + globalVariable.currentOrg;
+    const collaboratorRef = doc(
+        fireDb,
+        `organizations/${currOrg}/collaborators`,
+        uid
+    );
+
+    try {
+        await updateDoc(collaboratorRef, {
+            role: role,
+        });
+    } catch (e) {
+        console.error("Error updating document: ", e);
+    }
+};

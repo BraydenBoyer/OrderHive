@@ -10,7 +10,7 @@ export default function StackLayout() {
 const Stack = createStackNavigator();
 	return (
 
-			<Stack.Navigator>
+			<Stack.Navigator screenOptions={basicScreenOption}>
                   <Stack.Screen name="index" component={InventoryPage} />
                   <Stack.Screen name="ModifyItemPage" component={ModifyItemPage} />
                 </Stack.Navigator>

@@ -1,6 +1,7 @@
 import { fireApp, fireAuth, fireDb } from "../initializeFirebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {collection, doc, getDoc, getDocs, setDoc, updateDoc} from "firebase/firestore";
+import {globalVariable} from "../../_layout.jsx";
 
 
 /*
@@ -50,6 +51,8 @@ export const getCurrentUserInfo = async () => {
 
 	const docRef = doc(fireDb, "users", fireAuth.currentUser.uid);
 	const docSnap = await getDoc(docRef);
+
+	console.log('getCurrentUserInfo: ', docSnap.data())
 
 	return docSnap.data()
 }
@@ -109,6 +112,8 @@ export const getUserOrgs = async () => {
 	const collectionRef = collection(docRef, collectionName);
 	const snapshot = await getDocs(collectionRef);
 
+	console.log('getUserOrgs: ', snapshot.docs.map(doc => doc.data()))
+
 	return snapshot.docs.map(doc => doc.data());
 }
 
@@ -134,3 +139,21 @@ export const updateUserPhone = async (phone) => {
 	}
 	await updateDoc(userRef,update)
 }
+
+export const changeUserRole = async (uid, role) => {
+
+	const currOrg = globalVariable.currentOrg;
+	const collaboratorRef = doc(
+		fireDb,
+		`users/${uid}/organizations`,
+		currOrg
+	);
+
+	try {
+		await updateDoc(collaboratorRef, {
+			role: role,
+		});
+	} catch (e) {
+		console.error("Error updating document: ", e);
+	}
+};

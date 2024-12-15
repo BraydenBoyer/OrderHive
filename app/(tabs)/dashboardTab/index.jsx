@@ -9,7 +9,8 @@ import {StatusBar} from "expo-status-bar";
 import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
 import {MySurface} from "../../../components/MySurface.jsx";
 import {MyButton} from "../../../components/inputs/MyButton.jsx";
-import {InventoryCard} from "../../../components/InventoryCard.jsx"; // Adjust path as necessary
+import {InventoryCard} from "../../../components/InventoryCard.jsx";
+import {MyWidgetButton} from "../../../components/MyWidgetButton.jsx"; // Adjust path as necessary
 
 const colors = lightTheme.colors;
 
@@ -27,39 +28,37 @@ export default function DashboardPage() {
 
   return (
     <BackDrop title='Dashboard'>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View>
 
         {/* Dashboard Widgets */}
         <View style={styles.widgetContainer}>
-          <WidgetButton
-            title="Collection Info"
-            route="dashboardTab/CollectionInfo"
-            style={[styles.widget, ]}
+
+          <MyWidgetButton
+              title="Order Creation"
+              route="dashboardTab/OrderCreation"
           />
-          <WidgetButton
-            title="Collaborator"
-            route="dashboardTab/Collaborator"
-            style={[styles.widget,]}
-          />
-          <WidgetButton
+          <MyWidgetButton
             title="Pickup"
             route="dashboardTab/Pickup"
-            style={[styles.widget, ]}
           />
-          <WidgetButton
-            title="Sales Forecasting"
+          <MyWidgetButton
+            title="Sales Forecast"
             route="dashboardTab/SalesForecasting"
-            style={[styles.widget, ]}
           />
-          <WidgetButton
-            title="Order Assembly"
-            route="dashboardTab/OrderAssembly"
-            style={[styles.widget, ]}
-          />
-          <WidgetButton
+          <MyWidgetButton
             title="Product Analysis"
             route="dashboardTab/ProductAnalysis"
-            style={[styles.widget,]}
+          />
+
+          <MyWidgetButton
+              title="Collection Info"
+              route="dashboardTab/CollectionInfo"
+              style={[styles.widget, ]}
+          />
+          <MyWidgetButton
+              title='Collab'
+              route="dashboardTab/Collaborator"
+              style={[styles.widget,]}
           />
 
         </View>
@@ -69,11 +68,6 @@ export default function DashboardPage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -83,8 +77,8 @@ const styles = StyleSheet.create({
   widgetContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-
+    justifyContent: 'space-between',
+    rowGap: 10,
   },
   widget: {
     width: '45%', // Set to approximately half the width to allow two widgets per row

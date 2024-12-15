@@ -14,7 +14,7 @@ export const MyButton = ({
 	variant = 'bodyMedium',
 	iconLeft,
 	iconRight,
-	textColor = globalVariable.colors.onPrimary
+	textColor = globalVariable.colors.black
 }) => {
 
 	const styles = inputStyles()

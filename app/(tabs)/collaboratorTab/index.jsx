@@ -4,14 +4,16 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import React, {useCallback, useState} from "react";
 import { lightTheme } from "../../styles/themes/colors/lightTheme.jsx";
 import { MyButton } from "../../../components/inputs/MyButton.jsx";
-import {getCurrentUserInfo} from "../../firebase/user/userFunctions.js";
+import {changeUserRole, getCurrentUserInfo} from "../../firebase/user/userFunctions.js";
 import {useFocusEffect} from "expo-router";
-import {getOrg} from "../../firebase/user/organizationFunctions.js";
+import {changeUserRoleInOrg, getOrg} from "../../firebase/user/organizationFunctions.js";
 import {globalVariable} from "../../_layout.jsx";
 import {addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where} from "firebase/firestore";
 import {fireDb} from "../../firebase/initializeFirebase.js";
 import CollaboratorsList from "./CollaboratorList.jsx";
 
+
+const colors = globalVariable.colors
 export default function CollaboratorPage() {
 
 	useFocusEffect(
@@ -127,17 +129,12 @@ export default function CollaboratorPage() {
 	};
 
 	const handleChangeRole = async (section, id) => {
-		const currOrg = "Org." + globalVariable.currentOrg;
-		const collaboratorRef = doc(
-			fireDb,
-			`organizations/${currOrg}/collaborators`,
-			id
-		);
+
+		const newRole = section === "admins" ? "editor" : "admin"
 
 		try {
-			await updateDoc(collaboratorRef, {
-				role: section === "admins" ? "editor" : "admin",
-			});
+			await changeUserRoleInOrg(id, newRole)
+			await changeUserRole(id, newRole)
 			await fetchCollaborators();
 		} catch (e) {
 			console.error("Error updating document: ", e);
@@ -164,6 +161,7 @@ export default function CollaboratorPage() {
 		const paginatedData = data.slice(startIndex, endIndex);
 
 		return (
+
 			<View style={styles.sectionContainer}>
 				<Text style={styles.text}>
 					{section.charAt(0).toUpperCase() + section.slice(1)}
@@ -177,7 +175,6 @@ export default function CollaboratorPage() {
 					<MyButton
 						title={editMode[section] ? "Done" : "Edit"}
 						onClick={() => toggleEditMode(section)}
-						style={{ marginLeft: 10 }}
 					/>
 				</View>
 				{visibleSections[section] && (
@@ -217,7 +214,7 @@ export default function CollaboratorPage() {
 	};
 
 	return (
-		<BackDrop title="Collaborators" mainHeader={false}>
+		<BackDrop title="Collaborators" mainHeader={true}>
 			<View style={styles.container}>
 				{renderSection("admins", admins)}
 				{renderSection("editors", editors)}
@@ -253,7 +250,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 	},
 	sectionContainer: {
-		backgroundColor: lightTheme.colors.primaryContainer,
+		backgroundColor: colors.primaryContainer,
 		padding: 10,
 		borderRadius: 10,
 		marginBottom: 10,
@@ -261,11 +258,11 @@ const styles = StyleSheet.create({
 	text: {
 		fontSize: 25,
 		fontWeight: "bold",
-		color: lightTheme.colors.black,
+		color: colors.black,
 	},
 	subText: {
 		fontSize: 18,
-		color: lightTheme.colors.black,
+		color: colors.black,
 	},
 	inputContainer: {
 		flexDirection: "row",
@@ -276,8 +273,8 @@ const styles = StyleSheet.create({
 	listItem: {
 		fontSize: 16,
 		padding: 5,
-		color: lightTheme.colors.black,
-		backgroundColor: lightTheme.colors.secondaryContainer,
+		color: colors.black,
+		backgroundColor: colors.secondaryContainer,
 		marginVertical: 2,
 		borderRadius: 5,
 	},
@@ -289,7 +286,7 @@ const styles = StyleSheet.create({
 	},
 	pageIndicator: {
 		fontSize: 16,
-		color: lightTheme.colors.black,
+		color: colors.black,
 		textAlign: "center",
 	},
 	modalContainer: {
@@ -303,19 +300,19 @@ const styles = StyleSheet.create({
 			width: "80%",
 			padding: 20,
 			backgroundColor:
-			lightTheme.colors.white,
+			colors.white,
 			borderRadius: 10,
 			alignItems: "center",
 		},
 	modalText: {
 		fontSize: 18,
 		marginBottom: 10,
-		color: lightTheme.colors.black,
+		color: colors.black,
 	},
 	input: {
 		width: "100%",
 		borderWidth: 1,
-		borderColor: lightTheme.colors.primary,
+		borderColor: colors.primary,
 		borderRadius: 5,
 		padding: 10,
 		marginBottom: 10,
