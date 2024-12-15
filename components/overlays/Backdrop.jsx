@@ -35,7 +35,7 @@ import {logoutCurrentUser} from "../../app/firebase/user/authentication.js";
 
 	@author Miles Hoffman
  */
-export const BackDrop = ({ children, style, mainHeader = true, title = 'App.OrderHive', header = true }) => {
+export const BackDrop = ({ children, style, mainHeader = true, title = 'App.OrderHive', header = true, showOrg = true }) => {
 
 	const colors = useTheme().colors
 	const [orgName, setOrgName] = useState('')
@@ -48,7 +48,7 @@ export const BackDrop = ({ children, style, mainHeader = true, title = 'App.Orde
 	return (
 		<SafeAreaView style={[basicBackdropStyle]} >
 			{ !header ? <></> : mainHeader ?
-				<MainHeader title={title}/>
+				<MainHeader title={title} />
 				:
 				<BackHeader title={title}/>
 			}
@@ -61,7 +61,7 @@ export const BackDrop = ({ children, style, mainHeader = true, title = 'App.Orde
 				<View style={[{padding: 10, flex: 1 }, style]}>
 
 					{
-						orgName.length < 1 || !header ?
+						orgName.length < 1 || !header || !showOrg ?
 							<></>
 							:
 							<View style={{marginTop: 10, marginBottom: 30, rowGap: 10}}>

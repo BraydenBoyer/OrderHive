@@ -22,6 +22,10 @@ export default function StackLayout() {
     <Stack screenOptions={themedScreenOptions}>
       <Stack.Screen name={"index"} />
       <Stack.Screen name={"OrderCreation"} />
+      <Stack.Screen name={"CreateOrder"} />
+      <Stack.Screen name={"orderPage/[OrderID]"} />
+      <Stack.Screen name={"pickupOrderPage/[OrderID]"} />
+      <Stack.Screen name={"OrderPickup"} />
       <Stack.Screen name={"CollectionInfo"} />
       <Stack.Screen name={"Collaborator"}/>
       <Stack.Screen name={"Pickup"} />

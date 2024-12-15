@@ -2,8 +2,8 @@ import { BackDrop } from "../../../components/overlays/Backdrop.jsx";
 import { MySeachBar } from "../../../components/MySeachBar.jsx";
 import {useState, useEffect, useCallback} from "react";
 import { MyOrderCard } from "../../../components/MyOrderCard.jsx";
-import { fetchOrders } from "../../firebase/orderFunctions.js";
-import { ActivityIndicator, View } from 'react-native';
+import {deleteFinishedOrders, fetchOrders} from "../../firebase/orderFunctions.js";
+import {ActivityIndicator, Alert, View} from 'react-native';
 import {LocalFAB} from "../../../components/overlays/LocalFAB.jsx";
 import {router, useFocusEffect} from "expo-router";
 
@@ -21,18 +21,36 @@ const OrderList = ({ orders }) => {
 				notes={order.notes}
 				totalCost={order.totalCost}
 				totalItems={order.totalItems}
-				onClick={() => router.navigate(`dashboardTab/orderPage/${order.id}`)}
+				showCheck={true}
+				isChecked={order.done ? 'checked' : 'unchecked'}
+				onClick={() => router.navigate(`dashboardTab/pickupOrderPage/${order.id}`)}
 			/>
-	)});
+		)});
 };
 
 
 
-export default function OrderCreation() {
+export default function OrderPickup() {
 	const [searchTxt, setSearchTxt] = useState('');
 	const [orders, setOrders] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [isVisible, setVisible] = useState(true)
+
+
+	const handleDeleteFinished = async () => {
+		Alert.alert(
+			"Confirm Delete",
+			"Are you sure you want to delete all finished orders? This action cannot be undone.",
+			[
+				{ text: "Cancel", style: "cancel" },
+				{ text: "Delete", style: "destructive", onPress: async () => {
+						await deleteFinishedOrders();
+						// Call loadOrders to refresh the list after deletion
+						router.back()
+					}},
+			]
+		);
+	};
 
 	const loadOrders = async () => {
 		try {
@@ -52,28 +70,34 @@ export default function OrderCreation() {
 		loadOrders();
 	}, []);
 
+	useEffect(() => {
+		console.log(orders)
+	}, [orders]);
+
 	useFocusEffect(
 		useCallback(() => {
+			// Re-fetch data on focus
+			(
+				async () => {
+					await loadOrders()
+				}
+			)()
 
-			setVisible(true)
-			loadOrders()
+			return () => {};
+		}, [])
+	);
 
-			return () => {
-				setVisible(false)
-			}
-		}, [setVisible])
-	)
 
 	if (loading) {
 		return (
-			<BackDrop title={'Order Creation'} mainHeader={false}>
+			<BackDrop title={'Order Pickup'} mainHeader={false}>
 				<ActivityIndicator size="large" color="blue" />
 			</BackDrop>
 		);
 	}
 
 	return (
-		<BackDrop title={'Order Creation'} mainHeader={false}>
+		<BackDrop title={'Order Pickup'} mainHeader={false}>
 			<MySeachBar
 				placeholder={'Search'}
 				value={searchTxt}
@@ -88,10 +112,10 @@ export default function OrderCreation() {
 			<LocalFAB
 				visible={isVisible}
 				actions={[{
-						icon: "plus",
-						label: "Create Order",
-						onPress: () => router.navigate('dashboardTab/CreateOrder')
-					}]}
+					icon: "delete",
+					label: "Delete Finished Orders",
+					onPress: () => handleDeleteFinished()
+				}]}
 				icon={['plus', 'close']}
 			/>
 		</BackDrop>

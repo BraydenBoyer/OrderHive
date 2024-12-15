@@ -6,7 +6,7 @@ import {lightTheme} from "../../app/styles/themes/colors/lightTheme.jsx";
 import {globalVariable} from "../../app/_layout.jsx";
 
 
-export const BackHeader = ({title = 'App.OrderHive'}) => {
+export const BackHeader = ({title = 'App.OrderHive', showOrg}) => {
 
 
 	const colors = globalVariable.colors

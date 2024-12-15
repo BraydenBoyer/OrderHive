@@ -38,8 +38,8 @@ export default function DashboardPage() {
               route="dashboardTab/OrderCreation"
           />
           <MyWidgetButton
-            title="Pickup"
-            route="dashboardTab/Pickup"
+            title="Order Pickup"
+            route="dashboardTab/OrderPickup"
           />
           <MyWidgetButton
             title="Sales Forecast"
